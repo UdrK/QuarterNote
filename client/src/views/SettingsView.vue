@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { Settings, Folder, Database, RefreshCw, CheckCircle2, AlertCircle } from '@lucide/vue';
+import { Settings as SettingsIcon, Folder, Database, RefreshCw, CheckCircle2, AlertCircle } from '@lucide/vue';
 import { fetchSettings, updateSettings, triggerScan } from '../api/client';
 import type { AppSettings } from '@quarter-note/shared';
 
@@ -13,11 +13,16 @@ const isLoading = ref(true);
 async function load() {
   try {
     const data = await fetchSettings();
-    settings.value = data;
-    musicDirInput.value = data.musicDir;
+    if (data && typeof data === 'object' && 'musicDir' in data) {
+      settings.value = data;
+      musicDirInput.value = data.musicDir || '';
+    }
   } catch (err) {
     console.error('Failed to load settings:', err);
-    message.value = { type: 'error', text: 'Impossibile caricare le impostazioni' };
+    message.value = {
+      type: 'error',
+      text: err instanceof Error ? err.message : 'Impossibile caricare le impostazioni',
+    };
   } finally {
     isLoading.value = false;
   }
@@ -63,7 +68,7 @@ onMounted(load);
     <!-- Header -->
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center border border-sky-500/20">
-        <Settings class="w-5 h-5" />
+        <SettingsIcon class="w-5 h-5" />
       </div>
       <div>
         <h1 class="text-2xl font-bold tracking-tight text-slate-100">Impostazioni</h1>
@@ -133,7 +138,7 @@ onMounted(load);
     </div>
 
     <!-- System & Storage Status Card -->
-    <div v-if="settings" class="bg-slate-900/60 rounded-2xl border border-slate-800/80 p-6 space-y-4 shadow-xl backdrop-blur">
+    <div v-if="settings && settings.musicDir" class="bg-slate-900/60 rounded-2xl border border-slate-800/80 p-6 space-y-4 shadow-xl backdrop-blur">
       <div class="flex items-center gap-2.5">
         <Database class="w-4 h-4 text-sky-400" />
         <h2 class="text-sm font-bold text-slate-100">Stato Archivio & Cache</h2>

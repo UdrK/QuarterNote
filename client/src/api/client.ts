@@ -91,6 +91,9 @@ export async function fetchScanStatus(): Promise<ScanStatus> {
 
 export async function fetchSettings(): Promise<AppSettings> {
   const res = await fetch(`${API_BASE}/settings`);
+  if (!res.ok) {
+    throw new Error('Impossibile caricare le impostazioni dal server');
+  }
   return res.json();
 }
 

@@ -162,7 +162,7 @@ function navigateToAlbum() {
       <!-- SPEED SELECTOR (Rallentatore) -->
       <div class="relative">
         <button
-          @click="isSpeedMenuOpen = !isSpeedMenuOpen"
+          @click.stop="isSpeedMenuOpen = !isSpeedMenuOpen"
           class="flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold border transition-all"
           :class="[
             playerState.playbackRate !== 1.0
@@ -178,7 +178,8 @@ function navigateToAlbum() {
         <!-- Speed Dropdown Popover -->
         <div
           v-if="isSpeedMenuOpen"
-          class="absolute bottom-11 right-0 w-44 bg-slate-800 border border-slate-700 rounded-lg shadow-2xl p-2.5 z-50 text-xs space-y-2 select-none"
+          @click.stop
+          class="absolute bottom-12 right-0 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-2xl p-2.5 z-50 text-xs space-y-2 select-none"
         >
           <div class="flex items-center justify-between pb-1 border-b border-slate-700/60">
             <span class="text-slate-300 font-semibold">Velocità Audio</span>
