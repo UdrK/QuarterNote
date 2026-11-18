@@ -8,7 +8,8 @@ import {
   ListMusic, 
   RefreshCw, 
   CheckCircle2, 
-  AlertCircle 
+  AlertCircle,
+  Settings 
 } from '@lucide/vue';
 import { triggerScan, fetchScanStatus } from '../api/client';
 import type { ScanStatus } from '@quarter-note/shared';
@@ -63,6 +64,7 @@ const navLinks = [
   { name: 'Album', path: '/albums', icon: Disc3 },
   { name: 'Brani', path: '/tracks', icon: Music2 },
   { name: 'Playlist', path: '/playlists', icon: ListMusic },
+  { name: 'Impostazioni', path: '/settings', icon: Settings },
 ];
 </script>
 

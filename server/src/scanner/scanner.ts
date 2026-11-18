@@ -58,6 +58,14 @@ export class ScannerService {
     return { ...this.status };
   }
 
+  public setMusicDir(newDir: string): void {
+    this.musicDir = newDir;
+  }
+
+  public getMusicDir(): string {
+    return this.musicDir;
+  }
+
   public async startScan(): Promise<void> {
     if (this.status.isScanning) {
       return;

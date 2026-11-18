@@ -5,12 +5,14 @@ import path from 'node:path';
 import fs from 'node:fs';
 
 import { initDatabase } from './db/db.js';
+import { getSetting } from './db/repository.js';
 import { ScannerService } from './scanner/scanner.js';
 import { libraryRoutes } from './routes/library.js';
 import { streamRoutes } from './routes/stream.js';
 import { coverRoutes } from './routes/cover.js';
 import { playlistRoutes } from './routes/playlists.js';
 import { scanRoutes } from './routes/scan.js';
+import { settingsRoutes } from './routes/settings.js';
 
 // Configuration
 const PORT = parseInt(process.env.PORT || '8080', 10);
@@ -32,15 +34,19 @@ async function main() {
   console.log('----------------------------------------------------');
   console.log(' Quarter Note ♩ - Minimal Self-Hosted Music Streamer');
   console.log('----------------------------------------------------');
-  console.log(`[Config] Music Directory : ${MUSIC_DIR}`);
-  console.log(`[Config] Data Directory  : ${DATA_DIR}`);
-  console.log(`[Config] Client Directory: ${CLIENT_DIR || 'Not found (API only mode)'}`);
-
   // Initialize SQLite database
   initDatabase(DATA_DIR);
 
+  // Check if music directory was saved in database settings
+  const savedMusicDir = getSetting('music_dir');
+  const activeMusicDir = savedMusicDir || MUSIC_DIR;
+
+  console.log(`[Config] Music Directory : ${activeMusicDir} ${savedMusicDir ? '(from settings)' : '(default)'}`);
+  console.log(`[Config] Data Directory  : ${DATA_DIR}`);
+  console.log(`[Config] Client Directory: ${CLIENT_DIR || 'Not found (API only mode)'}`);
+
   // Initialize Scanner Service
-  const scanner = new ScannerService(MUSIC_DIR, DATA_DIR);
+  const scanner = new ScannerService(activeMusicDir, DATA_DIR);
 
   const fastify = Fastify({
     logger: {
@@ -60,6 +66,7 @@ async function main() {
   await fastify.register(coverRoutes(DATA_DIR), { prefix: '/api' });
   await fastify.register(playlistRoutes, { prefix: '/api' });
   await fastify.register(scanRoutes(scanner), { prefix: '/api' });
+  await fastify.register(settingsRoutes(scanner, DATA_DIR), { prefix: '/api' });
 
   // Serve static client frontend if available
   if (CLIENT_DIR) {

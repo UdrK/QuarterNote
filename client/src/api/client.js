@@ -63,3 +63,19 @@ export async function fetchScanStatus() {
     const res = await fetch(`${API_BASE}/scan/status`);
     return res.json();
 }
+export async function fetchSettings() {
+    const res = await fetch(`${API_BASE}/settings`);
+    return res.json();
+}
+export async function updateSettings(musicDir) {
+    const res = await fetch(`${API_BASE}/settings`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ musicDir }),
+    });
+    if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Impossibile aggiornare le impostazioni');
+    }
+    return res.json();
+}

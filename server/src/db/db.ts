@@ -81,6 +81,11 @@ export function initDatabase(dataDir: string): DatabaseSync {
       FOREIGN KEY (track_id) REFERENCES tracks(id) ON DELETE CASCADE
     );
 
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    );
+
     CREATE INDEX IF NOT EXISTS idx_tracks_album_id ON tracks(album_id);
     CREATE INDEX IF NOT EXISTS idx_tracks_artist_name ON tracks(artist_name);
     CREATE INDEX IF NOT EXISTS idx_tracks_title ON tracks(title);

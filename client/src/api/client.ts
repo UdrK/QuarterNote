@@ -6,6 +6,7 @@ import type {
   PlaylistTrack,
   ScanStatus,
   SearchResponse,
+  AppSettings,
 } from '@quarter-note/shared';
 
 const API_BASE = '/api';
@@ -85,5 +86,23 @@ export async function triggerScan(): Promise<ScanStatus> {
 
 export async function fetchScanStatus(): Promise<ScanStatus> {
   const res = await fetch(`${API_BASE}/scan/status`);
+  return res.json();
+}
+
+export async function fetchSettings(): Promise<AppSettings> {
+  const res = await fetch(`${API_BASE}/settings`);
+  return res.json();
+}
+
+export async function updateSettings(musicDir: string): Promise<AppSettings> {
+  const res = await fetch(`${API_BASE}/settings`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ musicDir }),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || 'Impossibile aggiornare le impostazioni');
+  }
   return res.json();
 }

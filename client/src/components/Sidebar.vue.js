@@ -1,6 +1,6 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { Users, Disc3, Music2, ListMusic, RefreshCw } from '@lucide/vue';
+import { Users, Disc3, Music2, ListMusic, RefreshCw, Settings } from '@lucide/vue';
 import { triggerScan, fetchScanStatus } from '../api/client';
 const route = useRoute();
 const router = useRouter();
@@ -49,6 +49,7 @@ const navLinks = [
     { name: 'Album', path: '/albums', icon: Disc3 },
     { name: 'Brani', path: '/tracks', icon: Music2 },
     { name: 'Playlist', path: '/playlists', icon: ListMusic },
+    { name: 'Impostazioni', path: '/settings', icon: Settings },
 ];
 debugger; /* PartiallyEnd: #3632/scriptSetup.vue */
 const __VLS_ctx = {};

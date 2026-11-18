@@ -90,3 +90,15 @@ export interface AddTracksToPlaylistInput {
 export interface ReorderPlaylistTracksInput {
   trackPositions: { trackId: string; position: number }[];
 }
+
+export interface AppSettings {
+  musicDir: string;
+  dataDir: string;
+  totalTracks: number;
+  totalAlbums: number;
+  totalArtists: number;
+}
+
+export interface UpdateSettingsInput {
+  musicDir: string;
+}
