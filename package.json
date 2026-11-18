@@ -1,0 +1,28 @@
+{
+  "name": "quarter-note-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Quarter Note ♩ - Minimal self-hosted local music streamer",
+  "workspaces": [
+    "shared",
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "build:shared": "npm --workspace=shared run build",
+    "build:client": "npm --workspace=client run build",
+    "build:server": "npm --workspace=server run build",
+    "build": "npm run build:shared && npm run build:client && npm run build:server",
+    "dev:server": "npm --workspace=server run dev",
+    "dev:client": "npm --workspace=client run dev",
+    "start": "npm --workspace=server run start"
+  },
+  "keywords": [
+    "music-streaming",
+    "self-hosted",
+    "audio-player",
+    "zimablade"
+  ],
+  "author": "",
+  "license": "MIT"
+}

@@ -1,0 +1,17 @@
+services:
+  quarter-note:
+    build: .
+    container_name: quarter-note
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - HOST=0.0.0.0
+      - MUSIC_DIR=/music
+      - DATA_DIR=/data
+    volumes:
+      # Sostituisci il percorso con la cartella della tua musica sulla ZimaBlade
+      - /path/to/my/music:/music:ro
+      # Volume persistente per il database SQLite e le copertine
+      - ./data:/data
