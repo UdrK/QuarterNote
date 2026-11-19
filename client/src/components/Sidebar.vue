@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { 
   Users, 
   Disc3, 
-  Music2, 
+  Heart, 
   ListMusic, 
   RefreshCw, 
   CheckCircle2, 
@@ -62,7 +62,7 @@ onUnmounted(() => {
 const navLinks = [
   { name: 'Artisti', path: '/artists', icon: Users },
   { name: 'Album', path: '/albums', icon: Disc3 },
-  { name: 'Brani', path: '/tracks', icon: Music2 },
+  { name: 'Preferiti', path: '/favorites', icon: Heart },
   { name: 'Playlist', path: '/playlists', icon: ListMusic },
   { name: 'Impostazioni', path: '/settings', icon: Settings },
 ];
@@ -73,7 +73,7 @@ const navLinks = [
     <!-- Brand / Header -->
     <div class="p-4">
       <div 
-        @click="router.push('/albums')" 
+        @click="router.push('/')" 
         class="flex items-center gap-2.5 cursor-pointer group mb-6 px-2 py-1"
       >
         <div class="w-8 h-8 rounded-lg bg-sky-500 flex items-center justify-center text-slate-950 font-bold text-lg shadow-lg shadow-sky-500/20 group-hover:scale-105 transition-transform">

@@ -13,6 +13,7 @@ import { coverRoutes } from './routes/cover.js';
 import { playlistRoutes } from './routes/playlists.js';
 import { scanRoutes } from './routes/scan.js';
 import { settingsRoutes } from './routes/settings.js';
+import { favoriteRoutes } from './routes/favorites.js';
 
 // Configuration
 const PORT = parseInt(process.env.PORT || '8080', 10);
@@ -49,6 +50,7 @@ async function main() {
   const scanner = new ScannerService(activeMusicDir, DATA_DIR);
 
   const fastify = Fastify({
+    bodyLimit: 15 * 1024 * 1024, // 15MB for custom artist image uploads
     logger: {
       level: process.env.LOG_LEVEL || 'info',
     },
@@ -61,10 +63,11 @@ async function main() {
   });
 
   // Register API Routes
-  await fastify.register(libraryRoutes, { prefix: '/api' });
+  await fastify.register(libraryRoutes(DATA_DIR), { prefix: '/api' });
   await fastify.register(streamRoutes, { prefix: '/api' });
   await fastify.register(coverRoutes(DATA_DIR), { prefix: '/api' });
   await fastify.register(playlistRoutes, { prefix: '/api' });
+  await fastify.register(favoriteRoutes, { prefix: '/api' });
   await fastify.register(scanRoutes(scanner), { prefix: '/api' });
   await fastify.register(settingsRoutes(scanner, DATA_DIR), { prefix: '/api' });
 

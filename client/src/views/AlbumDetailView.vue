@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { Play, Shuffle, ArrowLeft } from '@lucide/vue';
+import { Play, Shuffle, ArrowLeft, Heart } from '@lucide/vue';
 import { fetchAlbum } from '../api/client';
 import { playerActions, formatTime } from '../stores/player';
+import { isFavorite, toggleFavorite } from '../stores/favorites';
 import TrackRow from '../components/TrackRow.vue';
 import type { Album, Track } from '@quarter-note/shared';
 
@@ -80,7 +81,7 @@ function playShuffled() {
         </div>
 
         <!-- Action buttons -->
-        <div class="flex items-center justify-center sm:justify-start gap-3 pt-2">
+        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-2">
           <button
             @click="playAll"
             class="flex items-center gap-2 px-5 py-2.5 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-sky-500/20 hover:scale-105 transition-all"
@@ -94,6 +95,22 @@ function playShuffled() {
           >
             <Shuffle class="w-3.5 h-3.5" />
             <span>Casuale</span>
+          </button>
+          <button
+            v-if="album"
+            @click="toggleFavorite('album', album.id)"
+            class="flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-semibold transition-all"
+            :class="[
+              isFavorite('album', album.id)
+                ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                : 'bg-slate-800/80 hover:bg-slate-800 border-slate-700/80 text-slate-300'
+            ]"
+          >
+            <Heart
+              class="w-4 h-4"
+              :class="{ 'fill-rose-500 text-rose-500': isFavorite('album', album.id) }"
+            />
+            <span>{{ isFavorite('album', album.id) ? 'Nei Preferiti' : 'Aggiungi ai Preferiti' }}</span>
           </button>
         </div>
       </div>

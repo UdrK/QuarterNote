@@ -36,6 +36,7 @@ export interface Artist {
   name: string;
   albumCount: number;
   trackCount: number;
+  imageUrl?: string;
 }
 
 export interface Playlist {
@@ -94,11 +95,59 @@ export interface ReorderPlaylistTracksInput {
 export interface AppSettings {
   musicDir: string;
   dataDir: string;
+  defaultView: DefaultViewType;
   totalTracks: number;
   totalAlbums: number;
   totalArtists: number;
 }
 
 export interface UpdateSettingsInput {
-  musicDir: string;
+  musicDir?: string;
+  defaultView?: DefaultViewType;
+}
+
+export type DefaultViewType = 'artists' | 'albums' | 'favorites' | 'playlists';
+
+export type FavoriteItemType = 'artist' | 'album' | 'track' | 'playlist';
+
+export interface FavoriteItem {
+  id: string;
+  containerId: string;
+  itemType: FavoriteItemType;
+  itemId: string;
+  position: number;
+  createdAt: number;
+  artist?: Artist;
+  album?: Album;
+  track?: Track;
+  playlist?: Playlist;
+}
+
+export interface FavoriteContainer {
+  id: string;
+  title: string;
+  position: number;
+  isDefault: boolean;
+  createdAt: number;
+  items: FavoriteItem[];
+}
+
+export interface CreateContainerInput {
+  title: string;
+}
+
+export interface UpdateContainerInput {
+  title?: string;
+  position?: number;
+}
+
+export interface ToggleFavoriteInput {
+  itemType: FavoriteItemType;
+  itemId: string;
+  containerId?: string;
+}
+
+export interface MoveFavoriteInput {
+  targetContainerId: string;
+  position?: number;
 }

@@ -1,14 +1,34 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { Settings as SettingsIcon, Folder, Database, RefreshCw, CheckCircle2, AlertCircle } from '@lucide/vue';
+import { 
+  Settings as SettingsIcon, 
+  Folder, 
+  Database, 
+  RefreshCw, 
+  CheckCircle2, 
+  AlertCircle,
+  LayoutGrid,
+  Users,
+  Disc3,
+  Heart,
+  ListMusic
+} from '@lucide/vue';
 import { fetchSettings, updateSettings, triggerScan } from '../api/client';
-import type { AppSettings } from '@quarter-note/shared';
+import type { AppSettings, DefaultViewType } from '@quarter-note/shared';
 
 const settings = ref<AppSettings | null>(null);
 const musicDirInput = ref('');
+const defaultViewInput = ref<DefaultViewType>('artists');
 const isSaving = ref(false);
 const message = ref<{ type: 'success' | 'error'; text: string } | null>(null);
 const isLoading = ref(true);
+
+const viewOptions: { id: DefaultViewType; label: string; icon: any; desc: string }[] = [
+  { id: 'artists', label: 'Artisti', icon: Users, desc: 'Visualizza tutti gli artisti con immagini' },
+  { id: 'albums', label: 'Album', icon: Disc3, desc: 'Sfoglia le copertine degli album' },
+  { id: 'favorites', label: 'Preferiti', icon: Heart, desc: 'Apri subito i tuoi divisori e preferiti' },
+  { id: 'playlists', label: 'Playlist', icon: ListMusic, desc: 'Mostra le tue playlist personali' },
+];
 
 async function load() {
   try {
@@ -16,6 +36,8 @@ async function load() {
     if (data && typeof data === 'object' && 'musicDir' in data) {
       settings.value = data;
       musicDirInput.value = data.musicDir || '';
+      defaultViewInput.value = data.defaultView || (localStorage.getItem('qn_default_view') as DefaultViewType) || 'artists';
+      localStorage.setItem('qn_default_view', defaultViewInput.value);
     }
   } catch (err) {
     console.error('Failed to load settings:', err);
@@ -28,15 +50,33 @@ async function load() {
   }
 }
 
+async function handleViewChange(view: DefaultViewType) {
+  defaultViewInput.value = view;
+  localStorage.setItem('qn_default_view', view);
+  try {
+    await updateSettings({ defaultView: view });
+    message.value = {
+      type: 'success',
+      text: `Schermata iniziale predefinita impostata su "${viewOptions.find(o => o.id === view)?.label}"`,
+    };
+  } catch (err) {
+    console.error('Failed to save default view setting:', err);
+  }
+}
+
 async function handleSave(triggerScanAfter = false) {
   if (!musicDirInput.value.trim()) return;
   isSaving.value = true;
   message.value = null;
 
   try {
-    const updated = await updateSettings(musicDirInput.value.trim());
+    const updated = await updateSettings({
+      musicDir: musicDirInput.value.trim(),
+      defaultView: defaultViewInput.value,
+    });
     settings.value = updated;
     musicDirInput.value = updated.musicDir;
+    localStorage.setItem('qn_default_view', updated.defaultView || defaultViewInput.value);
 
     if (triggerScanAfter) {
       await triggerScan();
@@ -47,7 +87,7 @@ async function handleSave(triggerScanAfter = false) {
     } else {
       message.value = {
         type: 'success',
-        text: 'Percorso della libreria aggiornato con successo!',
+        text: 'Impostazioni aggiornate con successo!',
       };
     }
   } catch (err) {
@@ -89,6 +129,54 @@ onMounted(load);
       <CheckCircle2 v-if="message.type === 'success'" class="w-4 h-4 shrink-0" />
       <AlertCircle v-else class="w-4 h-4 shrink-0" />
       <span class="font-medium">{{ message.text }}</span>
+    </div>
+
+    <!-- Default Startup Screen Card -->
+    <div class="bg-slate-900/60 rounded-2xl border border-slate-800/80 p-6 space-y-4 shadow-xl backdrop-blur">
+      <div class="flex items-center gap-2.5">
+        <LayoutGrid class="w-4 h-4 text-sky-400" />
+        <h2 class="text-sm font-bold text-slate-100">Schermata Iniziale Predefinita</h2>
+      </div>
+
+      <p class="text-xs text-slate-400 leading-relaxed">
+        Scegli quale schermata aprire automaticamente all'avvio dell'applicazione.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+        <button
+          v-for="opt in viewOptions"
+          :key="opt.id"
+          type="button"
+          @click="handleViewChange(opt.id)"
+          class="flex flex-col items-start p-3.5 rounded-xl border text-left transition-all relative overflow-hidden group cursor-pointer"
+          :class="[
+            defaultViewInput === opt.id
+              ? 'bg-sky-500/10 border-sky-500/50 ring-1 ring-sky-500/50 shadow-md shadow-sky-500/10'
+              : 'bg-slate-950/60 border-slate-800 hover:border-slate-700 hover:bg-slate-900'
+          ]"
+        >
+          <div class="flex items-center gap-2 mb-1.5">
+            <component 
+              :is="opt.icon" 
+              class="w-4 h-4" 
+              :class="defaultViewInput === opt.id ? 'text-sky-400' : 'text-slate-400 group-hover:text-slate-200'" 
+            />
+            <span 
+              class="text-xs font-bold" 
+              :class="defaultViewInput === opt.id ? 'text-sky-300' : 'text-slate-200'"
+            >
+              {{ opt.label }}
+            </span>
+          </div>
+          <span class="text-[11px] text-slate-400 leading-snug">
+            {{ opt.desc }}
+          </span>
+          <div 
+            v-if="defaultViewInput === opt.id"
+            class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-sky-400 shadow-sm shadow-sky-400"
+          />
+        </button>
+      </div>
     </div>
 
     <!-- Music Library Path Configuration Card -->

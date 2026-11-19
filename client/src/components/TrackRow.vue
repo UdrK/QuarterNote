@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Play, ListPlus, CornerDownRight, Plus } from '@lucide/vue';
+import { Play, ListPlus, CornerDownRight, Plus, Heart } from '@lucide/vue';
 import { playerState, playerActions, formatTime } from '../stores/player';
+import { isFavorite, toggleFavorite } from '../stores/favorites';
 import AddToPlaylistModal from './AddToPlaylistModal.vue';
 import type { Track } from '@quarter-note/shared';
 
@@ -76,6 +77,23 @@ function play() {
           <Plus class="w-3.5 h-3.5" />
         </button>
       </div>
+
+      <!-- Favorite button -->
+      <button
+        @click.stop="toggleFavorite('track', track.id)"
+        class="p-1.5 rounded transition-all"
+        :class="[
+          isFavorite('track', track.id)
+            ? 'text-rose-500 hover:text-rose-400'
+            : 'text-slate-500 hover:text-rose-400 opacity-0 group-hover:opacity-100'
+        ]"
+        :title="isFavorite('track', track.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+      >
+        <Heart
+          class="w-3.5 h-3.5"
+          :class="{ 'fill-rose-500 text-rose-500': isFavorite('track', track.id) }"
+        />
+      </button>
 
       <!-- Duration -->
       <span class="w-12 text-right font-mono text-[11px] text-slate-400 tabular-nums">

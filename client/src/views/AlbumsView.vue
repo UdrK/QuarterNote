@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { Play, Disc3 } from '@lucide/vue';
+import { Play, Disc3, Heart } from '@lucide/vue';
 import { fetchAlbums, fetchAlbum } from '../api/client';
 import { playerActions } from '../stores/player';
+import { isFavorite, toggleFavorite } from '../stores/favorites';
 import type { Album } from '@quarter-note/shared';
 
 const router = useRouter();
@@ -112,6 +113,24 @@ async function playAlbum(album: Album) {
             loading="lazy"
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
+
+          <!-- Favorite Button Overlay -->
+          <button
+            type="button"
+            @click.stop="toggleFavorite('album', album.id)"
+            class="absolute top-2 right-2 p-1.5 rounded-full bg-slate-950/70 hover:bg-slate-900 text-slate-400 hover:text-rose-400 backdrop-blur transition-all z-10"
+            :class="[
+              isFavorite('album', album.id)
+                ? 'opacity-100 text-rose-500'
+                : 'opacity-0 group-hover:opacity-100'
+            ]"
+            :title="isFavorite('album', album.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+          >
+            <Heart
+              class="w-3.5 h-3.5 transition-transform hover:scale-110"
+              :class="{ 'fill-rose-500 text-rose-500': isFavorite('album', album.id) }"
+            />
+          </button>
 
           <!-- Quick Play Overlay Button -->
           <button

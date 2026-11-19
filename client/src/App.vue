@@ -1,8 +1,14 @@
 <script setup lang="ts">
+import { onMounted } from 'vue';
 import Sidebar from './components/Sidebar.vue';
 import Header from './components/Header.vue';
 import Player from './components/Player.vue';
 import QueueDrawer from './components/QueueDrawer.vue';
+import { initFavorites } from './stores/favorites';
+
+onMounted(() => {
+  initFavorites();
+});
 </script>
 
 <template>

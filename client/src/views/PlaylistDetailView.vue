@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { ListMusic, ArrowLeft, Play, Shuffle, Trash2, X } from '@lucide/vue';
+import { ListMusic, ArrowLeft, Play, Shuffle, Trash2, X, Heart } from '@lucide/vue';
 import { fetchPlaylist, removeTrackFromPlaylist, deletePlaylist } from '../api/client';
 import { playerActions, formatTime } from '../stores/player';
+import { isFavorite, toggleFavorite } from '../stores/favorites';
 import TrackRow from '../components/TrackRow.vue';
 import type { Playlist, PlaylistTrack } from '@quarter-note/shared';
 
@@ -111,8 +112,26 @@ onMounted(load);
             <span>Casuale</span>
           </button>
           <button
+            v-if="playlist"
+            @click="toggleFavorite('playlist', playlist.id)"
+            class="flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-semibold transition-all"
+            :class="[
+              isFavorite('playlist', playlist.id)
+                ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                : 'bg-slate-800/80 hover:bg-slate-800 border-slate-700/80 text-slate-300'
+            ]"
+          >
+            <Heart
+              class="w-4 h-4"
+              :class="{ 'fill-rose-500 text-rose-500': isFavorite('playlist', playlist.id) }"
+            />
+            <span>{{ isFavorite('playlist', playlist.id) ? 'Nei Preferiti' : 'Aggiungi ai Preferiti' }}</span>
+          </button>
+          <button
             @click="handleDelete"
             class="p-2.5 text-slate-400 hover:text-red-400 rounded-xl hover:bg-slate-800 transition-colors"
+            title="Elimina playlist"
+          >
             title="Elimina playlist"
           >
             <Trash2 class="w-4 h-4" />

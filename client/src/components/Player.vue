@@ -14,9 +14,11 @@ import {
   VolumeX, 
   ListMusic, 
   Gauge, 
-  Disc3 
+  Disc3,
+  Heart
 } from '@lucide/vue';
 import { playerState, playerActions, formatTime } from '../stores/player';
+import { isFavorite, toggleFavorite } from '../stores/favorites';
 import type { PlaybackRate } from '@quarter-note/shared';
 
 const router = useRouter();
@@ -65,7 +67,7 @@ function navigateToAlbum() {
         </div>
       </div>
 
-      <div v-if="playerState.currentTrack" class="min-w-0 pr-2">
+      <div v-if="playerState.currentTrack" class="min-w-0 pr-1 flex-1">
         <p class="text-xs font-semibold text-slate-100 truncate" :title="playerState.currentTrack.title">
           {{ playerState.currentTrack.title }}
         </p>
@@ -77,6 +79,20 @@ function navigateToAlbum() {
           {{ playerState.currentTrack.artistName }}
         </p>
       </div>
+
+      <!-- Favorite Current Track Button -->
+      <button
+        v-if="playerState.currentTrack"
+        type="button"
+        @click="toggleFavorite('track', playerState.currentTrack.id)"
+        class="p-1 rounded-full text-slate-400 hover:text-rose-400 transition-colors shrink-0"
+        :title="isFavorite('track', playerState.currentTrack.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+      >
+        <Heart
+          class="w-4 h-4"
+          :class="{ 'fill-rose-500 text-rose-500': isFavorite('track', playerState.currentTrack.id) }"
+        />
+      </button>
       <div v-else class="min-w-0">
         <p class="text-xs text-slate-500 italic">Nessun brano in riproduzione</p>
       </div>

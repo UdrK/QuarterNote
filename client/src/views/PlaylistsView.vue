@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { ListMusic, Plus, Trash2 } from '@lucide/vue';
+import { ListMusic, Plus, Trash2, Heart } from '@lucide/vue';
 import { fetchPlaylists, createPlaylist, deletePlaylist } from '../api/client';
 import { formatTime } from '../stores/player';
+import { isFavorite, toggleFavorite } from '../stores/favorites';
 import type { Playlist } from '@quarter-note/shared';
 
 const router = useRouter();
@@ -119,7 +120,18 @@ onMounted(load);
           </div>
         </div>
 
-        <div class="pt-3 border-t border-slate-800/60 mt-4 flex items-center justify-end">
+        <div class="pt-3 border-t border-slate-800/60 mt-4 flex items-center justify-between">
+          <button
+            @click.stop="toggleFavorite('playlist', pl.id)"
+            class="text-slate-500 hover:text-rose-400 p-1 rounded transition-colors"
+            :title="isFavorite('playlist', pl.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+          >
+            <Heart
+              class="w-3.5 h-3.5"
+              :class="{ 'fill-rose-500 text-rose-500': isFavorite('playlist', pl.id) }"
+            />
+          </button>
+
           <button
             @click.stop="handleDelete(pl.id)"
             class="text-slate-500 hover:text-red-400 p-1 rounded transition-colors"

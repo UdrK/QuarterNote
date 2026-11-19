@@ -41,6 +41,16 @@ Documenti di riferimento:
   - [x] 4.1 `Dockerfile` multi-stage ottimizzato per Node 24 Alpine
   - [x] 4.2 `docker-compose.yml` di riferimento per ZimaBlade (`/music:ro` e `/data`)
   - [x] 4.3 Test end-to-end di build, scansione ed esecuzione streaming
+- [x] **Fase 5: Preferiti con Divisori, Immagini Artisti & Vista Iniziale**
+  - [x] 5.1 Schermata "Artisti" impostata come predefinita all'avvio dell'app (`/artists`)
+  - [x] 5.2 Selettore in Impostazioni per scegliere la schermata iniziale predefinita (Artisti, Album, Preferiti, Playlist)
+  - [x] 5.3 Immagini per Artisti: fallback automatico alla copertina del primo album + caricamento foto personalizzata (`sharp` 300x300 WebP)
+  - [x] 5.4 Rimozione della schermata "Brani" ridondante
+  - [x] 5.5 Schermata "Preferiti" flessibile:
+    - [x] Possibilità di aggiungere ai Preferiti artisti, album, brani e playlist con toggle Heart universale
+    - [x] Divisori personalizzati con linea orizzontale e titolo centrale ("Artisti", "Album", "Brani", "Playlist" predefiniti)
+    - [x] Creazione, rinomina ed eliminazione dei divisori/contenitori
+    - [x] Menu "Sposta in..." per riorganizzare qualsiasi preferito tra i contenitori
 
 ---
 
