@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { X, Trash2, Disc3 } from '@lucide/vue';
+import { Disc3 } from '@lucide/vue';
 import { playerState, playerActions, formatTime } from '../stores/player';
 
 function close() {
@@ -10,76 +10,88 @@ function close() {
 <template>
   <aside
     v-if="playerState.isQueueOpen"
-    class="w-80 bg-black border-l-2 border-[#00ffff] flex flex-col shrink-0 select-none z-20 shadow-2xl transition-all font-mono"
+    class="w-84 bg-black border-l-2 border-[#00ffff] flex flex-col shrink-0 select-none z-20 shadow-2xl transition-all font-mono text-xs"
   >
     <!-- Header -->
-    <div class="h-12 px-3 border-b border-[#222222] bg-[#080808] flex items-center justify-between shrink-0">
-      <div class="flex items-center gap-2">
-        <span class="text-[#00ffff] font-bold text-xs">■ [ CODA DI RIPRODUZIONE ]</span>
-        <span class="text-xs text-[#ffff00] font-mono">({{ playerState.queue.length }})</span>
+    <div class="h-9 px-2 border-b border-[#00ffff]/60 bg-[#001726] flex items-center justify-between shrink-0 text-[#00ffff]">
+      <div class="flex items-center gap-1.5 font-bold">
+        <span>┌──[ CODA DI RIPRODUZIONE ]</span>
+        <span class="text-[#ffff00]">({{ playerState.queue.length }})</span>
       </div>
 
       <div class="flex items-center gap-1">
         <button
           v-if="playerState.queue.length > 0"
           @click="playerActions.clearQueue()"
-          class="bbs-btn py-0.5 px-1.5 text-[10px] bbs-btn-red"
+          class="text-[10px] px-1 bg-[#330011] text-[#ff3366] hover:bg-[#ff3366] hover:text-black font-bold border border-[#661122] transition-colors cursor-pointer"
           title="Svuota coda"
         >
-          <span>[SVUOTA]</span>
+          [SVUOTA]
         </button>
         <button
           @click="close"
-          class="bbs-btn py-0.5 px-1.5 text-[10px] border-[#333333]"
-          title="Chiudi pannello coda"
+          class="text-[10px] px-1 bg-[#111c26] text-[#00ffff] hover:bg-[#00ffff] hover:text-black font-bold border border-[#223d54] transition-colors cursor-pointer"
+          title="Chiudi (ESC)"
         >
-          <span>[X]</span>
+          [X]─┐
         </button>
       </div>
     </div>
 
     <!-- Queue List -->
-    <div class="flex-1 overflow-y-auto p-2 space-y-1">
+    <div class="flex-1 overflow-y-auto p-1.5 space-y-0.5">
       <div
         v-if="playerState.queue.length === 0"
-        class="h-full flex flex-col items-center justify-center text-center p-4 text-[#666666] text-xs"
+        class="h-full flex flex-col items-center justify-center text-center p-4 text-[#556677] text-xs"
       >
-        <Disc3 class="w-8 h-8 mb-2 opacity-40 text-[#555555]" />
-        &gt; CODA VUOTA &lt;<br />Aggiungi brani per iniziare la riproduzione.
+        <Disc3 class="w-8 h-8 mb-2 opacity-30 text-[#00ffff]" />
+        &gt;&gt; CODA VUOTA &lt;&lt;<br />Aggiungi dei brani per iniziare.
       </div>
 
       <div
         v-for="(track, index) in playerState.queue"
         :key="`${track.id}-${index}`"
-        class="group flex items-center justify-between p-2 text-xs border border-[#1a1a1a] transition-all"
+        class="group flex items-center justify-between px-2 py-1 text-xs border transition-colors cursor-pointer"
         :class="[
           index === playerState.queueIndex
-            ? 'bg-[#002b4d] border-[#00ffff] text-[#ffff00]'
-            : 'hover:bg-[#0c0c0c] hover:border-[#333333] text-[#aaaaaa]'
+            ? 'bg-[#00ffff] text-black font-extrabold border-[#00ffff]'
+            : 'border-[#172533] hover:bg-[#002238] hover:text-[#ffff00] text-[#aaaaaa]'
         ]"
       >
         <div 
           @click="playerActions.jumpToQueueIndex(index)"
-          class="flex items-center gap-2 min-w-0 flex-1 cursor-pointer"
+          class="flex items-center gap-1.5 min-w-0 flex-1"
         >
-          <span class="text-[10px] text-[#777777] font-mono w-5">
-            {{ String(index + 1).padStart(2, '0') }}.
+          <span 
+            class="text-[10px] font-mono w-5 shrink-0"
+            :class="index === playerState.queueIndex ? 'text-black font-bold' : 'text-[#556677]'"
+          >
+            {{ index === playerState.queueIndex ? '►' : String(index + 1).padStart(2, '0') + '.' }}
           </span>
           <div class="min-w-0 flex-1">
-            <p class="font-bold truncate" :class="index === playerState.queueIndex ? 'text-[#ffff00]' : 'text-[#d4d4d4]'">
+            <p class="font-bold truncate" :class="index === playerState.queueIndex ? 'text-black' : 'text-[#d4d4d4]'">
               {{ track.title }}
             </p>
-            <p class="text-[10px] text-[#00ffff] opacity-80 truncate">{{ track.artistName }}</p>
+            <p 
+              class="text-[9px] truncate"
+              :class="index === playerState.queueIndex ? 'text-black/80' : 'text-[#00ffff]/80'"
+            >
+              {{ track.artistName }}
+            </p>
           </div>
         </div>
 
-        <div class="flex items-center gap-1 shrink-0 ml-2">
-          <span class="text-[10px] text-[#777777] font-mono tabular-nums">
+        <div class="flex items-center gap-1 shrink-0 ml-1.5">
+          <span 
+            class="text-[9px] font-mono tabular-nums"
+            :class="index === playerState.queueIndex ? 'text-black' : 'text-[#667788]'"
+          >
             {{ formatTime(track.duration) }}
           </span>
           <button
-            @click="playerActions.removeFromQueue(index)"
-            class="text-[#666666] hover:text-[#ff3366] text-xs font-bold px-1"
+            @click.stop="playerActions.removeFromQueue(index)"
+            class="text-xs font-bold px-1 transition-colors cursor-pointer"
+            :class="index === playerState.queueIndex ? 'text-black hover:text-[#ff3366]' : 'text-[#667788] hover:text-[#ff3366]'"
             title="Rimuovi"
           >
             [X]

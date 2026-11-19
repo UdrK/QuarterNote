@@ -1,21 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { 
-  ListMusic, 
-  ArrowLeft, 
-  Play, 
-  Shuffle, 
-  Trash2, 
-  X, 
-  Heart,
-  Camera,
-  Loader2
-} from '@lucide/vue';
+import { Camera, Loader2 } from '@lucide/vue';
 import { fetchPlaylist, removeTrackFromPlaylist, deletePlaylist, uploadPlaylistImage } from '../api/client';
 import { playerActions, formatTime } from '../stores/player';
 import { isFavorite, toggleFavorite } from '../stores/favorites';
 import TrackRow from '../components/TrackRow.vue';
+import TuiWindow from '../components/TuiWindow.vue';
 import type { Playlist, PlaylistTrack } from '@quarter-note/shared';
 
 const route = useRoute();
@@ -111,138 +102,137 @@ onMounted(load);
 </script>
 
 <template>
-  <div class="space-y-4 font-mono select-none">
-    <!-- Breadcrumb -->
-    <div class="flex items-center gap-2 text-xs">
-      <button
-        @click="router.back()"
-        class="bbs-btn py-0.5 px-2 text-xs border-[#333333]"
-      >
-        <span>[&lt; INDIETRO]</span>
-      </button>
-      <span class="text-[#555555]">&gt; MENU &gt; PLAYLIST &gt;</span>
-      <span class="text-[#00ff66] font-bold" v-if="playlist">[{{ playlist.name }}]</span>
-    </div>
-
-    <!-- Hidden file input for uploading custom playlist photo -->
-    <input
-      ref="fileInput"
-      type="file"
-      accept="image/*"
-      class="hidden"
-      @change="handleFileSelected"
-    />
-
-    <!-- Playlist Hero Card in BBS Box -->
-    <div v-if="playlist" class="border border-[#2a2a2a] bg-[#070707] p-4 flex flex-col sm:flex-row items-center sm:items-start gap-4">
-      <!-- Playlist Cover with Upload Overlay -->
-      <div class="relative group shrink-0">
-        <div class="w-32 h-32 sm:w-36 sm:h-36 bg-black border-2 border-[#00ff66] overflow-hidden">
-          <img
-            :src="playlistCoverUrl"
-            :alt="playlist.name"
-            class="w-full h-full object-cover"
-          />
-        </div>
-
-        <!-- Upload overlay button -->
+  <TuiWindow 
+    :title="playlist ? `PLAYLIST: ${playlist.name}` : 'CARICAMENTO...'" 
+    :badge="playlist ? `${playlistTracks.length} BRANI / ${formatTime(playlist.totalDuration)}` : ''"
+    variant="green"
+  >
+    <div class="space-y-4 font-mono select-none">
+      <!-- Breadcrumb -->
+      <div class="flex items-center gap-2 text-xs border-b border-[#003311] pb-2">
         <button
-          @click="triggerPhotoUpload"
-          :disabled="isUploading"
-          type="button"
-          class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 text-[#00ff66] transition-opacity cursor-pointer border-2 border-[#00ff66]"
-          title="Cambia copertina playlist"
+          @click="router.back()"
+          class="bg-[#001710] hover:bg-[#00ff66] hover:text-black text-[#00ff66] border border-[#005522] px-2 py-0.5 text-xs font-bold transition-colors cursor-pointer"
         >
-          <Loader2 v-if="isUploading" class="w-5 h-5 animate-spin" />
-          <template v-else>
-            <Camera class="w-5 h-5" />
-            <span class="text-[9px] font-bold">[CAMBIA COVER]</span>
-          </template>
+          <span>[&lt; INDIETRO]</span>
         </button>
+        <span class="text-[#006622]">&gt; RACCOLTE &gt; PLAYLIST &gt;</span>
+        <span class="text-[#00ff66] font-bold" v-if="playlist">[{{ playlist.name }}]</span>
       </div>
 
-      <div class="space-y-1.5 min-w-0 flex-1 text-center sm:text-left">
-        <div class="text-[10px] text-[#00ff66] font-bold">
-          ■ PLAYLIST UTENTE
-        </div>
-        <h1 class="text-xl sm:text-2xl font-bold text-[#ffff00] truncate">
-          {{ playlist.name }}
-        </h1>
-        <div class="text-[11px] text-[#888888] space-x-2">
-          <span>BRANI: <span class="text-[#00ff66]">{{ playlistTracks.length }}</span></span>
-          <span>|</span>
-          <span>DURATA: {{ formatTime(playlist.totalDuration) }}</span>
-        </div>
+      <!-- Hidden file input for uploading custom playlist photo -->
+      <input
+        ref="fileInput"
+        type="file"
+        accept="image/*"
+        class="hidden"
+        @change="handleFileSelected"
+      />
 
-        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-2">
-          <button
-            @click="playAll"
-            :disabled="rawTracks.length === 0"
-            class="bbs-btn bbs-btn-green py-1.5 px-3 text-xs disabled:opacity-40"
-          >
-            <span>[ ▶ RIPRODUCI ]</span>
-          </button>
-          <button
-            @click="playShuffled"
-            :disabled="rawTracks.length === 0"
-            class="bbs-btn py-1.5 px-3 text-xs border-[#333333] text-[#cccccc] disabled:opacity-40"
-          >
-            <span>[ ⇄ CASUALE ]</span>
-          </button>
-          <button
-            v-if="playlist"
-            @click="toggleFavorite('playlist', playlist.id)"
-            class="bbs-btn py-1.5 px-3 text-xs"
-            :class="isFavorite('playlist', playlist.id) ? 'bbs-btn-red' : 'border-[#333333] text-[#aaaaaa]'"
-          >
-            <span>{{ isFavorite('playlist', playlist.id) ? '[★ NEI PREFERITI]' : '[☆ AGGIUNGI PREFERITI]' }}</span>
-          </button>
-          <button
-            @click="handleDelete"
-            class="bbs-btn bbs-btn-red py-1.5 px-3 text-xs"
-            title="Elimina playlist"
-          >
-            <span>[ELIMINA PLAYLIST]</span>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tracks List -->
-    <div v-if="playlistTracks.length > 0" class="space-y-2">
-      <div class="border-b border-[#222222] pb-1 flex items-center justify-between text-xs font-bold text-[#00ff66]">
-        <span>■ [ BRANI IN PLAYLIST ] ──────────────────────────</span>
-        <span class="text-[#ffff00]">({{ playlistTracks.length }})</span>
-      </div>
-      <div class="border border-[#222222] bg-[#070707]">
-        <div
-          v-for="(pt, idx) in playlistTracks"
-          :key="pt.id"
-          class="flex items-center justify-between border-b border-[#1c1c1c] hover:bg-[#001710] group"
-        >
-          <div class="flex-1 min-w-0">
-            <TrackRow
-              :track="pt.track"
-              :index="idx"
-              :playlistContext="rawTracks"
-              :showAlbum="true"
+      <!-- Playlist Hero Card in Curses Box -->
+      <div v-if="playlist" class="border border-[#005522] bg-[#000d07] p-3 flex flex-col sm:flex-row items-center sm:items-start gap-4">
+        <!-- Playlist Cover with Upload Overlay -->
+        <div class="relative group shrink-0">
+          <div class="w-28 h-28 sm:w-32 sm:h-32 bg-black border-2 border-[#00ff66] overflow-hidden">
+            <img
+              :src="playlistCoverUrl"
+              :alt="playlist.name"
+              class="w-full h-full object-cover"
             />
           </div>
+
           <button
-            @click="handleRemove(pt.id)"
-            class="text-[#555555] hover:text-[#ff3366] text-xs font-bold px-2 py-1 mr-1"
-            title="Rimuovi dalla playlist"
+            @click="triggerPhotoUpload"
+            :disabled="isUploading"
+            type="button"
+            class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 text-[#00ff66] transition-opacity cursor-pointer border-2 border-[#00ff66]"
+            title="Cambia copertina playlist"
           >
-            [X]
+            <Loader2 v-if="isUploading" class="w-5 h-5 animate-spin" />
+            <template v-else>
+              <Camera class="w-4 h-4" />
+              <span class="text-[8px] font-bold">[COVER]</span>
+            </template>
           </button>
+        </div>
+
+        <div class="space-y-1.5 min-w-0 flex-1 text-center sm:text-left">
+          <div class="text-[10px] text-[#00ff66] font-bold">
+            ┌──[ DETTAGLI PLAYLIST ]
+          </div>
+          <h1 class="text-xl sm:text-2xl font-bold text-[#ffff00] truncate">
+            {{ playlist.name }}
+          </h1>
+          <div class="text-[11px] text-[#00aa44] space-x-2">
+            <span>BRANI: <span class="text-[#00ff66] font-bold">{{ playlistTracks.length }}</span></span>
+            <span>|</span>
+            <span>DURATA TOTALE: {{ formatTime(playlist.totalDuration) }}</span>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1.5">
+            <button
+              @click="playAll"
+              :disabled="rawTracks.length === 0"
+              class="bg-[#00ff66] hover:bg-[#55ff99] text-black font-extrabold px-3 py-1 text-xs border border-[#00ff66] transition-colors cursor-pointer disabled:opacity-40"
+            >
+              <span>[ ▶ RIPRODUCI ]</span>
+            </button>
+            <button
+              @click="playShuffled"
+              :disabled="rawTracks.length === 0"
+              class="bg-[#001710] hover:bg-[#00ff66] hover:text-black text-[#00ff66] border border-[#005522] px-3 py-1 text-xs font-bold transition-colors cursor-pointer disabled:opacity-40"
+            >
+              <span>[ ⇄ CASUALE ]</span>
+            </button>
+            <button
+              v-if="playlist"
+              @click="toggleFavorite('playlist', playlist.id)"
+              class="px-3 py-1 text-xs font-bold border transition-colors cursor-pointer"
+              :class="isFavorite('playlist', playlist.id) ? 'bg-[#ff3366] text-black border-[#ff3366]' : 'bg-[#001710] text-[#aaaaaa] border-[#005522] hover:border-[#ff3366] hover:text-[#ff3366]'"
+            >
+              <span>{{ isFavorite('playlist', playlist.id) ? '[★ NEI PREFERITI]' : '[☆ AGGIUNGI PREFERITI]' }}</span>
+            </button>
+            <button
+              @click="handleDelete"
+              class="bg-[#2a0008] hover:bg-[#ff3366] text-[#ff3366] hover:text-black px-3 py-1 text-xs font-bold border border-[#661122] transition-colors cursor-pointer"
+              title="Elimina playlist"
+            >
+              <span>[ELIMINA]</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tracks List Table -->
+      <div v-if="playlistTracks.length > 0" class="space-y-2">
+        <div class="border-b border-[#003311] pb-1 flex items-center justify-between text-xs font-bold text-[#00ff66]">
+          <span>┌──[ BRANI CONTENUTI ]───────────────────────────</span>
+          <span class="text-[#ffff00]">({{ playlistTracks.length }})─┐</span>
+        </div>
+        <div class="border border-[#003311] bg-[#000d07]">
+          <div
+            v-for="(pt, idx) in playlistTracks"
+            :key="pt.id"
+            class="flex items-center justify-between border-b border-[#00220d] hover:bg-[#001f11] group"
+          >
+            <div class="flex-1 min-w-0">
+              <TrackRow
+                :track="pt.track"
+                :index="idx"
+                :playlistContext="rawTracks"
+                :showAlbum="true"
+              />
+            </div>
+            <button
+              @click="handleRemove(pt.id)"
+              class="text-[#446655] hover:text-[#ff3366] text-xs font-bold px-2 py-1 mr-1 cursor-pointer"
+              title="Rimuovi dalla playlist"
+            >
+              [X]
+            </button>
+          </div>
         </div>
       </div>
     </div>
-
-    <div v-else-if="!isLoading" class="border border-[#222222] p-12 text-center text-[#666666]">
-      <ListMusic class="w-10 h-10 mx-auto mb-2 opacity-30 text-[#00ff66]" />
-      <p class="text-xs">&gt; PLAYLIST VUOTA &lt;</p>
-      <p class="text-[10px] text-[#555555] mt-1">Aggiungi brani usando il pulsante [+LIST] sui singoli brani.</p>
-    </div>
-  </div>
+  </TuiWindow>
 </template>

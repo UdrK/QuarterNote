@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { Users, Heart } from '@lucide/vue';
+import { Users } from '@lucide/vue';
 import { fetchArtists } from '../api/client';
 import { isFavorite, toggleFavorite } from '../stores/favorites';
+import TuiWindow from '../components/TuiWindow.vue';
 import type { Artist } from '@quarter-note/shared';
 
 const router = useRouter();
@@ -32,89 +33,92 @@ async function handleToggleFavorite(e: Event, artistId: string) {
   try {
     await toggleFavorite('artist', artistId);
   } catch (err) {
-    console.error('Failed to toggle favorite for artist:', err);
+    console.error('Failed to toggle favorite:', err);
   }
 }
 </script>
 
 <template>
-  <div class="space-y-4 font-mono select-none">
-    <!-- BBS Header Banner -->
-    <div class="border border-[#2a2a2a] bg-[#070707] p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-      <div>
-        <div class="flex items-center gap-2">
-          <span class="text-[#00ffff] font-bold text-sm">■ [ DIRECTORY ARTISTI ]</span>
-          <span class="text-xs text-[#ffff00]">[{{ artists.length }} ARTISTI]</span>
+  <TuiWindow 
+    title="DIRECTORY ARTISTI" 
+    :badge="`${artists.length} REGISTRATI`" 
+    hotkey="F2"
+    variant="cyan"
+  >
+    <div class="space-y-3 font-mono select-none">
+      <!-- Top Action & Filter Row -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#1c2936] pb-2">
+        <div class="text-[11px] text-[#6688aa]">
+          &gt; Seleziona un artista per sfogliare la discografia (Tasto rapido: [F2] o [1])
         </div>
-        <p class="text-[11px] text-[#777777] mt-0.5">&gt; Seleziona un artista per sfogliare gli album disponibili</p>
-      </div>
 
-      <div class="flex items-center bg-black border border-[#333333] px-2 py-1 focus-within:border-[#00ffff]">
-        <span class="text-[#00ffff] text-xs font-bold mr-1">&gt;</span>
-        <input
-          v-model="filterText"
-          type="text"
-          placeholder="Filtra per nome..."
-          class="bg-transparent text-xs text-[#ffff00] placeholder-[#555555] focus:outline-none w-36 sm:w-48"
-        />
-        <button v-if="filterText" @click="filterText = ''" class="text-[#777777] hover:text-[#ff3366] text-xs">
-          [X]
-        </button>
-      </div>
-    </div>
-
-    <!-- Empty State -->
-    <div v-if="!isLoading && filteredArtists.length === 0" class="border border-[#222222] p-12 text-center text-[#666666]">
-      <Users class="w-10 h-10 mx-auto mb-2 opacity-30 text-[#00ffff]" />
-      <p class="text-xs">&gt; NESSUN ARTISTA TROVATO &lt;</p>
-    </div>
-
-    <!-- Artists Grid in BBS Style -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-      <div
-        v-for="artist in filteredArtists"
-        :key="artist.id"
-        @click="router.push(`/artists/${artist.id}`)"
-        class="relative flex flex-col items-center text-center p-3 border border-[#222222] bg-[#070707] hover:border-[#00ffff] hover:bg-[#001726] transition-colors cursor-pointer group"
-      >
-        <!-- Favorite toggle button -->
-        <button
-          type="button"
-          @click="handleToggleFavorite($event, artist.id)"
-          class="absolute top-2 right-2 text-xs font-bold z-10 transition-colors"
-          :class="[
-            isFavorite('artist', artist.id)
-              ? 'text-[#ff3366]'
-              : 'text-[#444444] hover:text-[#ff3366] opacity-0 group-hover:opacity-100'
-          ]"
-          :title="isFavorite('artist', artist.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
-        >
-          <span>{{ isFavorite('artist', artist.id) ? '[★]' : '[☆]' }}</span>
-        </button>
-
-        <!-- Artist Image Frame -->
-        <div class="w-24 h-24 sm:w-28 sm:h-28 bg-black border border-[#333333] group-hover:border-[#00ffff] overflow-hidden mb-2.5 relative">
-          <img
-            :src="artist.imageUrl || `/api/artists/${artist.id}/image`"
-            :alt="artist.name"
-            class="w-full h-full object-cover"
-            loading="lazy"
+        <div class="flex items-center bg-black border border-[#00ffff]/60 px-2 py-0.5 focus-within:border-[#ffff00]">
+          <span class="text-[#00ffff] text-xs font-bold mr-1.5">&gt; FILTRO:</span>
+          <input
+            v-model="filterText"
+            type="text"
+            placeholder="Nome artista..."
+            class="bg-transparent text-xs text-[#ffff00] placeholder-[#445566] focus:outline-none w-36 sm:w-48 font-mono"
           />
-          <div class="absolute bottom-0 right-0 bg-black/80 text-[8px] text-[#00ffff] px-0.5 leading-none">
-            IMG
-          </div>
+          <button v-if="filterText" @click="filterText = ''" class="text-[#777777] hover:text-[#ff3366] text-xs cursor-pointer">
+            [X]
+          </button>
         </div>
+      </div>
 
-        <h3
-          class="text-xs font-bold text-[#d4d4d4] group-hover:text-[#ffff00] truncate w-full transition-colors"
-          :title="artist.name"
+      <!-- Empty State -->
+      <div v-if="!isLoading && filteredArtists.length === 0" class="border border-dashed border-[#223d54] p-10 text-center text-[#556677]">
+        <Users class="w-8 h-8 mx-auto mb-2 opacity-30 text-[#00ffff]" />
+        <p class="text-xs">&gt;&gt; NESSUN ARTISTA CORRISPONDENTE &lt;&lt;</p>
+      </div>
+
+      <!-- Artists Grid in Curses Box Style -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
+        <div
+          v-for="artist in filteredArtists"
+          :key="artist.id"
+          @click="router.push(`/artists/${artist.id}`)"
+          class="relative flex flex-col items-center text-center p-2.5 border border-[#1a2b3c] bg-[#04080e] hover:border-[#00ffff] hover:bg-[#001f33] transition-colors cursor-pointer group"
         >
-          {{ artist.name }}
-        </h3>
-        <p class="text-[10px] text-[#00ffff]/80 mt-1">
-          [{{ artist.albumCount }} ALBUM]
-        </p>
+          <!-- Favorite toggle -->
+          <button
+            type="button"
+            @click="handleToggleFavorite($event, artist.id)"
+            class="absolute top-1.5 right-1.5 text-xs font-bold z-10 transition-colors cursor-pointer"
+            :class="[
+              isFavorite('artist', artist.id)
+                ? 'text-[#ff3366]'
+                : 'text-[#334455] hover:text-[#ff3366] opacity-0 group-hover:opacity-100'
+            ]"
+            :title="isFavorite('artist', artist.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+          >
+            <span>{{ isFavorite('artist', artist.id) ? '[★]' : '[☆]' }}</span>
+          </button>
+
+          <!-- Artist Image Frame with ASCII border -->
+          <div class="w-20 h-20 sm:w-24 sm:h-24 bg-black border border-[#223d54] group-hover:border-[#00ffff] overflow-hidden mb-2 relative">
+            <img
+              :src="artist.imageUrl || `/api/artists/${artist.id}/image`"
+              :alt="artist.name"
+              class="w-full h-full object-cover"
+              loading="lazy"
+            />
+            <div class="absolute bottom-0 right-0 bg-black text-[7px] text-[#00ffff] px-0.5 border-t border-l border-[#223d54]">
+              IMG
+            </div>
+          </div>
+
+          <h3
+            class="text-xs font-bold text-[#d4d4d4] group-hover:text-[#ffff00] truncate w-full transition-colors"
+            :title="artist.name"
+          >
+            {{ artist.name }}
+          </h3>
+          <p class="text-[10px] text-[#00ffff]/80 mt-0.5">
+            [{{ artist.albumCount }} ALBUM]
+          </p>
+        </div>
       </div>
     </div>
-  </div>
+  </TuiWindow>
 </template>

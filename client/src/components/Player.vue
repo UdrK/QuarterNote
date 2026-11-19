@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { 
   Play, 
@@ -10,10 +10,7 @@ import {
   Repeat, 
   Repeat1, 
   Volume2, 
-  Volume1, 
-  VolumeX, 
   ListMusic, 
-  Gauge, 
   Disc3,
   Heart
 } from '@lucide/vue';
@@ -23,6 +20,7 @@ import type { PlaybackRate } from '@quarter-note/shared';
 
 const router = useRouter();
 const isSpeedMenuOpen = ref(false);
+const showAsciiArt = ref(false);
 
 const speedPresets: PlaybackRate[] = [0.5, 0.75, 0.85, 1.0, 1.15, 1.25, 1.5, 2.0];
 
@@ -47,220 +45,272 @@ function navigateToAlbum() {
   }
 }
 
-// ASCII visual progress bar calculation
+// ASCII progress bar calculation
 const asciiBar = computed(() => {
   const total = playerState.duration || 1;
   const current = playerState.currentTime || 0;
-  const barLength = 22;
+  const barLength = 26;
   const filled = Math.min(barLength, Math.max(0, Math.round((current / total) * barLength)));
   const empty = barLength - filled;
   return '█'.repeat(filled) + '░'.repeat(empty);
 });
+
+// Animated ASCII spectrum visualizer bars when playing
+const eqFrame = ref(0);
+let eqTimer: ReturnType<typeof setInterval> | null = null;
+
+const eqBars = [
+  ' ▂▃▅▆▇█▇▆▅▃▂ ',
+  '▂▃▅▆▇█▇▆▅▃▂  ',
+  '▃▅▆▇█▇▆▅▃▂ ▂',
+  '▅▆▇█▇▆▅▃▂ ▂▃',
+  '▆▇█▇▆▅▃▂ ▂▃▅',
+  '▇█▇▆▅▃▂ ▂▃▅▆',
+  '█▇▆▅▃▂ ▂▃▅▆▇',
+];
+
+onMounted(() => {
+  eqTimer = setInterval(() => {
+    if (playerState.isPlaying) {
+      eqFrame.value = (eqFrame.value + 1) % eqBars.length;
+    }
+  }, 140);
+});
+
+onUnmounted(() => {
+  if (eqTimer) clearInterval(eqTimer);
+});
 </script>
 
 <template>
-  <footer class="h-22 bg-[#050505] border-t-2 border-[#00ffff]/80 px-4 py-2 flex items-center justify-between shrink-0 select-none z-30 font-mono">
-    <!-- LEFT: Currently Playing Track Info in ANSI terminal frame -->
-    <div class="flex items-center gap-3 w-1/4 min-w-[220px]">
-      <div 
-        @click="navigateToAlbum"
-        class="w-12 h-12 bg-black border border-[#00ffff] shrink-0 overflow-hidden cursor-pointer relative group"
-      >
-        <img
-          v-if="playerState.currentTrack"
-          :src="`/api/cover/${playerState.currentTrack.albumId}`"
-          :alt="playerState.currentTrack.title"
-          class="w-full h-full object-cover"
-        />
-        <div v-else class="w-full h-full flex items-center justify-center text-[#555555]">
-          <Disc3 class="w-6 h-6" />
-        </div>
-        <div class="absolute bottom-0 right-0 bg-black/80 text-[8px] text-[#00ffff] px-0.5 leading-none">
-          IMG
-        </div>
+  <footer class="bg-black border-t-2 border-[#00ffff] px-3 py-1.5 shrink-0 select-none z-30 font-mono text-xs">
+    <!-- Curses Console Top Header -->
+    <div class="flex items-center justify-between text-[10px] text-[#446688] pb-1 border-b border-[#172533] mb-1.5">
+      <div class="flex items-center gap-2">
+        <span class="text-[#00ffff] font-extrabold">┌──[ QN-TUI AUDIO CONSOLE ]</span>
+        <span v-if="playerState.isPlaying" class="text-[#00ff66] font-bold">
+          [EQ: {{ eqBars[eqFrame] }}]
+        </span>
+        <span v-else class="text-[#666666]">[PAUSED]</span>
       </div>
 
-      <div v-if="playerState.currentTrack" class="min-w-0 pr-1 flex-1">
-        <div class="flex items-center gap-1.5">
-          <span class="text-[#00ff66] text-[10px] animate-pulse">▶</span>
-          <p class="text-xs font-bold text-[#ffff00] truncate" :title="playerState.currentTrack.title">
-            {{ playerState.currentTrack.title }}
-          </p>
-        </div>
-        <p 
-          @click="navigateToAlbum"
-          class="text-[11px] text-[#00ffff] truncate hover:underline cursor-pointer transition-colors"
-          :title="playerState.currentTrack.artistName"
+      <div class="flex items-center gap-2">
+        <button 
+          @click="showAsciiArt = !showAsciiArt" 
+          class="text-[9px] px-1 bg-[#0f1f2d] hover:bg-[#00ffff] hover:text-black text-[#00ffff] border border-[#224466] transition-colors cursor-pointer"
         >
-          &gt; {{ playerState.currentTrack.artistName }}
-        </p>
-      </div>
-
-      <!-- Favorite Current Track Button -->
-      <button
-        v-if="playerState.currentTrack"
-        type="button"
-        @click="toggleFavorite('track', playerState.currentTrack.id)"
-        class="px-1.5 py-1 text-xs border border-[#333333] hover:border-[#ff3366] shrink-0 transition-colors"
-        :class="isFavorite('track', playerState.currentTrack.id) ? 'bg-[#330011] text-[#ff3366] border-[#ff3366]' : 'text-[#666666]'"
-        :title="isFavorite('track', playerState.currentTrack.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
-      >
-        <span>{{ isFavorite('track', playerState.currentTrack.id) ? '[★]' : '[☆]' }}</span>
-      </button>
-      <div v-else class="min-w-0">
-        <p class="text-[11px] text-[#666666]">&gt; NESSUN BRANO ATTIVO</p>
+          [{{ showAsciiArt ? 'COPERTINA: FOTO' : 'COPERTINA: ASCII' }}]
+        </button>
+        <span class="text-[#446688]">──┐</span>
       </div>
     </div>
 
-    <!-- CENTER: Playback Controls & Retro ASCII Scrubber -->
-    <div class="flex flex-col items-center gap-1.5 w-2/4 max-w-xl">
-      <!-- Buttons row in BBS bracketed style -->
-      <div class="flex items-center gap-2 text-xs">
-        <!-- Shuffle -->
-        <button
-          @click="playerActions.toggleShuffle()"
-          class="bbs-btn py-0.5 px-2 text-[10px]"
-          :class="playerState.shuffle ? 'bbs-btn-yellow border-[#ffff00]' : 'text-[#666666] border-[#333333]'"
-          title="Riproduzione casuale"
+    <!-- Main Console Grid: 3 columns -->
+    <div class="flex items-center justify-between gap-3">
+      <!-- LEFT: Track Metadata & Cover Thumbnail -->
+      <div class="flex items-center gap-2.5 w-1/4 min-w-[220px]">
+        <!-- Cover Art or ASCII Cassette -->
+        <div 
+          @click="navigateToAlbum"
+          class="w-12 h-12 bg-black border border-[#00ffff] shrink-0 overflow-hidden cursor-pointer relative"
         >
-          <span>[⇄ CAS: {{ playerState.shuffle ? 'ON' : 'OFF' }}]</span>
-        </button>
+          <!-- ASCII Cassette Mode -->
+          <div v-if="showAsciiArt" class="w-full h-full flex flex-col items-center justify-center text-[7px] text-[#00ff66] font-bold leading-none bg-[#02111a]">
+            <span>.-----.</span>
+            <span>|{{ playerState.isPlaying && (eqFrame % 2 === 0) ? '(o) (o)' : '(O) (O)' }}|</span>
+            <span>`====='</span>
+          </div>
 
-        <!-- Previous -->
-        <button
-          @click="playerActions.prev()"
-          class="bbs-btn py-0.5 px-2.5 text-xs border-[#333333]"
-          title="Precedente"
-        >
-          <span>[&lt;&lt;]</span>
-        </button>
+          <!-- Real Image Mode -->
+          <img
+            v-else-if="playerState.currentTrack"
+            :src="`/api/cover/${playerState.currentTrack.albumId}`"
+            :alt="playerState.currentTrack.title"
+            class="w-full h-full object-cover"
+          />
+          <div v-else class="w-full h-full flex items-center justify-center text-[#555555]">
+            <Disc3 class="w-6 h-6" />
+          </div>
+        </div>
 
-        <!-- Play / Pause -->
-        <button
-          @click="playerActions.togglePlay()"
-          class="bbs-btn py-1 px-4 text-xs font-bold border-2"
-          :class="playerState.isPlaying ? 'bbs-btn-yellow border-[#ffff00]' : 'bbs-btn-green border-[#00ff66]'"
-          :title="playerState.isPlaying ? 'Pausa' : 'Riproduci'"
-        >
-          <span v-if="playerState.isPlaying">[ ❚❚ PAUSA ]</span>
-          <span v-else>[ ▶ PLAY ]</span>
-        </button>
+        <div v-if="playerState.currentTrack" class="min-w-0 pr-1 flex-1">
+          <div class="flex items-center gap-1">
+            <span class="text-[#00ff66] text-[10px]">{{ playerState.isPlaying ? '▶' : '❚❚' }}</span>
+            <p class="text-xs font-bold text-[#ffff00] truncate" :title="playerState.currentTrack.title">
+              {{ playerState.currentTrack.title }}
+            </p>
+          </div>
+          <p 
+            @click="navigateToAlbum"
+            class="text-[10px] text-[#00ffff] truncate hover:underline cursor-pointer"
+            :title="playerState.currentTrack.artistName"
+          >
+            &gt; {{ playerState.currentTrack.artistName }}
+          </p>
+        </div>
 
-        <!-- Next -->
+        <!-- Favorite Button -->
         <button
-          @click="playerActions.next()"
-          class="bbs-btn py-0.5 px-2.5 text-xs border-[#333333]"
-          title="Successivo"
+          v-if="playerState.currentTrack"
+          type="button"
+          @click="toggleFavorite('track', playerState.currentTrack.id)"
+          class="px-1 text-xs border border-[#223d54] hover:border-[#ff3366] shrink-0 transition-colors cursor-pointer"
+          :class="isFavorite('track', playerState.currentTrack.id) ? 'bg-[#330011] text-[#ff3366] border-[#ff3366]' : 'text-[#666666]'"
+          :title="isFavorite('track', playerState.currentTrack.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
         >
-          <span>[&gt;&gt;]</span>
+          <span>{{ isFavorite('track', playerState.currentTrack.id) ? '[★]' : '[☆]' }}</span>
         </button>
-
-        <!-- Repeat Mode -->
-        <button
-          @click="playerActions.toggleRepeat()"
-          class="bbs-btn py-0.5 px-2 text-[10px]"
-          :class="playerState.repeatMode !== 'off' ? 'bbs-btn-yellow border-[#ffff00]' : 'text-[#666666] border-[#333333]'"
-          :title="`Ripeti: ${playerState.repeatMode}`"
-        >
-          <span>[↻ REP: {{ playerState.repeatMode.toUpperCase() }}]</span>
-        </button>
+        <div v-else class="min-w-0">
+          <p class="text-[10px] text-[#556677]">&gt; NESSUN BRANO</p>
+        </div>
       </div>
 
-      <!-- Time & ASCII Scrubber Row -->
-      <div class="flex items-center gap-3 w-full">
-        <span class="text-[11px] font-mono text-[#ffff00] w-12 text-right tabular-nums">
-          {{ formatTime(playerState.currentTime) }}
-        </span>
+      <!-- CENTER: Controls & Dual Scrubber (ASCII + interactive bar) -->
+      <div class="flex flex-col items-center gap-1 w-2/4 max-w-xl">
+        <!-- Buttons row in true TUI style -->
+        <div class="flex items-center gap-1.5 text-xs">
+          <!-- Shuffle -->
+          <button
+            @click="playerActions.toggleShuffle()"
+            class="px-1.5 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer"
+            :class="playerState.shuffle ? 'bg-[#ffff00] text-black border-[#ffff00]' : 'text-[#888888] border-[#223d54] hover:border-[#00ffff]'"
+            title="Riproduzione casuale"
+          >
+            <span>[⇄ CAS]</span>
+          </button>
 
-        <!-- Interactive Range Slider with ASCII gauge feel -->
-        <div class="flex-1 flex flex-col items-center">
+          <!-- Previous -->
+          <button
+            @click="playerActions.prev()"
+            class="px-2 py-0.5 text-[11px] font-bold bg-[#0d1622] hover:bg-[#00ffff] hover:text-black text-[#00ffff] border border-[#223d54] transition-colors cursor-pointer"
+            title="Precedente (P)"
+          >
+            <span>[&lt;&lt;]</span>
+          </button>
+
+          <!-- Play / Pause -->
+          <button
+            @click="playerActions.togglePlay()"
+            class="px-4 py-0.5 text-xs font-extrabold border-2 transition-all cursor-pointer"
+            :class="playerState.isPlaying ? 'bg-[#ffff00] text-black border-[#ffff00]' : 'bg-[#00ff66] text-black border-[#00ff66]'"
+            :title="playerState.isPlaying ? 'Pausa (Space)' : 'Riproduci (Space)'"
+          >
+            <span v-if="playerState.isPlaying">[ ❚❚ PAUSA ]</span>
+            <span v-else>[ ▶ PLAY ]</span>
+          </button>
+
+          <!-- Next -->
+          <button
+            @click="playerActions.next()"
+            class="px-2 py-0.5 text-[11px] font-bold bg-[#0d1622] hover:bg-[#00ffff] hover:text-black text-[#00ffff] border border-[#223d54] transition-colors cursor-pointer"
+            title="Successivo (N)"
+          >
+            <span>[&gt;&gt;]</span>
+          </button>
+
+          <!-- Repeat Mode -->
+          <button
+            @click="playerActions.toggleRepeat()"
+            class="px-1.5 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer"
+            :class="playerState.repeatMode !== 'off' ? 'bg-[#ffff00] text-black border-[#ffff00]' : 'text-[#888888] border-[#223d54] hover:border-[#00ffff]'"
+            :title="`Ripeti: ${playerState.repeatMode}`"
+          >
+            <span>[↻ {{ playerState.repeatMode.toUpperCase() }}]</span>
+          </button>
+        </div>
+
+        <!-- Time & Scrubber row -->
+        <div class="flex items-center gap-2 w-full">
+          <span class="text-[10px] font-bold text-[#ffff00] w-10 text-right tabular-nums">
+            {{ formatTime(playerState.currentTime) }}
+          </span>
+
+          <div class="flex-1 flex flex-col items-center">
+            <input
+              type="range"
+              min="0"
+              :max="playerState.duration || 100"
+              :value="playerState.currentTime"
+              @input="handleSeek"
+              class="w-full h-1.5 cursor-pointer"
+            />
+            <div class="w-full flex justify-between text-[8px] text-[#00ffff]/70 font-mono tracking-tighter mt-0.5">
+              <span>[{{ asciiBar }}]</span>
+              <span class="text-[#556677]">{{ Math.round((playerState.currentTime / (playerState.duration || 1)) * 100) }}%</span>
+            </div>
+          </div>
+
+          <span class="text-[10px] text-[#888888] w-10 text-left tabular-nums">
+            {{ formatTime(playerState.duration) }}
+          </span>
+        </div>
+      </div>
+
+      <!-- RIGHT: Controls (Rate, Volume, Queue) -->
+      <div class="flex items-center justify-end gap-2 w-1/4 min-w-[220px] relative">
+        <!-- Playback Rate (Rallentatore) -->
+        <div class="relative">
+          <button
+            @click.stop="isSpeedMenuOpen = !isSpeedMenuOpen"
+            class="px-1.5 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer"
+            :class="playerState.playbackRate !== 1.0 ? 'bg-[#ffff00] text-black border-[#ffff00]' : 'text-[#aaaaaa] border-[#223d54] hover:border-[#00ffff]'"
+            title="Velocità di riproduzione"
+          >
+            <span>[{{ playerState.playbackRate }}x]</span>
+          </button>
+
+          <!-- Popover Menu -->
+          <div
+            v-if="isSpeedMenuOpen"
+            @click.stop
+            class="absolute bottom-10 right-0 w-44 bg-black border-2 border-[#00ffff] p-2 z-50 text-xs space-y-1.5 select-none shadow-[0_0_20px_rgba(0,255,255,0.3)]"
+          >
+            <div class="flex items-center justify-between pb-1 border-b border-[#223d54] text-[10px] text-[#00ffff] font-bold">
+              <span>┌──[ VELOCITÀ AUDIO ]</span>
+              <button @click="isSpeedMenuOpen = false" class="text-[#888888] hover:text-[#ff3366]">[X]─┐</button>
+            </div>
+            <div class="grid grid-cols-4 gap-1">
+              <button
+                v-for="speed in speedPresets"
+                :key="speed"
+                @click="selectSpeed(speed)"
+                class="py-1 text-[10px] font-bold border transition-colors cursor-pointer"
+                :class="playerState.playbackRate === speed ? 'bg-[#ffff00] text-black border-[#ffff00]' : 'bg-[#0d1622] text-[#00ffff] border-[#223d54] hover:border-[#00ffff]'"
+              >
+                {{ speed }}x
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Volume Bar -->
+        <div class="flex items-center gap-1 border border-[#223d54] px-1.5 py-0.5 bg-black">
+          <span class="text-[9px] text-[#00ffff] font-bold">VOL:</span>
           <input
             type="range"
             min="0"
-            :max="playerState.duration || 100"
-            :value="playerState.currentTime"
-            @input="handleSeek"
-            class="w-full h-2 cursor-pointer"
+            max="1"
+            step="0.05"
+            :value="playerState.volume"
+            @input="handleVolume"
+            class="w-14 h-1 cursor-pointer"
+            title="Volume"
           />
-          <div class="w-full flex justify-between text-[9px] text-[#00ffff]/60 font-mono tracking-tighter mt-0.5">
-            <span>[{{ asciiBar }}]</span>
-            <span class="text-[#777777] hidden sm:inline">TRACK SEEK</span>
-          </div>
+          <span class="text-[9px] text-[#ffff00] tabular-nums w-6 text-right">
+            {{ Math.round(playerState.volume * 100) }}%
+          </span>
         </div>
 
-        <span class="text-[11px] font-mono text-[#888888] w-12 text-left tabular-nums">
-          {{ formatTime(playerState.duration) }}
-        </span>
-      </div>
-    </div>
-
-    <!-- RIGHT: Speed Selector (Rallentatore), Volume, Queue -->
-    <div class="flex items-center justify-end gap-2.5 w-1/4 min-w-[220px] relative">
-      <!-- SPEED SELECTOR (Rallentatore) -->
-      <div class="relative">
+        <!-- Queue Drawer Button -->
         <button
-          @click.stop="isSpeedMenuOpen = !isSpeedMenuOpen"
-          class="bbs-btn py-0.5 px-2 text-[10px]"
-          :class="playerState.playbackRate !== 1.0 ? 'bbs-btn-yellow border-[#ffff00]' : 'border-[#333333] text-[#aaaaaa]'"
-          title="Velocità di riproduzione"
+          @click="playerState.isQueueOpen = !playerState.isQueueOpen"
+          class="px-1.5 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer"
+          :class="playerState.isQueueOpen ? 'bg-[#00ffff] text-black border-[#00ffff]' : 'text-[#aaaaaa] border-[#223d54] hover:border-[#00ffff]'"
+          title="Mostra / Nascondi coda (Q)"
         >
-          <Gauge class="w-3 h-3" />
-          <span>[{{ playerState.playbackRate }}x]</span>
+          <span>[Q: {{ playerState.queue.length }}]</span>
         </button>
-
-        <!-- Speed Dropdown Popover in BBS box -->
-        <div
-          v-if="isSpeedMenuOpen"
-          @click.stop
-          class="absolute bottom-12 right-0 w-44 bg-black border border-[#00ffff] p-2 z-50 text-xs space-y-2 select-none shadow-[0_0_15px_rgba(0,255,255,0.2)]"
-        >
-          <div class="flex items-center justify-between pb-1 border-b border-[#2a2a2a] text-[10px] text-[#00ffff] font-bold">
-            <span>■ VELOCITÀ AUDIO</span>
-            <button @click="isSpeedMenuOpen = false" class="text-[#888888] hover:text-[#ff3366]">[X]</button>
-          </div>
-
-          <div class="grid grid-cols-4 gap-1">
-            <button
-              v-for="speed in speedPresets"
-              :key="speed"
-              @click="selectSpeed(speed)"
-              class="bbs-btn py-1 text-[10px]"
-              :class="playerState.playbackRate === speed ? 'bbs-btn-yellow' : 'border-[#222222] text-[#aaaaaa]'"
-            >
-              {{ speed }}x
-            </button>
-          </div>
-        </div>
       </div>
-
-      <!-- Volume Scrubber -->
-      <div class="flex items-center gap-1.5 border border-[#222222] px-2 py-0.5 bg-black">
-        <Volume2 class="w-3.5 h-3.5 text-[#00ffff]" />
-        <input
-          type="range"
-          min="0"
-          max="1"
-          step="0.05"
-          :value="playerState.volume"
-          @input="handleVolume"
-          class="w-16 h-1.5 cursor-pointer"
-          title="Volume"
-        />
-        <span class="text-[10px] text-[#ffff00] tabular-nums w-7 text-right">
-          {{ Math.round(playerState.volume * 100) }}%
-        </span>
-      </div>
-
-      <!-- Queue Drawer Toggle -->
-      <button
-        @click="playerState.isQueueOpen = !playerState.isQueueOpen"
-        class="bbs-btn py-0.5 px-2 text-[10px]"
-        :class="playerState.isQueueOpen ? 'bbs-btn-cyan border-[#00ffff]' : 'border-[#333333] text-[#aaaaaa]'"
-        title="Visualizza coda di riproduzione"
-      >
-        <ListMusic class="w-3.5 h-3.5" />
-        <span>[{{ playerState.queue.length }}]</span>
-      </button>
     </div>
   </footer>
 </template>

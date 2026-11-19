@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { ListMusic, Plus, Trash2, Heart } from '@lucide/vue';
+import { ListMusic } from '@lucide/vue';
 import { fetchPlaylists, createPlaylist, deletePlaylist } from '../api/client';
 import { formatTime } from '../stores/player';
 import { isFavorite, toggleFavorite } from '../stores/favorites';
+import TuiWindow from '../components/TuiWindow.vue';
 import type { Playlist } from '@quarter-note/shared';
 
 const router = useRouter();
@@ -49,105 +50,107 @@ onMounted(load);
 </script>
 
 <template>
-  <div class="space-y-4 font-mono select-none">
-    <!-- Header -->
-    <div class="border border-[#2a2a2a] bg-[#070707] p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-      <div>
-        <div class="flex items-center gap-2">
-          <span class="text-[#00ff66] font-bold text-sm">■ [ ARCHIVIO PLAYLIST ]</span>
-          <span class="text-xs text-[#ffff00]">[{{ playlists.length }} PLAYLIST]</span>
+  <TuiWindow 
+    title="ARCHIVIO PLAYLIST" 
+    :badge="`${playlists.length} SALVATE`" 
+    hotkey="F5"
+    variant="green"
+  >
+    <div class="space-y-3 font-mono select-none">
+      <!-- Header Bar -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#003311] pb-2">
+        <div class="text-[11px] text-[#00aa44]">
+          &gt; Raccolte musicali personalizzate (Tasto rapido: [F5] o [4])
         </div>
-        <p class="text-[11px] text-[#777777] mt-0.5">&gt; Raccolte musicali personalizzate dell'utente</p>
+
+        <button
+          @click="showCreate = true"
+          class="bg-[#00ff66] hover:bg-[#55ff99] text-black font-extrabold px-3 py-1 text-xs border border-[#00ff66] transition-colors cursor-pointer self-start sm:self-auto"
+        >
+          <span>[+ NUOVA PLAYLIST]</span>
+        </button>
       </div>
 
-      <button
-        @click="showCreate = true"
-        class="bbs-btn bbs-btn-green py-1.5 px-3 text-xs self-start sm:self-auto"
-      >
-        <span>[+ NUOVA PLAYLIST]</span>
-      </button>
-    </div>
+      <!-- Create Inline Form in Curses Box -->
+      <div v-if="showCreate" class="p-2.5 border-2 border-[#00ff66] bg-[#001710] flex items-center gap-2">
+        <span class="text-[#00ff66] text-xs font-bold">&gt; NOME:</span>
+        <input
+          v-model="newName"
+          type="text"
+          placeholder="Es: Workout, Notturna, Top 50..."
+          class="flex-1 bg-black text-xs text-[#ffff00] px-2 py-1 border border-[#00ff66]/60 focus:outline-none focus:border-[#ffff00] font-mono"
+          @keyup.enter="handleCreate"
+          autofocus
+        />
+        <button
+          @click="handleCreate"
+          :disabled="!newName.trim()"
+          class="bg-[#00ff66] hover:bg-[#55ff99] text-black font-bold px-3 py-1 text-xs border border-[#00ff66] cursor-pointer"
+        >
+          [SALVA]
+        </button>
+        <button
+          @click="showCreate = false"
+          class="bg-[#002211] text-[#aaaaaa] hover:text-white px-2 py-1 text-xs border border-[#004422] cursor-pointer"
+        >
+          [ANNULLA]
+        </button>
+      </div>
 
-    <!-- Create Inline Form in BBS Box -->
-    <div v-if="showCreate" class="p-3 border-2 border-[#00ff66] bg-black shadow-[0_0_15px_rgba(0,255,102,0.15)] flex items-center gap-2">
-      <span class="text-[#00ff66] text-xs font-bold">&gt; NOME PLAYLIST:</span>
-      <input
-        v-model="newName"
-        type="text"
-        placeholder="Es: Workout, Notte, Top Tracks..."
-        class="flex-1 bg-[#0a0a0a] text-xs text-[#ffff00] px-3 py-1.5 border border-[#333333] focus:outline-none focus:border-[#00ff66]"
-        @keyup.enter="handleCreate"
-        autofocus
-      />
-      <button
-        @click="handleCreate"
-        :disabled="!newName.trim()"
-        class="bbs-btn bbs-btn-green py-1 px-3 text-xs"
-      >
-        [SALVA]
-      </button>
-      <button
-        @click="showCreate = false"
-        class="bbs-btn py-1 px-2 text-xs border-[#333333] text-[#888888]"
-      >
-        [ANNULLA]
-      </button>
-    </div>
+      <!-- Empty State -->
+      <div v-if="!isLoading && playlists.length === 0" class="border border-dashed border-[#003311] p-10 text-center text-[#006622]">
+        <ListMusic class="w-8 h-8 mx-auto mb-2 opacity-30 text-[#00ff66]" />
+        <p class="text-xs">&gt;&gt; NESSUNA PLAYLIST SALVATA &lt;&lt;</p>
+      </div>
 
-    <!-- Empty State -->
-    <div v-if="!isLoading && playlists.length === 0" class="border border-[#222222] p-12 text-center text-[#666666]">
-      <ListMusic class="w-10 h-10 mx-auto mb-2 opacity-30 text-[#00ff66]" />
-      <p class="text-xs">&gt; NESSUNA PLAYLIST SALVATA &lt;</p>
-      <p class="text-[10px] text-[#555555] mt-1">Premi [+ NUOVA PLAYLIST] per crearne una.</p>
-    </div>
+      <!-- Playlists Grid -->
+      <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5">
+        <div
+          v-for="pl in playlists"
+          :key="pl.id"
+          @click="router.push(`/playlists/${pl.id}`)"
+          class="group p-2 bg-[#000d07] border border-[#003311] hover:border-[#00ff66] hover:bg-[#001a0e] transition-colors cursor-pointer flex flex-col justify-between"
+        >
+          <div class="space-y-1.5">
+            <div class="aspect-square bg-black border border-[#003311] group-hover:border-[#00ff66] overflow-hidden">
+              <img
+                :src="`/api/playlists/${pl.id}/cover`"
+                :alt="pl.name"
+                class="w-full h-full object-cover"
+                loading="lazy"
+              />
+            </div>
 
-    <!-- Playlists Grid -->
-    <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-      <div
-        v-for="pl in playlists"
-        :key="pl.id"
-        @click="router.push(`/playlists/${pl.id}`)"
-        class="group p-2.5 bg-[#070707] border border-[#222222] hover:border-[#00ff66] hover:bg-[#001710] transition-colors cursor-pointer flex flex-col justify-between"
-      >
-        <div class="space-y-2">
-          <div class="aspect-square bg-black border border-[#333333] group-hover:border-[#00ff66] overflow-hidden">
-            <img
-              :src="`/api/playlists/${pl.id}/cover`"
-              :alt="pl.name"
-              class="w-full h-full object-cover"
-              loading="lazy"
-            />
+            <div>
+              <h3 class="text-xs font-bold text-[#d4d4d4] truncate group-hover:text-[#00ff66] transition-colors">
+                {{ pl.name }}
+              </h3>
+              <p class="text-[9px] text-[#668877]">
+                [{{ pl.trackCount }} BRANI] • {{ formatTime(pl.totalDuration) }}
+              </p>
+            </div>
           </div>
 
-          <div>
-            <h3 class="text-xs font-bold text-[#d4d4d4] truncate group-hover:text-[#00ff66] transition-colors">
-              {{ pl.name }}
-            </h3>
-            <p class="text-[10px] text-[#888888] mt-0.5">
-              [{{ pl.trackCount }} BRANI] • {{ formatTime(pl.totalDuration) }}
-            </p>
+          <div class="pt-1.5 border-t border-[#00220d] mt-2 flex items-center justify-between text-xs">
+            <button
+              @click.stop="toggleFavorite('playlist', pl.id)"
+              class="font-bold transition-colors cursor-pointer"
+              :class="isFavorite('playlist', pl.id) ? 'text-[#ff3366]' : 'text-[#446655] hover:text-[#ff3366]'"
+              :title="isFavorite('playlist', pl.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+            >
+              <span>{{ isFavorite('playlist', pl.id) ? '[★]' : '[☆]' }}</span>
+            </button>
+
+            <button
+              @click.stop="handleDelete(pl.id)"
+              class="text-[#446655] hover:text-[#ff3366] text-[10px] font-bold cursor-pointer"
+              title="Elimina playlist"
+            >
+              [ELIMINA]
+            </button>
           </div>
-        </div>
-
-        <div class="pt-2 border-t border-[#1f1f1f] mt-2 flex items-center justify-between text-xs">
-          <button
-            @click.stop="toggleFavorite('playlist', pl.id)"
-            class="font-bold transition-colors"
-            :class="isFavorite('playlist', pl.id) ? 'text-[#ff3366]' : 'text-[#555555] hover:text-[#ff3366]'"
-            :title="isFavorite('playlist', pl.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
-          >
-            <span>{{ isFavorite('playlist', pl.id) ? '[★]' : '[☆]' }}</span>
-          </button>
-
-          <button
-            @click.stop="handleDelete(pl.id)"
-            class="text-[#555555] hover:text-[#ff3366] text-[10px] font-bold"
-            title="Elimina playlist"
-          >
-            [ELIMINA]
-          </button>
         </div>
       </div>
     </div>
-  </div>
+  </TuiWindow>
 </template>

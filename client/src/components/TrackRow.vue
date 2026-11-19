@@ -22,72 +22,88 @@ function play() {
 
 <template>
   <div
-    class="group flex items-center justify-between px-2.5 py-1.5 text-xs select-none transition-colors border-b border-[#1c1c1c] font-mono"
+    class="group flex items-center justify-between px-2 py-1 text-xs select-none transition-colors border-b border-[#141b24] font-mono cursor-pointer"
     :class="[
       playerState.currentTrack?.id === track.id
-        ? 'bg-[#002b4d] text-[#ffff00] border-[#00ffff]'
-        : 'hover:bg-[#0c0c0c] text-[#cccccc] hover:text-[#00ffff]'
+        ? 'bg-[#00ffff] text-black font-extrabold border-[#00ffff]'
+        : 'text-[#cccccc] hover:bg-[#002238] hover:text-[#ffff00]'
     ]"
   >
     <!-- Left: Index / Play & Title -->
-    <div @click="play" class="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer">
+    <div @click="play" class="flex items-center gap-2 min-w-0 flex-1">
       <!-- Index or Play cursor -->
-      <span class="w-6 text-center text-[#777777] font-mono text-[11px] group-hover:hidden">
-        {{ index !== undefined ? String(index + 1).padStart(2, '0') : (track.trackNumber ? String(track.trackNumber).padStart(2, '0') : '..') }}.
-      </span>
-      <span class="w-6 hidden group-hover:flex items-center justify-center text-[#00ff66] font-bold">
-        ►
+      <span 
+        class="w-7 text-center font-mono text-[10px] shrink-0"
+        :class="playerState.currentTrack?.id === track.id ? 'text-black font-extrabold' : 'text-[#556677] group-hover:text-[#00ff66]'"
+      >
+        <span v-if="playerState.currentTrack?.id === track.id">►►</span>
+        <template v-else>
+          <span class="group-hover:hidden">{{ index !== undefined ? String(index + 1).padStart(2, '0') : '..' }}.</span>
+          <span class="hidden group-hover:inline font-bold">►</span>
+        </template>
       </span>
 
       <!-- Title & Artist -->
-      <div class="min-w-0 flex-1">
-        <p class="font-bold truncate" :class="playerState.currentTrack?.id === track.id ? 'text-[#ffff00]' : 'group-hover:text-[#ffffff]'">
+      <div class="min-w-0 flex-1 flex items-baseline gap-2">
+        <p class="font-bold truncate" :class="playerState.currentTrack?.id === track.id ? 'text-black' : 'group-hover:text-[#ffffff]'">
           {{ track.title }}
         </p>
-        <p class="text-[10px] text-[#00ffff] opacity-80 truncate">{{ track.artistName }}</p>
+        <p 
+          class="text-[10px] truncate shrink-0"
+          :class="playerState.currentTrack?.id === track.id ? 'text-black/80' : 'text-[#00ffff] opacity-75'"
+        >
+          {{ track.artistName }}
+        </p>
       </div>
 
       <!-- Optional Album column -->
-      <div v-if="showAlbum" class="hidden md:block w-1/3 min-w-0 truncate text-[#888888] text-[11px]">
+      <div 
+        v-if="showAlbum" 
+        class="hidden md:block w-1/4 min-w-0 truncate text-[10px]"
+        :class="playerState.currentTrack?.id === track.id ? 'text-black/80' : 'text-[#667788]'"
+      >
         [{{ track.albumTitle }}]
       </div>
     </div>
 
-    <!-- Right: Duration & Quick Actions in BBS bracket format -->
-    <div class="flex items-center gap-1 shrink-0 ml-3">
+    <!-- Right: Duration & Quick Actions in TUI bracket format -->
+    <div class="flex items-center gap-1.5 shrink-0 ml-2">
       <!-- Action buttons (visible on hover) -->
       <div class="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity">
         <button
           @click.stop="playerActions.playNext(track)"
-          class="bbs-btn py-0.5 px-1.5 text-[10px] border-[#333333]"
-          title="Riproduci dopo questo brano"
+          class="px-1 text-[10px] font-bold border transition-colors"
+          :class="playerState.currentTrack?.id === track.id ? 'bg-black text-[#00ffff] border-black' : 'bg-[#0d1622] text-[#00ffff] border-[#224466] hover:bg-[#00ffff] hover:text-black'"
+          title="Riproduci dopo questo brano (↳)"
         >
-          <span>[↳]</span>
+          [↳]
         </button>
         <button
           @click.stop="playerActions.addToQueue(track)"
-          class="bbs-btn py-0.5 px-1.5 text-[10px] border-[#333333]"
-          title="Aggiungi alla coda"
+          class="px-1 text-[10px] font-bold border transition-colors"
+          :class="playerState.currentTrack?.id === track.id ? 'bg-black text-[#00ffff] border-black' : 'bg-[#0d1622] text-[#00ffff] border-[#224466] hover:bg-[#00ffff] hover:text-black'"
+          title="Aggiungi alla coda (+CODA)"
         >
-          <span>[+CODA]</span>
+          [+C]
         </button>
         <button
           @click.stop="showPlaylistModal = true"
-          class="bbs-btn py-0.5 px-1.5 text-[10px] border-[#333333]"
-          title="Aggiungi a playlist"
+          class="px-1 text-[10px] font-bold border transition-colors"
+          :class="playerState.currentTrack?.id === track.id ? 'bg-black text-[#00ffff] border-black' : 'bg-[#0d1622] text-[#00ffff] border-[#224466] hover:bg-[#00ffff] hover:text-black'"
+          title="Aggiungi a playlist (+LIST)"
         >
-          <span>[+LIST]</span>
+          [+L]
         </button>
       </div>
 
       <!-- Favorite button -->
       <button
         @click.stop="toggleFavorite('track', track.id)"
-        class="px-1 text-[11px] font-bold transition-all"
+        class="px-0.5 text-[11px] font-bold transition-all"
         :class="[
           isFavorite('track', track.id)
-            ? 'text-[#ff3366]'
-            : 'text-[#555555] hover:text-[#ff3366] opacity-40 group-hover:opacity-100'
+            ? (playerState.currentTrack?.id === track.id ? 'text-black' : 'text-[#ff3366]')
+            : 'text-[#445566] hover:text-[#ff3366] opacity-40 group-hover:opacity-100'
         ]"
         :title="isFavorite('track', track.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
       >
@@ -95,7 +111,10 @@ function play() {
       </button>
 
       <!-- Duration -->
-      <span class="w-12 text-right font-mono text-[11px] text-[#888888] tabular-nums">
+      <span 
+        class="w-11 text-right font-mono text-[10px] tabular-nums"
+        :class="playerState.currentTrack?.id === track.id ? 'text-black' : 'text-[#778899]'"
+      >
         {{ formatTime(track.duration) }}
       </span>
     </div>
