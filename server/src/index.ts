@@ -19,7 +19,26 @@ import { favoriteRoutes } from './routes/favorites.js';
 const PORT = parseInt(process.env.PORT || '8080', 10);
 const HOST = process.env.HOST || '0.0.0.0';
 const MUSIC_DIR = path.resolve(process.env.MUSIC_DIR || path.join(process.cwd(), 'music'));
-const DATA_DIR = path.resolve(process.env.DATA_DIR || path.join(process.cwd(), 'data'));
+function resolveDataDir(): string {
+  if (process.env.DATA_DIR) {
+    return path.resolve(process.env.DATA_DIR);
+  }
+  const serverData = path.resolve(process.cwd(), 'server', 'data');
+  if (fs.existsSync(path.join(serverData, 'quarter.db'))) {
+    return serverData;
+  }
+  const cwdData = path.resolve(process.cwd(), 'data');
+  if (fs.existsSync(path.join(cwdData, 'quarter.db'))) {
+    return cwdData;
+  }
+  const parentData = path.resolve(process.cwd(), '..', 'data');
+  if (fs.existsSync(path.join(parentData, 'quarter.db'))) {
+    return parentData;
+  }
+  return cwdData;
+}
+
+const DATA_DIR = resolveDataDir();
 
 // Look for client dist in monorepo or production container path
 const possibleClientDirs = [

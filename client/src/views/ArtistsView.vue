@@ -89,7 +89,7 @@ async function handleToggleFavorite(e: Event, artistId: string) {
         <!-- Artist Image Avatar -->
         <div class="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-slate-800 border-2 border-slate-700/60 group-hover:border-sky-400/80 group-hover:scale-105 transition-all shadow-md mb-3 shrink-0">
           <img
-            :src="`/api/artists/${artist.id}/image`"
+            :src="artist.imageUrl || `/api/artists/${artist.id}/image`"
             :alt="artist.name"
             class="w-full h-full object-cover"
             loading="lazy"

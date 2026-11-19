@@ -78,7 +78,7 @@ export const libraryRoutes = (dataDir: string): FastifyPluginAsync => {
       }
 
       reply.header('Content-Type', 'image/svg+xml');
-      reply.header('Cache-Control', 'public, max-age=86400');
+      reply.header('Cache-Control', 'no-cache, must-revalidate');
       return reply.send(ARTIST_PLACEHOLDER_SVG);
     });
 
