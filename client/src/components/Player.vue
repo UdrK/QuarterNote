@@ -99,7 +99,7 @@ onUnmounted(() => {
           @click="showAsciiArt = !showAsciiArt" 
           class="text-[9px] px-1 bg-[#0f1f2d] hover:bg-[#00ffff] hover:text-black text-[#00ffff] border border-[#224466] transition-colors cursor-pointer"
         >
-          [{{ showAsciiArt ? 'COPERTINA: FOTO' : 'COPERTINA: ASCII' }}]
+          [{{ showAsciiArt ? 'COVER: PHOTO' : 'COVER: ASCII' }}]
         </button>
         <span class="text-[#446688]">──┐</span>
       </div>
@@ -156,12 +156,12 @@ onUnmounted(() => {
           @click="toggleFavorite('track', playerState.currentTrack.id)"
           class="px-1 text-xs border border-[#223d54] hover:border-[#ff3366] shrink-0 transition-colors cursor-pointer"
           :class="isFavorite('track', playerState.currentTrack.id) ? 'bg-[#330011] text-[#ff3366] border-[#ff3366]' : 'text-[#666666]'"
-          :title="isFavorite('track', playerState.currentTrack.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+          :title="isFavorite('track', playerState.currentTrack.id) ? 'Remove from favorites' : 'Add to favorites'"
         >
           <span>{{ isFavorite('track', playerState.currentTrack.id) ? '[★]' : '[☆]' }}</span>
         </button>
         <div v-else class="min-w-0">
-          <p class="text-[10px] text-[#556677]">&gt; NESSUN BRANO</p>
+          <p class="text-[10px] text-[#556677]">&gt; NO TRACK PLAYING</p>
         </div>
       </div>
 
@@ -174,16 +174,16 @@ onUnmounted(() => {
             @click="playerActions.toggleShuffle()"
             class="px-1.5 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer"
             :class="playerState.shuffle ? 'bg-[#ffff00] text-black border-[#ffff00]' : 'text-[#888888] border-[#223d54] hover:border-[#00ffff]'"
-            title="Riproduzione casuale"
+            title="Shuffle playback"
           >
-            <span>[⇄ CAS]</span>
+            <span>[⇄ SHUF]</span>
           </button>
 
           <!-- Previous -->
           <button
             @click="playerActions.prev()"
             class="px-2 py-0.5 text-[11px] font-bold bg-[#0d1622] hover:bg-[#00ffff] hover:text-black text-[#00ffff] border border-[#223d54] transition-colors cursor-pointer"
-            title="Precedente (P)"
+            title="Previous (P)"
           >
             <span>[&lt;&lt;]</span>
           </button>
@@ -193,9 +193,9 @@ onUnmounted(() => {
             @click="playerActions.togglePlay()"
             class="px-4 py-0.5 text-xs font-extrabold border-2 transition-all cursor-pointer"
             :class="playerState.isPlaying ? 'bg-[#ffff00] text-black border-[#ffff00]' : 'bg-[#00ff66] text-black border-[#00ff66]'"
-            :title="playerState.isPlaying ? 'Pausa (Space)' : 'Riproduci (Space)'"
+            :title="playerState.isPlaying ? 'Pause (Space)' : 'Play (Space)'"
           >
-            <span v-if="playerState.isPlaying">[ ❚❚ PAUSA ]</span>
+            <span v-if="playerState.isPlaying">[ ❚❚ PAUSE ]</span>
             <span v-else>[ ▶ PLAY ]</span>
           </button>
 
@@ -203,7 +203,7 @@ onUnmounted(() => {
           <button
             @click="playerActions.next()"
             class="px-2 py-0.5 text-[11px] font-bold bg-[#0d1622] hover:bg-[#00ffff] hover:text-black text-[#00ffff] border border-[#223d54] transition-colors cursor-pointer"
-            title="Successivo (N)"
+            title="Next (N)"
           >
             <span>[&gt;&gt;]</span>
           </button>
@@ -213,7 +213,7 @@ onUnmounted(() => {
             @click="playerActions.toggleRepeat()"
             class="px-1.5 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer"
             :class="playerState.repeatMode !== 'off' ? 'bg-[#ffff00] text-black border-[#ffff00]' : 'text-[#888888] border-[#223d54] hover:border-[#00ffff]'"
-            :title="`Ripeti: ${playerState.repeatMode}`"
+            :title="`Repeat: ${playerState.repeatMode}`"
           >
             <span>[↻ {{ playerState.repeatMode.toUpperCase() }}]</span>
           </button>
@@ -254,7 +254,7 @@ onUnmounted(() => {
             @click.stop="isSpeedMenuOpen = !isSpeedMenuOpen"
             class="px-1.5 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer"
             :class="playerState.playbackRate !== 1.0 ? 'bg-[#ffff00] text-black border-[#ffff00]' : 'text-[#aaaaaa] border-[#223d54] hover:border-[#00ffff]'"
-            title="Velocità di riproduzione"
+            title="Playback speed"
           >
             <span>[{{ playerState.playbackRate }}x]</span>
           </button>
@@ -266,7 +266,7 @@ onUnmounted(() => {
             class="absolute bottom-10 right-0 w-44 bg-black border-2 border-[#00ffff] p-2 z-50 text-xs space-y-1.5 select-none shadow-[0_0_20px_rgba(0,255,255,0.3)]"
           >
             <div class="flex items-center justify-between pb-1 border-b border-[#223d54] text-[10px] text-[#00ffff] font-bold">
-              <span>┌──[ VELOCITÀ AUDIO ]</span>
+              <span>┌──[ PLAYBACK RATE ]</span>
               <button @click="isSpeedMenuOpen = false" class="text-[#888888] hover:text-[#ff3366]">[X]─┐</button>
             </div>
             <div class="grid grid-cols-4 gap-1">
@@ -306,7 +306,7 @@ onUnmounted(() => {
           @click="playerState.isQueueOpen = !playerState.isQueueOpen"
           class="px-1.5 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer"
           :class="playerState.isQueueOpen ? 'bg-[#00ffff] text-black border-[#00ffff]' : 'text-[#aaaaaa] border-[#223d54] hover:border-[#00ffff]'"
-          title="Mostra / Nascondi coda (Q)"
+          title="Show / Hide queue (Q)"
         >
           <span>[Q: {{ playerState.queue.length }}]</span>
         </button>

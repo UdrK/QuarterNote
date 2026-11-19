@@ -74,7 +74,7 @@ async function handleFileSelected(event: Event) {
       imageTimestamp.value = Date.now();
     } catch (err) {
       console.error('Error uploading artist photo:', err);
-      alert('Errore durante il caricamento della foto dell\'artista.');
+      alert('Error uploading artist photo.');
     } finally {
       isUploading.value = false;
       if (fileInput.value) fileInput.value.value = '';
@@ -86,8 +86,8 @@ async function handleFileSelected(event: Event) {
 
 <template>
   <TuiWindow 
-    :title="artist ? `ARTISTA: ${artist.name}` : 'CARICAMENTO...'" 
-    :badge="artist ? `${albums.length} ALBUM / ${tracks.length} BRANI` : ''"
+    :title="artist ? `ARTIST: ${artist.name}` : 'LOADING...'" 
+    :badge="artist ? `${albums.length} ALBUMS / ${tracks.length} TRACKS` : ''"
     variant="cyan"
   >
     <div class="space-y-4 font-mono select-none">
@@ -97,9 +97,9 @@ async function handleFileSelected(event: Event) {
           @click="router.back()"
           class="bg-[#0f1f2d] hover:bg-[#00ffff] hover:text-black text-[#00ffff] border border-[#224466] px-2 py-0.5 text-xs font-bold transition-colors cursor-pointer"
         >
-          <span>[&lt; INDIETRO]</span>
+          <span>[&lt; BACK]</span>
         </button>
-        <span class="text-[#446688]">&gt; DIRECTORY &gt; ARTISTI &gt;</span>
+        <span class="text-[#446688]">&gt; DIRECTORY &gt; ARTISTS &gt;</span>
         <span class="text-[#ffff00] font-bold" v-if="artist">[{{ artist.name }}]</span>
       </div>
 
@@ -130,25 +130,25 @@ async function handleFileSelected(event: Event) {
             :disabled="isUploading"
             type="button"
             class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 text-[#00ffff] transition-opacity cursor-pointer border-2 border-[#00ffff]"
-            title="Cambia foto artista"
+            title="Change artist photo"
           >
             <Loader2 v-if="isUploading" class="w-5 h-5 animate-spin" />
             <template v-else>
               <Camera class="w-4 h-4" />
-              <span class="text-[8px] font-bold">[FOTO]</span>
+              <span class="text-[8px] font-bold">[PHOTO]</span>
             </template>
           </button>
         </div>
 
         <div class="space-y-1.5 min-w-0 flex-1 text-center sm:text-left">
           <div class="text-[10px] text-[#00ffff] font-bold">
-            ┌──[ SCHEDA ARTISTA ]
+            ┌──[ ARTIST DETAILS ]
           </div>
           <h1 class="text-xl sm:text-2xl font-bold text-[#ffff00] truncate">
             {{ artist.name }}
           </h1>
           <p class="text-xs text-[#88aacc]">
-            DISCOGRAFIA: <span class="text-[#00ffff] font-bold">{{ albums.length }} ALBUM</span> | TRACCE: <span class="text-[#00ff66] font-bold">{{ tracks.length }} BRANI</span>
+            DISCOGRAPHY: <span class="text-[#00ffff] font-bold">{{ albums.length }} ALBUMS</span> | TRACKS: <span class="text-[#00ff66] font-bold">{{ tracks.length }} TRACKS</span>
           </p>
 
           <!-- Actions: Play All & Favorite -->
@@ -157,7 +157,7 @@ async function handleFileSelected(event: Event) {
               @click="playAll"
               class="bg-[#00ff66] hover:bg-[#55ff99] text-black font-extrabold px-3 py-1 text-xs border border-[#00ff66] transition-colors cursor-pointer"
             >
-              <span>[ ▶ RIPRODUCI TUTTO ]</span>
+              <span>[ ▶ PLAY ALL ]</span>
             </button>
 
             <button
@@ -165,7 +165,7 @@ async function handleFileSelected(event: Event) {
               class="px-3 py-1 text-xs font-bold border transition-colors cursor-pointer"
               :class="isFavorite('artist', artist.id) ? 'bg-[#ff3366] text-black border-[#ff3366]' : 'bg-[#0f1f2d] text-[#aaaaaa] border-[#224466] hover:border-[#00ffff] hover:text-[#00ffff]'"
             >
-              <span>{{ isFavorite('artist', artist.id) ? '[★ NEI PREFERITI]' : '[☆ AGGIUNGI PREFERITI]' }}</span>
+              <span>{{ isFavorite('artist', artist.id) ? '[★ IN FAVORITES]' : '[☆ ADD FAVORITE]' }}</span>
             </button>
           </div>
         </div>
@@ -174,7 +174,7 @@ async function handleFileSelected(event: Event) {
       <!-- Albums Section -->
       <div v-if="albums.length > 0" class="space-y-2">
         <div class="border-b border-[#1c2936] pb-1 flex items-center justify-between text-xs font-bold text-[#00ffff]">
-          <span>┌──[ ALBUM DISPONIBILI ]─────────────────────────</span>
+          <span>┌──[ AVAILABLE ALBUMS ]─────────────────────────</span>
           <span class="text-[#ffff00]">({{ albums.length }})─┐</span>
         </div>
 
@@ -197,7 +197,7 @@ async function handleFileSelected(event: Event) {
                     ? 'text-[#ff3366]'
                     : 'text-[#445566] hover:text-[#ff3366] opacity-0 group-hover:opacity-100'
                 ]"
-                :title="isFavorite('album', alb.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+                :title="isFavorite('album', alb.id) ? 'Remove from favorites' : 'Add to favorites'"
               >
                 <span>{{ isFavorite('album', alb.id) ? '[★]' : '[☆]' }}</span>
               </button>
@@ -205,7 +205,7 @@ async function handleFileSelected(event: Event) {
             <p class="text-xs font-bold text-[#d4d4d4] group-hover:text-[#ffff00] truncate transition-colors">
               {{ alb.title }}
             </p>
-            <p class="text-[10px] text-[#6688aa]">ANNO: {{ alb.year || 'N/D' }}</p>
+            <p class="text-[10px] text-[#6688aa]">YEAR: {{ alb.year || 'N/A' }}</p>
           </div>
         </div>
       </div>
@@ -213,8 +213,8 @@ async function handleFileSelected(event: Event) {
       <!-- Tracks Table -->
       <div v-if="tracks.length > 0" class="space-y-2">
         <div class="border-b border-[#1c2936] pb-1 flex items-center justify-between text-xs font-bold text-[#00ff66]">
-          <span>┌──[ TRACKLIST COMPLETA ]────────────────────────</span>
-          <span class="text-[#ffff00]">({{ tracks.length }} BRANI)─┐</span>
+          <span>┌──[ COMPLETE TRACKLIST ]────────────────────────</span>
+          <span class="text-[#ffff00]">({{ tracks.length }} TRACKS)─┐</span>
         </div>
         <div class="border border-[#1a2b3c] bg-[#04080e]">
           <TrackRow

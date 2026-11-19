@@ -33,7 +33,7 @@ export async function uploadArtistImage(artistId: string, image: string): Promis
   });
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.error || 'Impossibile caricare l\'immagine dell\'artista');
+    throw new Error(errorData.error || 'Failed to upload artist image');
   }
   return res.json();
 }
@@ -46,7 +46,7 @@ export async function uploadPlaylistImage(playlistId: string, image: string): Pr
   });
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.error || 'Impossibile caricare l\'immagine della playlist');
+    throw new Error(errorData.error || 'Failed to upload playlist image');
   }
   return res.json();
 }
@@ -122,7 +122,7 @@ export async function fetchScanStatus(): Promise<ScanStatus> {
 export async function fetchSettings(): Promise<AppSettings> {
   const res = await fetch(`${API_BASE}/settings`);
   if (!res.ok) {
-    throw new Error('Impossibile caricare le impostazioni dal server');
+    throw new Error('Failed to load settings from server');
   }
   return res.json();
 }
@@ -135,7 +135,7 @@ export async function updateSettings(input: UpdateSettingsInput): Promise<AppSet
   });
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.error || 'Impossibile aggiornare le impostazioni');
+    throw new Error(errorData.error || 'Failed to update settings');
   }
   return res.json();
 }
@@ -144,13 +144,13 @@ export async function updateSettings(input: UpdateSettingsInput): Promise<AppSet
 
 export async function fetchFavorites(): Promise<FavoriteContainer[]> {
   const res = await fetch(`${API_BASE}/favorites`);
-  if (!res.ok) throw new Error('Errore durante il recupero dei preferiti');
+  if (!res.ok) throw new Error('Failed to fetch favorites');
   return res.json();
 }
 
 export async function fetchFavoriteIds(): Promise<{ artists: string[]; albums: string[]; tracks: string[]; playlists: string[] }> {
   const res = await fetch(`${API_BASE}/favorites/ids`);
-  if (!res.ok) throw new Error('Errore durante il recupero degli ID dei preferiti');
+  if (!res.ok) throw new Error('Failed to fetch favorite IDs');
   return res.json();
 }
 
@@ -164,7 +164,7 @@ export async function toggleFavoriteApi(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ itemType, itemId, containerId }),
   });
-  if (!res.ok) throw new Error('Errore durante l\'aggiornamento del preferito');
+  if (!res.ok) throw new Error('Failed to toggle favorite');
   return res.json();
 }
 
@@ -174,7 +174,7 @@ export async function createContainerApi(title: string): Promise<FavoriteContain
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ title }),
   });
-  if (!res.ok) throw new Error('Errore durante la creazione del divisore');
+  if (!res.ok) throw new Error('Failed to create category');
   return res.json();
 }
 
@@ -184,7 +184,7 @@ export async function updateContainerApi(id: string, updates: { title?: string; 
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(updates),
   });
-  if (!res.ok) throw new Error('Errore durante la modifica del divisore');
+  if (!res.ok) throw new Error('Failed to update category');
   return res.json();
 }
 
@@ -192,7 +192,7 @@ export async function deleteContainerApi(id: string): Promise<void> {
   const res = await fetch(`${API_BASE}/favorites/containers/${id}`, {
     method: 'DELETE',
   });
-  if (!res.ok) throw new Error('Errore durante l\'eliminazione del divisore');
+  if (!res.ok) throw new Error('Failed to delete category');
 }
 
 export async function reorderContainersApi(containerIds: string[]): Promise<void> {
@@ -201,7 +201,7 @@ export async function reorderContainersApi(containerIds: string[]): Promise<void
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ containerIds }),
   });
-  if (!res.ok) throw new Error('Errore durante il riordinamento dei divisori');
+  if (!res.ok) throw new Error('Failed to reorder categories');
 }
 
 export async function moveFavoriteItemApi(favoriteId: string, targetContainerId: string, position?: number): Promise<void> {
@@ -210,5 +210,5 @@ export async function moveFavoriteItemApi(favoriteId: string, targetContainerId:
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ targetContainerId, position }),
   });
-  if (!res.ok) throw new Error('Errore durante lo spostamento del preferito');
+  if (!res.ok) throw new Error('Failed to move favorite item');
 }

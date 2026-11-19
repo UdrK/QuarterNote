@@ -44,7 +44,7 @@ export const playlistRoutes = (dataDir: string): FastifyPluginAsync => {
     fastify.post<{ Body: CreatePlaylistInput }>('/playlists', async (request, reply) => {
       const { name } = request.body || {};
       if (!name || !name.trim()) {
-        return reply.code(400).send({ error: 'Il nome della playlist è obbligatorio' });
+        return reply.code(400).send({ error: 'Playlist name is required' });
       }
       const playlist = createPlaylist(name.trim());
       return reply.code(201).send(playlist);
@@ -53,7 +53,7 @@ export const playlistRoutes = (dataDir: string): FastifyPluginAsync => {
     fastify.get<{ Params: { id: string } }>('/playlists/:id', async (request, reply) => {
       const playlist = getPlaylistById(request.params.id);
       if (!playlist) {
-        return reply.code(404).send({ error: 'Playlist non trovata' });
+        return reply.code(404).send({ error: 'Playlist not found' });
       }
       return playlist;
     });
@@ -80,12 +80,12 @@ export const playlistRoutes = (dataDir: string): FastifyPluginAsync => {
       const { image } = request.body || {};
 
       if (!image || typeof image !== 'string') {
-        return reply.code(400).send({ error: 'Payload immagine mancante o non valido' });
+        return reply.code(400).send({ error: 'Missing or invalid image payload' });
       }
 
       const playlist = getPlaylistById(id);
       if (!playlist) {
-        return reply.code(404).send({ error: 'Playlist non trovata' });
+        return reply.code(404).send({ error: 'Playlist not found' });
       }
 
       try {
@@ -110,18 +110,18 @@ export const playlistRoutes = (dataDir: string): FastifyPluginAsync => {
         };
       } catch (err) {
         fastify.log.error(err);
-        return reply.code(500).send({ error: 'Errore durante l\'elaborazione della copertina della playlist' });
+        return reply.code(500).send({ error: 'Error processing playlist cover' });
       }
     });
 
     fastify.put<{ Params: { id: string }; Body: UpdatePlaylistInput }>('/playlists/:id', async (request, reply) => {
       const { name } = request.body || {};
       if (!name || !name.trim()) {
-        return reply.code(400).send({ error: 'Il nome della playlist non può essere vuoto' });
+        return reply.code(400).send({ error: 'Playlist name cannot be empty' });
       }
       const updated = updatePlaylist(request.params.id, name.trim());
       if (!updated) {
-        return reply.code(404).send({ error: 'Playlist non trovata' });
+        return reply.code(404).send({ error: 'Playlist not found' });
       }
       return { success: true };
     });
@@ -129,7 +129,7 @@ export const playlistRoutes = (dataDir: string): FastifyPluginAsync => {
     fastify.delete<{ Params: { id: string } }>('/playlists/:id', async (request, reply) => {
       const deleted = deletePlaylist(request.params.id);
       if (!deleted) {
-        return reply.code(404).send({ error: 'Playlist non trovata' });
+        return reply.code(404).send({ error: 'Playlist not found' });
       }
 
       // Cleanup custom cover file if it exists

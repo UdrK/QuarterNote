@@ -1,66 +1,87 @@
 # Quarter Note ♩
 
-**Quarter Note** è un music streamer self-hosted minimale, veloce e reattivo per la tua libreria musicale locale, pensato specificamente per girare su **ZimaBlade** (e qualsiasi host con Docker).
+**Quarter Note** is a minimal, blazing-fast, and responsive self-hosted music streamer for your local music library, designed specifically to run on **ZimaBlade** (and any Docker-capable host), featuring an authentic **retro BBS / curses TUI (Terminal User Interface)** aesthetic.
 
 ---
 
-## Caratteristiche Principali
+## Key Features
 
-- ⚡ **Zero Bloat & Prestazioni Estreme**: Scritto in TypeScript con **Fastify**, **Vue 3** e il modulo nativo **`node:sqlite`** di Node 24. Avvio istantaneo e consumo di RAM contenuto (~30-50 MB).
-- 🎚️ **Rallentatore Audio Integrato (Playback Rate)**: Controllo nativo della velocità (`0.5x`, `0.75x`, `0.85x`, `1.0x`, `1.15x`, `1.25x`, `1.5x`, `2.0x` e slider continuo) per studio musicale, trascrizione o ascolto rapido.
-- 🎵 **Qualità Bit-Perfect & Seek Istantaneo**: Streaming HTTP con supporto completo per header `Range` (`206 Partial Content`).
-- 🖼️ **Copertine Veloci in WebP**: Estrazione da tag incorporati o file nella cartella (`cover.jpg`, `folder.png`), con generazione automatica di miniature 250x250 tramite **Sharp**.
-- 📑 **Playlist & Coda**: Crea e gestisci le tue playlist, aggiungi brani alla coda e riordinali al volo con il cassetto laterale.
-- 🔍 **Ricerca in Tempo Reale**: Risultati immediati raggruppati per Artisti, Album e Brani mentre digiti.
-- 🚀 **Zero Login**: Accesso immediato nella tua rete locale, nessuna schermata di login né password da ricordare.
+- ⚡ **Zero Bloat & Extreme Performance**: Built with TypeScript using **Fastify**, **Vue 3**, and Node 24's native **`node:sqlite`** module. Instant startup and minimal RAM footprint (~30-50 MB).
+- 🖥️ **Retro BBS / Curses TUI Interface**: Windowed terminal frames, ASCII headers, function key navigation (`F1`-`F6`, `Space`, `/`, `Q`, `C`, `ESC`), cassette player ASCII art, animated VU/spectrum meter, and optional CRT scanlines.
+- 🎚️ **Integrated Playback Rate Controller**: Native playback speed adjustments (`0.5x`, `0.75x`, `0.85x`, `1.0x`, `1.15x`, `1.25x`, `1.5x`, `2.0x`) for music practice, transcription, or quick listening.
+- 🎵 **Bit-Perfect Quality & Instant Seek**: HTTP audio streaming with complete `Range` header support (`206 Partial Content`).
+- 🖼️ **Fast WebP Cover Art**: Automatic extraction from embedded audio tags or directory files (`cover.jpg`, `folder.png`), with cached 250x250 thumbnails powered by **Sharp**.
+- 📑 **Playlists & Playback Queue**: Create and manage custom playlists, add tracks to queue, and reorder them on the fly using the slide-over queue drawer.
+- ⭐ **Favorites with Drag & Drop**: Categorize your favorite artists, albums, tracks, and playlists into custom categories using drag-and-drop.
+- 🔍 **Real-Time Instant Search**: Live search results grouped by Artists, Albums, and Tracks as you type.
+- 🚀 **Zero Login**: Seamless instant access on your local network with no login gates or passwords to remember.
 
 ---
 
-## Avvio Rapido con Docker (ZimaBlade)
+## Quick Start with Docker (ZimaBlade)
 
-Il modo più semplice per deployare Quarter Note sulla ZimaBlade è tramite Docker Compose:
+The easiest way to deploy Quarter Note on ZimaBlade (or any Linux server) is via Docker Compose:
 
-1. Clona il repository o copia la cartella del progetto sulla ZimaBlade.
-2. Modifica il volume della musica in `docker-compose.yml`:
+1. Clone the repository or copy the project folder to your server.
+2. Update the music directory mount in `docker-compose.yml`:
    ```yaml
    volumes:
-     - /media/mio-disco/Musica:/music:ro
+     - /media/my-drive/Music:/music:ro
      - ./data:/data
    ```
-3. Avvia il container:
+3. Start the container:
    ```sh
    docker compose up -d --build
    ```
-4. Apri il browser all'indirizzo `http://<IP-DELLA-ZIMABLADE>:8080`.
-5. Clicca su **"Riscansiona Libreria"** nella barra laterale per avviare la prima scansione dei tuoi brani.
+4. Open your browser at `http://<ZIMABLADE-IP>:8080`.
+5. Click **"[ RESCAN LIBRARY ]"** in the sidebar to start indexing your music collection.
 
 ---
 
-## Sviluppo Locale
+## Global Keyboard Shortcuts (TUI)
 
-Requisiti: **Node.js >= 22.5.0** (raccomandato Node 24)
+| Key | Action |
+| --- | --- |
+| `F1` or `?` | Open Help & Keybindings Modal |
+| `F2` or `1` | Artists Directory |
+| `F3` or `2` | Albums Catalog |
+| `F4` or `3` | Favorites Archive |
+| `F5` or `4` | Playlists Archive |
+| `F6` or `5` | System Configuration |
+| `Space` | Play / Pause audio |
+| `N` / `P` | Next / Previous track |
+| `/` | Focus search prompt |
+| `Q` | Toggle Playback Queue Drawer |
+| `C` | Toggle CRT Scanline Shader Effect |
+| `ESC` | Close modal dialogs / Cancel |
+
+---
+
+## Local Development
+
+Requirements: **Node.js >= 22.5.0** (Node 24 recommended)
 
 ```sh
-# 1. Installa tutte le dipendenze del monorepo
+# 1. Install all monorepo dependencies
 npm install
 
-# 2. Compila i pacchetti
+# 2. Build shared, client, and server packages
 npm run build
 
-# 3. Avvia in modalità sviluppo
-# In un terminale avvia il server API:
+# 3. Start development servers
+# In one terminal, launch the Fastify backend:
 npm run dev:server
 
-# In un altro terminale avvia il client Vue Vite:
+# In another terminal, launch the Vite client:
 npm run dev:client
 ```
 
-Il client di sviluppo sarà raggiungibile su `http://localhost:5173` con proxy automatico verso l'API su porta `8080`.
+The development client will be available at `http://localhost:5173` with an automatic proxy to the API server at port `8080`.
 
 ---
 
-## Documentazione
+## Documentation
 
-- [Scope & Requisiti](file:///docs/scope.md)
-- [Architettura Tecnica](file:///docs/architecture.md)
-- [Piano di Implementazione](file:///docs/development.md)
+- [Scope & Requirements](file:///docs/scope.md)
+- [Technical Architecture](file:///docs/architecture.md)
+- [Implementation Plan](file:///docs/development.md)

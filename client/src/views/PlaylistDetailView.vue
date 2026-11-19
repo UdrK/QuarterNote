@@ -62,7 +62,7 @@ async function handleRemove(ptId: string) {
 }
 
 async function handleDelete() {
-  if (!confirm('Eliminare definitivamente questa playlist?')) return;
+  if (!confirm('Permanently delete this playlist?')) return;
   try {
     await deletePlaylist(playlistId.value);
     router.push('/playlists');
@@ -89,7 +89,7 @@ async function handleFileSelected(event: Event) {
       imageTimestamp.value = Date.now();
     } catch (err) {
       console.error('Error uploading playlist photo:', err);
-      alert('Errore durante il caricamento della foto della playlist.');
+      alert('Error uploading playlist cover.');
     } finally {
       isUploading.value = false;
       if (fileInput.value) fileInput.value.value = '';
@@ -103,8 +103,8 @@ onMounted(load);
 
 <template>
   <TuiWindow 
-    :title="playlist ? `PLAYLIST: ${playlist.name}` : 'CARICAMENTO...'" 
-    :badge="playlist ? `${playlistTracks.length} BRANI / ${formatTime(playlist.totalDuration)}` : ''"
+    :title="playlist ? `PLAYLIST: ${playlist.name}` : 'LOADING...'" 
+    :badge="playlist ? `${playlistTracks.length} TRACKS / ${formatTime(playlist.totalDuration)}` : ''"
     variant="green"
   >
     <div class="space-y-4 font-mono select-none">
@@ -114,9 +114,9 @@ onMounted(load);
           @click="router.back()"
           class="bg-[#001710] hover:bg-[#00ff66] hover:text-black text-[#00ff66] border border-[#005522] px-2 py-0.5 text-xs font-bold transition-colors cursor-pointer"
         >
-          <span>[&lt; INDIETRO]</span>
+          <span>[&lt; BACK]</span>
         </button>
-        <span class="text-[#006622]">&gt; RACCOLTE &gt; PLAYLIST &gt;</span>
+        <span class="text-[#006622]">&gt; COLLECTIONS &gt; PLAYLISTS &gt;</span>
         <span class="text-[#00ff66] font-bold" v-if="playlist">[{{ playlist.name }}]</span>
       </div>
 
@@ -146,7 +146,7 @@ onMounted(load);
             :disabled="isUploading"
             type="button"
             class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 text-[#00ff66] transition-opacity cursor-pointer border-2 border-[#00ff66]"
-            title="Cambia copertina playlist"
+            title="Change playlist cover"
           >
             <Loader2 v-if="isUploading" class="w-5 h-5 animate-spin" />
             <template v-else>
@@ -158,15 +158,15 @@ onMounted(load);
 
         <div class="space-y-1.5 min-w-0 flex-1 text-center sm:text-left">
           <div class="text-[10px] text-[#00ff66] font-bold">
-            ┌──[ DETTAGLI PLAYLIST ]
+            ┌──[ PLAYLIST DETAILS ]
           </div>
           <h1 class="text-xl sm:text-2xl font-bold text-[#ffff00] truncate">
             {{ playlist.name }}
           </h1>
           <div class="text-[11px] text-[#00aa44] space-x-2">
-            <span>BRANI: <span class="text-[#00ff66] font-bold">{{ playlistTracks.length }}</span></span>
+            <span>TRACKS: <span class="text-[#00ff66] font-bold">{{ playlistTracks.length }}</span></span>
             <span>|</span>
-            <span>DURATA TOTALE: {{ formatTime(playlist.totalDuration) }}</span>
+            <span>TOTAL DURATION: {{ formatTime(playlist.totalDuration) }}</span>
           </div>
 
           <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1.5">
@@ -175,14 +175,14 @@ onMounted(load);
               :disabled="rawTracks.length === 0"
               class="bg-[#00ff66] hover:bg-[#55ff99] text-black font-extrabold px-3 py-1 text-xs border border-[#00ff66] transition-colors cursor-pointer disabled:opacity-40"
             >
-              <span>[ ▶ RIPRODUCI ]</span>
+              <span>[ ▶ PLAY ]</span>
             </button>
             <button
               @click="playShuffled"
               :disabled="rawTracks.length === 0"
               class="bg-[#001710] hover:bg-[#00ff66] hover:text-black text-[#00ff66] border border-[#005522] px-3 py-1 text-xs font-bold transition-colors cursor-pointer disabled:opacity-40"
             >
-              <span>[ ⇄ CASUALE ]</span>
+              <span>[ ⇄ SHUFFLE ]</span>
             </button>
             <button
               v-if="playlist"
@@ -190,14 +190,14 @@ onMounted(load);
               class="px-3 py-1 text-xs font-bold border transition-colors cursor-pointer"
               :class="isFavorite('playlist', playlist.id) ? 'bg-[#ff3366] text-black border-[#ff3366]' : 'bg-[#001710] text-[#aaaaaa] border-[#005522] hover:border-[#ff3366] hover:text-[#ff3366]'"
             >
-              <span>{{ isFavorite('playlist', playlist.id) ? '[★ NEI PREFERITI]' : '[☆ AGGIUNGI PREFERITI]' }}</span>
+              <span>{{ isFavorite('playlist', playlist.id) ? '[★ IN FAVORITES]' : '[☆ ADD FAVORITE]' }}</span>
             </button>
             <button
               @click="handleDelete"
               class="bg-[#2a0008] hover:bg-[#ff3366] text-[#ff3366] hover:text-black px-3 py-1 text-xs font-bold border border-[#661122] transition-colors cursor-pointer"
-              title="Elimina playlist"
+              title="Delete playlist"
             >
-              <span>[ELIMINA]</span>
+              <span>[DELETE]</span>
             </button>
           </div>
         </div>
@@ -206,7 +206,7 @@ onMounted(load);
       <!-- Tracks List Table -->
       <div v-if="playlistTracks.length > 0" class="space-y-2">
         <div class="border-b border-[#003311] pb-1 flex items-center justify-between text-xs font-bold text-[#00ff66]">
-          <span>┌──[ BRANI CONTENUTI ]───────────────────────────</span>
+          <span>┌──[ INCLUDED TRACKS ]───────────────────────────</span>
           <span class="text-[#ffff00]">({{ playlistTracks.length }})─┐</span>
         </div>
         <div class="border border-[#003311] bg-[#000d07]">
@@ -226,7 +226,7 @@ onMounted(load);
             <button
               @click="handleRemove(pt.id)"
               class="text-[#446655] hover:text-[#ff3366] text-xs font-bold px-2 py-1 mr-1 cursor-pointer"
-              title="Rimuovi dalla playlist"
+              title="Remove from playlist"
             >
               [X]
             </button>

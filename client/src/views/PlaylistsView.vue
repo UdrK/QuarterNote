@@ -37,7 +37,7 @@ async function handleCreate() {
 }
 
 async function handleDelete(id: string) {
-  if (!confirm('Vuoi davvero eliminare questa playlist?')) return;
+  if (!confirm('Are you sure you want to delete this playlist?')) return;
   try {
     await deletePlaylist(id);
     playlists.value = playlists.value.filter(p => p.id !== id);
@@ -51,8 +51,8 @@ onMounted(load);
 
 <template>
   <TuiWindow 
-    title="ARCHIVIO PLAYLIST" 
-    :badge="`${playlists.length} SALVATE`" 
+    title="PLAYLISTS ARCHIVE" 
+    :badge="`${playlists.length} SAVED`" 
     hotkey="F5"
     variant="green"
   >
@@ -60,24 +60,24 @@ onMounted(load);
       <!-- Header Bar -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#003311] pb-2">
         <div class="text-[11px] text-[#00aa44]">
-          &gt; Raccolte musicali personalizzate (Tasto rapido: [F5] o [4])
+          &gt; Custom music collections (Hotkey: [F5] or [4])
         </div>
 
         <button
           @click="showCreate = true"
           class="bg-[#00ff66] hover:bg-[#55ff99] text-black font-extrabold px-3 py-1 text-xs border border-[#00ff66] transition-colors cursor-pointer self-start sm:self-auto"
         >
-          <span>[+ NUOVA PLAYLIST]</span>
+          <span>[+ NEW PLAYLIST]</span>
         </button>
       </div>
 
       <!-- Create Inline Form in Curses Box -->
       <div v-if="showCreate" class="p-2.5 border-2 border-[#00ff66] bg-[#001710] flex items-center gap-2">
-        <span class="text-[#00ff66] text-xs font-bold">&gt; NOME:</span>
+        <span class="text-[#00ff66] text-xs font-bold">&gt; NAME:</span>
         <input
           v-model="newName"
           type="text"
-          placeholder="Es: Workout, Notturna, Top 50..."
+          placeholder="E.g. Workout, Late Night, Top 50..."
           class="flex-1 bg-black text-xs text-[#ffff00] px-2 py-1 border border-[#00ff66]/60 focus:outline-none focus:border-[#ffff00] font-mono"
           @keyup.enter="handleCreate"
           autofocus
@@ -87,20 +87,20 @@ onMounted(load);
           :disabled="!newName.trim()"
           class="bg-[#00ff66] hover:bg-[#55ff99] text-black font-bold px-3 py-1 text-xs border border-[#00ff66] cursor-pointer"
         >
-          [SALVA]
+          [SAVE]
         </button>
         <button
           @click="showCreate = false"
           class="bg-[#002211] text-[#aaaaaa] hover:text-white px-2 py-1 text-xs border border-[#004422] cursor-pointer"
         >
-          [ANNULLA]
+          [CANCEL]
         </button>
       </div>
 
       <!-- Empty State -->
       <div v-if="!isLoading && playlists.length === 0" class="border border-dashed border-[#003311] p-10 text-center text-[#006622]">
         <ListMusic class="w-8 h-8 mx-auto mb-2 opacity-30 text-[#00ff66]" />
-        <p class="text-xs">&gt;&gt; NESSUNA PLAYLIST SALVATA &lt;&lt;</p>
+        <p class="text-xs">&gt;&gt; NO SAVED PLAYLISTS &lt;&lt;</p>
       </div>
 
       <!-- Playlists Grid -->
@@ -126,7 +126,7 @@ onMounted(load);
                 {{ pl.name }}
               </h3>
               <p class="text-[9px] text-[#668877]">
-                [{{ pl.trackCount }} BRANI] • {{ formatTime(pl.totalDuration) }}
+                [{{ pl.trackCount }} TRACKS] • {{ formatTime(pl.totalDuration) }}
               </p>
             </div>
           </div>
@@ -136,7 +136,7 @@ onMounted(load);
               @click.stop="toggleFavorite('playlist', pl.id)"
               class="font-bold transition-colors cursor-pointer"
               :class="isFavorite('playlist', pl.id) ? 'text-[#ff3366]' : 'text-[#446655] hover:text-[#ff3366]'"
-              :title="isFavorite('playlist', pl.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+              :title="isFavorite('playlist', pl.id) ? 'Remove from favorites' : 'Add to favorites'"
             >
               <span>{{ isFavorite('playlist', pl.id) ? '[★]' : '[☆]' }}</span>
             </button>
@@ -144,9 +144,9 @@ onMounted(load);
             <button
               @click.stop="handleDelete(pl.id)"
               class="text-[#446655] hover:text-[#ff3366] text-[10px] font-bold cursor-pointer"
-              title="Elimina playlist"
+              title="Delete playlist"
             >
-              [ELIMINA]
+              [DELETE]
             </button>
           </div>
         </div>

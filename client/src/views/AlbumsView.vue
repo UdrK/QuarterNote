@@ -54,8 +54,8 @@ async function playAlbum(album: Album) {
 
 <template>
   <TuiWindow 
-    title="CATALOGO DISCOGRAFICO" 
-    :badge="`${albums.length} ALBUM CATALOGATI`" 
+    title="ALBUMS CATALOG" 
+    :badge="`${albums.length} CATALOGED ALBUMS`" 
     hotkey="F3"
     variant="yellow"
   >
@@ -63,17 +63,17 @@ async function playAlbum(album: Album) {
       <!-- Filter and Sort Bar -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#2a2a00] pb-2">
         <div class="text-[11px] text-[#888800]">
-          &gt; Sfoglia le copertine degli album (Tasto rapido: [F3] o [2])
+          &gt; Browse album covers (Hotkey: [F3] or [2])
         </div>
 
         <div class="flex items-center gap-2">
           <!-- Filter search -->
           <div class="flex items-center bg-black border border-[#ffff00]/60 px-2 py-0.5 focus-within:border-[#00ffff]">
-            <span class="text-[#ffff00] text-xs font-bold mr-1.5">&gt; CERCA:</span>
+            <span class="text-[#ffff00] text-xs font-bold mr-1.5">&gt; SEARCH:</span>
             <input
               v-model="filterText"
               type="text"
-              placeholder="Filtra titolo/artista..."
+              placeholder="Filter title/artist..."
               class="bg-transparent text-xs text-[#ffff00] placeholder-[#555500] focus:outline-none w-36 sm:w-44 font-mono"
             />
             <button v-if="filterText" @click="filterText = ''" class="text-[#888888] hover:text-[#ff3366] text-xs cursor-pointer">
@@ -86,9 +86,9 @@ async function playAlbum(album: Album) {
             v-model="sortBy"
             class="bg-black border border-[#ffff00]/60 text-xs text-[#ffff00] px-2 py-0.5 focus:outline-none focus:border-[#00ffff] cursor-pointer font-mono"
           >
-            <option value="title">[ORD: TITOLO]</option>
-            <option value="artist">[ORD: ARTISTA]</option>
-            <option value="year">[ORD: ANNO]</option>
+            <option value="title">[SORT: TITLE]</option>
+            <option value="artist">[SORT: ARTIST]</option>
+            <option value="year">[SORT: YEAR]</option>
           </select>
         </div>
       </div>
@@ -96,7 +96,7 @@ async function playAlbum(album: Album) {
       <!-- Empty State -->
       <div v-if="!isLoading && filteredAlbums.length === 0" class="border border-dashed border-[#333300] p-10 text-center text-[#666600]">
         <Disc3 class="w-8 h-8 mx-auto mb-2 opacity-30 text-[#ffff00]" />
-        <p class="text-xs">&gt;&gt; NESSUN ALBUM CORRISPONDENTE &lt;&lt;</p>
+        <p class="text-xs">&gt;&gt; NO MATCHING ALBUMS &lt;&lt;</p>
       </div>
 
       <!-- Albums Grid -->
@@ -126,7 +126,7 @@ async function playAlbum(album: Album) {
                   ? 'text-[#ff3366]'
                   : 'text-[#444400] hover:text-[#ff3366] opacity-0 group-hover:opacity-100'
               ]"
-              :title="isFavorite('album', album.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+              :title="isFavorite('album', album.id) ? 'Remove from favorites' : 'Add to favorites'"
             >
               <span>{{ isFavorite('album', album.id) ? '[★]' : '[☆]' }}</span>
             </button>
@@ -135,7 +135,7 @@ async function playAlbum(album: Album) {
             <button
               @click.stop="playAlbum(album)"
               class="absolute bottom-1 right-1 bg-[#ffff00] text-black font-extrabold px-1.5 py-0.5 text-[9px] opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-              title="Riproduci album"
+              title="Play album"
             >
               <span>[▶ PLAY]</span>
             </button>
@@ -149,7 +149,7 @@ async function playAlbum(album: Album) {
             &gt; {{ album.artistName }}
           </p>
           <span v-if="album.year" class="text-[9px] text-[#888800] mt-0.5">
-            ANNO: {{ album.year }}
+            YEAR: {{ album.year }}
           </span>
         </div>
       </div>

@@ -13,10 +13,10 @@ const message = ref<{ type: 'success' | 'error'; text: string } | null>(null);
 const isLoading = ref(true);
 
 const viewOptions: { id: DefaultViewType; label: string; desc: string; key: string }[] = [
-  { id: 'artists', label: 'Artisti', desc: 'Sfoglia gli artisti con foto', key: 'F2' },
-  { id: 'albums', label: 'Album', desc: 'Catalogo copertine album', key: 'F3' },
-  { id: 'favorites', label: 'Preferiti', desc: 'Divisori e categorie preferite', key: 'F4' },
-  { id: 'playlists', label: 'Playlist', desc: 'Playlist personali', key: 'F5' },
+  { id: 'artists', label: 'Artists', desc: 'Browse artists with photos', key: 'F2' },
+  { id: 'albums', label: 'Albums', desc: 'Catalog of album covers', key: 'F3' },
+  { id: 'favorites', label: 'Favorites', desc: 'Categories and favorite items', key: 'F4' },
+  { id: 'playlists', label: 'Playlists', desc: 'Personal playlists', key: 'F5' },
 ];
 
 async function load() {
@@ -32,7 +32,7 @@ async function load() {
     console.error('Failed to load settings:', err);
     message.value = {
       type: 'error',
-      text: err instanceof Error ? err.message : 'Impossibile caricare le impostazioni',
+      text: err instanceof Error ? err.message : 'Unable to load settings',
     };
   } finally {
     isLoading.value = false;
@@ -46,7 +46,7 @@ async function handleViewChange(view: DefaultViewType) {
     await updateSettings({ defaultView: view });
     message.value = {
       type: 'success',
-      text: `Schermata predefinita impostata su "${viewOptions.find(o => o.id === view)?.label}"`,
+      text: `Default startup view set to "${viewOptions.find(o => o.id === view)?.label}"`,
     };
   } catch (err) {
     console.error('Failed to save default view setting:', err);
@@ -71,18 +71,18 @@ async function handleSave(triggerScanAfter = false) {
       await triggerScan();
       message.value = {
         type: 'success',
-        text: 'Percorso salvato! Scansione avviata in background.',
+        text: 'Path saved! Scan started in background.',
       };
     } else {
       message.value = {
         type: 'success',
-        text: 'Configurazione aggiornata con successo!',
+        text: 'Configuration updated successfully!',
       };
     }
   } catch (err) {
     message.value = {
       type: 'error',
-      text: err instanceof Error ? err.message : 'Errore durante il salvataggio',
+      text: err instanceof Error ? err.message : 'Error while saving',
     };
   } finally {
     isSaving.value = false;
@@ -94,7 +94,7 @@ onMounted(load);
 
 <template>
   <TuiWindow 
-    title="CONFIGURAZIONE SISTEMA" 
+    title="SYSTEM CONFIGURATION" 
     badge="NODE: LOCALHOST" 
     hotkey="F6"
     variant="cyan"
@@ -116,11 +116,11 @@ onMounted(load);
       <!-- Default Startup Screen Card -->
       <div class="border border-[#1a2b3c] bg-[#050a12] p-3 space-y-2">
         <div class="flex items-center gap-2 text-xs font-bold text-[#ffff00] border-b border-[#112233] pb-1">
-          <span>┌──[ 1. SCHERMATA DI AVVIO PREDEFINITA ]</span>
+          <span>┌──[ 1. DEFAULT STARTUP VIEW ]</span>
         </div>
 
         <p class="text-[10px] text-[#6688aa]">
-          Modulo caricato automaticamente all'avvio:
+          Module automatically loaded on startup:
         </p>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 pt-0.5">
@@ -157,11 +157,11 @@ onMounted(load);
       <!-- Music Library Path Card -->
       <div class="border border-[#1a2b3c] bg-[#050a12] p-3 space-y-2">
         <div class="flex items-center gap-2 text-xs font-bold text-[#00ffff] border-b border-[#112233] pb-1">
-          <span>┌──[ 2. PERCORSO CARTELLA MUSICALE ]</span>
+          <span>┌──[ 2. MUSIC FOLDER PATH ]</span>
         </div>
 
         <p class="text-[10px] text-[#6688aa]">
-          Cartella assoluta sul disco (es: <code class="text-[#ffff00]">C:\Musica</code> oppure <code class="text-[#ffff00]">/music</code>).
+          Absolute path on disk (e.g. <code class="text-[#ffff00]">C:\Music</code> or <code class="text-[#ffff00]">/music</code>).
         </p>
 
         <div class="flex items-center bg-black border border-[#00ffff]/60 px-2 py-1 focus-within:border-[#ffff00]">
@@ -169,7 +169,7 @@ onMounted(load);
           <input
             v-model="musicDirInput"
             type="text"
-            placeholder="C:\Users\nome\Music"
+            placeholder="C:\Users\username\Music"
             class="flex-1 bg-transparent text-xs text-[#ffff00] font-mono focus:outline-none"
           />
         </div>
@@ -181,7 +181,7 @@ onMounted(load);
             :disabled="isSaving || !musicDirInput.trim()"
             class="bg-[#0f1f2d] hover:bg-[#00ffff] hover:text-black text-[#00ffff] border border-[#224466] py-1 px-3 text-xs font-bold transition-colors cursor-pointer disabled:opacity-40"
           >
-            <span>{{ isSaving ? '[ IN SALVATAGGIO... ]' : '[ SALVA CONFIGURAZIONE ]' }}</span>
+            <span>{{ isSaving ? '[ SAVING... ]' : '[ SAVE CONFIGURATION ]' }}</span>
           </button>
 
           <button
@@ -190,7 +190,7 @@ onMounted(load);
             class="bg-[#00ff66] hover:bg-[#55ff99] text-black font-extrabold py-1 px-3 text-xs border border-[#00ff66] transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-40"
           >
             <RefreshCw class="w-3 h-3" :class="{ 'animate-spin': isSaving }" />
-            <span>[ SALVA &amp; RISCANSIONA SUBITO ]</span>
+            <span>[ SAVE &amp; RESCAN NOW ]</span>
           </button>
         </div>
       </div>
@@ -198,22 +198,22 @@ onMounted(load);
       <!-- Storage & DB Status -->
       <div v-if="settings && settings.musicDir" class="border border-[#1a2b3c] bg-[#050a12] p-3 space-y-2">
         <div class="flex items-center gap-2 text-xs font-bold text-[#00ff66] border-b border-[#112233] pb-1">
-          <span>┌──[ 3. STATISTICHE DATABASE &amp; CACHE ]</span>
+          <span>┌──[ 3. DATABASE &amp; CACHE STATS ]</span>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
           <div class="bg-black border border-[#223d54] p-2">
-            <span class="text-[9px] text-[#6688aa] font-bold">BRANI INDICIZZATI</span>
+            <span class="text-[9px] text-[#6688aa] font-bold">INDEXED TRACKS</span>
             <p class="text-base font-bold text-[#ffff00] mt-0.5">{{ settings.totalTracks }}</p>
           </div>
 
           <div class="bg-black border border-[#223d54] p-2">
-            <span class="text-[9px] text-[#6688aa] font-bold">ALBUM CATALOGATI</span>
+            <span class="text-[9px] text-[#6688aa] font-bold">CATALOGED ALBUMS</span>
             <p class="text-base font-bold text-[#00ffff] mt-0.5">{{ settings.totalAlbums }}</p>
           </div>
 
           <div class="bg-black border border-[#223d54] p-2">
-            <span class="text-[9px] text-[#6688aa] font-bold">ARTISTI REGISTRATI</span>
+            <span class="text-[9px] text-[#6688aa] font-bold">REGISTERED ARTISTS</span>
             <p class="text-base font-bold text-[#00ff66] mt-0.5">{{ settings.totalArtists }}</p>
           </div>
         </div>

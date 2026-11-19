@@ -24,7 +24,7 @@ let clockTimer: ReturnType<typeof setInterval> | null = null;
 
 function updateClock() {
   const now = new Date();
-  currentTime.value = now.toLocaleTimeString('it-IT', { hour12: false });
+  currentTime.value = now.toLocaleTimeString('en-US', { hour12: false });
 }
 
 onMounted(() => {
@@ -73,14 +73,14 @@ defineExpose({
       <button 
         @click="router.back()"
         class="bg-[#111c26] text-[#00ffff] hover:bg-[#00ffff] hover:text-black px-1.5 py-0.5 border border-[#223d54] text-[11px] font-bold transition-colors cursor-pointer"
-        title="Indietro (Alt+Left)"
+        title="Back (Alt+Left)"
       >
         &lt;
       </button>
       <button 
         @click="router.forward()"
         class="bg-[#111c26] text-[#00ffff] hover:bg-[#00ffff] hover:text-black px-1.5 py-0.5 border border-[#223d54] text-[11px] font-bold transition-colors cursor-pointer"
-        title="Avanti (Alt+Right)"
+        title="Forward (Alt+Right)"
       >
         &gt;
       </button>
@@ -99,7 +99,7 @@ defineExpose({
           v-model="searchQuery"
           @input="handleSearchInput"
           type="text"
-          placeholder="CERCA (/ per attivare)..."
+          placeholder="SEARCH (/ to activate)..."
           class="w-full bg-transparent text-xs text-[#ffff00] placeholder-[#445566] font-mono focus:outline-none"
         />
         <button
@@ -124,9 +124,9 @@ defineExpose({
       <button
         @click="emit('openHelp')"
         class="bg-[#002b4d] text-[#ffff00] border border-[#00ffff] hover:bg-[#ffff00] hover:text-black px-2 py-0.5 text-[11px] font-bold transition-colors cursor-pointer"
-        title="Guida tastiera (F1)"
+        title="Keyboard guide (F1)"
       >
-        <span>[? GUIDA]</span>
+        <span>[? HELP]</span>
       </button>
 
       <span class="text-[#00ffff] font-extrabold hidden lg:inline">─┐</span>

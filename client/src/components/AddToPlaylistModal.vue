@@ -63,7 +63,7 @@ onMounted(load);
       <!-- Header -->
       <div class="px-4 py-2 border-b border-[#222222] bg-[#0a0a0a] flex items-center justify-between">
         <div>
-          <h3 class="text-xs font-bold text-[#00ffff]">■ [ AGGIUNGI A PLAYLIST ]</h3>
+          <h3 class="text-xs font-bold text-[#00ffff]">■ [ ADD TO PLAYLIST ]</h3>
           <p class="text-[10px] text-[#888888] truncate max-w-[240px]">&gt; {{ track.title }}</p>
         </div>
         <button @click="emit('close')" class="bbs-btn py-0.5 px-1.5 text-xs border-[#333333]">
@@ -77,7 +77,7 @@ onMounted(load);
           <input
             v-model="newName"
             type="text"
-            placeholder="Nome nuova playlist..."
+            placeholder="New playlist name..."
             class="flex-1 bg-black text-xs text-[#ffff00] px-2.5 py-1.5 border border-[#333333] focus:outline-none focus:border-[#00ffff]"
           />
           <button
@@ -85,7 +85,7 @@ onMounted(load);
             :disabled="!newName.trim() || isCreating"
             class="bbs-btn bbs-btn-yellow py-1.5 px-3 text-xs"
           >
-            [+ CREA]
+            [+ CREATE]
           </button>
         </form>
       </div>
@@ -93,7 +93,7 @@ onMounted(load);
       <!-- Playlists list -->
       <div class="max-h-60 overflow-y-auto p-2 space-y-1">
         <div v-if="playlists.length === 0" class="text-center py-6 text-xs text-[#666666] italic">
-          Nessuna playlist creata.
+          No playlists created.
         </div>
 
         <button
@@ -104,10 +104,10 @@ onMounted(load);
         >
           <span class="truncate">&gt; {{ pl.name }}</span>
           <span v-if="addedTo === pl.id" class="text-[#00ff66] font-bold">
-            [✓ AGGIUNTO]
+            [✓ ADDED]
           </span>
           <span v-else class="text-[10px] text-[#777777] group-hover:text-[#00ffff]">
-            [{{ pl.trackCount }} brani]
+            [{{ pl.trackCount }} tracks]
           </span>
         </button>
       </div>

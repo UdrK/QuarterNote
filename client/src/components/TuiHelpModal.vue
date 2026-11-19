@@ -9,9 +9,9 @@ const emit = defineEmits<{
     <div class="bg-black border-2 border-[#00ffff] w-full max-w-2xl shadow-[0_0_30px_rgba(0,255,255,0.25)] flex flex-col">
       <!-- Title Bar -->
       <div class="flex items-center justify-between px-3 py-1 bg-[#002b4d] border-b border-[#00ffff] text-[#ffff00] text-xs font-bold">
-        <span>╔═[ GUIDA RAPIDA - COMANDI DA TASTIERA TUI ]</span>
+        <span>╔═[ QUICK GUIDE - TUI KEYBOARD COMMANDS ]</span>
         <button @click="emit('close')" class="text-[#00ffff] hover:text-[#ff3366] cursor-pointer">
-          [X CHIUDI]═╗
+          [X CLOSE]═╗
         </button>
       </div>
 
@@ -33,63 +33,63 @@ const emit = defineEmits<{
         <!-- Keybindings Table -->
         <div class="border border-[#2a2a2a] p-3 bg-[#070707] space-y-2">
           <div class="text-[#ffff00] font-bold border-b border-[#222222] pb-1 text-[11px]">
-            ■ SCORCIATOIE DA TASTIERA GLOBALI:
+            ■ GLOBAL KEYBOARD SHORTCUTS:
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 text-[11px]">
             <div class="flex items-center justify-between">
-              <span class="text-[#00ffff] font-bold">[F1] o [?]</span>
-              <span class="text-[#aaaaaa]">Mostra questo aiuto</span>
+              <span class="text-[#00ffff] font-bold">[F1] or [?]</span>
+              <span class="text-[#aaaaaa]">Show this help dialog</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-[#00ffff] font-bold">[F2] o [1]</span>
-              <span class="text-[#aaaaaa]">Directory Artisti</span>
+              <span class="text-[#00ffff] font-bold">[F2] or [1]</span>
+              <span class="text-[#aaaaaa]">Artists Directory</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-[#00ffff] font-bold">[F3] o [2]</span>
-              <span class="text-[#aaaaaa]">Catalogo Album</span>
+              <span class="text-[#00ffff] font-bold">[F3] or [2]</span>
+              <span class="text-[#aaaaaa]">Albums Catalog</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-[#00ffff] font-bold">[F4] o [3]</span>
-              <span class="text-[#aaaaaa]">Archivio Preferiti</span>
+              <span class="text-[#00ffff] font-bold">[F4] or [3]</span>
+              <span class="text-[#aaaaaa]">Favorites Archive</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-[#00ffff] font-bold">[F5] o [4]</span>
-              <span class="text-[#aaaaaa]">Elenco Playlist</span>
+              <span class="text-[#00ffff] font-bold">[F5] or [4]</span>
+              <span class="text-[#aaaaaa]">Playlists List</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-[#00ffff] font-bold">[F6] o [5]</span>
-              <span class="text-[#aaaaaa]">Configurazione Sistema</span>
+              <span class="text-[#00ffff] font-bold">[F6] or [5]</span>
+              <span class="text-[#aaaaaa]">System Configuration</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-[#ffff00] font-bold">[Space]</span>
-              <span class="text-[#aaaaaa]">Play / Pausa audio</span>
+              <span class="text-[#aaaaaa]">Play / Pause audio</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-[#ffff00] font-bold">[N] / [P]</span>
-              <span class="text-[#aaaaaa]">Brano successivo / prec.</span>
+              <span class="text-[#aaaaaa]">Next / previous track</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-[#00ff66] font-bold">[/]</span>
-              <span class="text-[#aaaaaa]">Cerca nella libreria</span>
+              <span class="text-[#aaaaaa]">Search library</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-[#ff00aa] font-bold">[Q]</span>
-              <span class="text-[#aaaaaa]">Apri / Chiudi Coda</span>
+              <span class="text-[#aaaaaa]">Open / Close Queue</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-[#00ff66] font-bold">[C]</span>
-              <span class="text-[#aaaaaa]">Attiva/Disattiva CRT</span>
+              <span class="text-[#aaaaaa]">Toggle CRT scanlines</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-[#ff3366] font-bold">[ESC]</span>
-              <span class="text-[#aaaaaa]">Chiudi finestre / Annulla</span>
+              <span class="text-[#aaaaaa]">Close dialogs / Cancel</span>
             </div>
           </div>
         </div>
 
         <div class="text-[10px] text-[#777777] text-center">
-          * I tasti di scelta rapida funzionano ovunque tranne quando stai digitando in un campo di testo.
+          * Keyboard shortcuts work globally except while typing in a text input.
         </div>
       </div>
 
@@ -99,7 +99,7 @@ const emit = defineEmits<{
           @click="emit('close')"
           class="bbs-btn bbs-btn-yellow py-1 px-4 text-xs font-bold"
         >
-          [ PREMI ESC O CLICCA QUI PER CONTINUARE ]
+          [ PRESS ESC OR CLICK HERE TO CONTINUE ]
         </button>
       </div>
     </div>

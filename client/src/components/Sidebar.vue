@@ -51,10 +51,10 @@ onUnmounted(() => {
 });
 
 const navLinks = [
-  { id: '1', key: 'F2', name: 'ARTISTI', path: '/artists' },
-  { id: '2', key: 'F3', name: 'ALBUM', path: '/albums' },
-  { id: '3', key: 'F4', name: 'PREFERITI', path: '/favorites' },
-  { id: '4', key: 'F5', name: 'PLAYLIST', path: '/playlists' },
+  { id: '1', key: 'F2', name: 'ARTISTS', path: '/artists' },
+  { id: '2', key: 'F3', name: 'ALBUMS', path: '/albums' },
+  { id: '3', key: 'F4', name: 'FAVORITES', path: '/favorites' },
+  { id: '4', key: 'F5', name: 'PLAYLISTS', path: '/playlists' },
   { id: '5', key: 'F6', name: 'CONFIG', path: '/settings' },
 ];
 </script>
@@ -79,7 +79,7 @@ const navLinks = [
 
       <!-- Navigation Section Header -->
       <div class="px-1 text-[10px] text-[#446688] font-bold flex items-center justify-between border-b border-[#1f2937] pb-0.5">
-        <span>┌──[ NAVIGAZIONE ]──┐</span>
+        <span>┌──[ NAVIGATION ]──┐</span>
       </div>
 
       <!-- Nav Links with Inverted Video Selection -->
@@ -116,13 +116,13 @@ const navLinks = [
       <div class="border border-[#223d54] p-2 bg-black">
         <div class="flex items-center justify-between text-[10px] font-bold text-[#888888] pb-1 border-b border-[#172533]">
           <span class="text-[#00ffff]">┌─[ SCANNER ]</span>
-          <span class="text-[#00ff66]" v-if="scanStatus.isScanning">[ATTIVO]─┐</span>
+          <span class="text-[#00ff66]" v-if="scanStatus.isScanning">[ACTIVE]─┐</span>
           <span class="text-[#6688aa]" v-else>[IDLE]─┐</span>
         </div>
 
         <div v-if="scanStatus.isScanning" class="space-y-1 mt-1.5">
           <div class="flex items-center justify-between text-[10px] text-[#aaaaaa]">
-            <span>Letti:</span>
+            <span>Scanned:</span>
             <span class="text-[#ffff00] font-bold">{{ scanStatus.scannedFiles }}/{{ scanStatus.totalFiles }}</span>
           </div>
           <!-- ASCII Progress Bar -->
@@ -138,7 +138,7 @@ const navLinks = [
         </div>
 
         <div v-else class="text-[9px] text-[#556677] mt-1 flex items-center justify-between">
-          <span>Stato: PRONTO</span>
+          <span>Status: READY</span>
           <span class="text-[#00ff66]">● OK</span>
         </div>
       </div>
@@ -149,7 +149,7 @@ const navLinks = [
         class="w-full bg-[#0a1622] hover:bg-[#00ffff] hover:text-black text-[#00ffff] border border-[#00ffff]/40 py-1 text-[11px] font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5"
       >
         <RefreshCw class="w-3 h-3" :class="{ 'animate-spin': scanStatus.isScanning }" />
-        <span>{{ scanStatus.isScanning ? '[ IN SCANSIONE... ]' : '[ RISCANSIONA LIBRERIA ]' }}</span>
+        <span>{{ scanStatus.isScanning ? '[ SCANNING... ]' : '[ RESCAN LIBRARY ]' }}</span>
       </button>
     </div>
   </aside>

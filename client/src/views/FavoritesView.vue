@@ -121,7 +121,7 @@ async function saveRename(id: string) {
 }
 
 async function handleDeleteContainer(id: string, title: string) {
-  if (!confirm(`Vuoi davvero eliminare la categoria "${title}" e i suoi elementi preferiti?`)) return;
+  if (!confirm(`Are you sure you want to delete the category "${title}" and its favorite items?`)) return;
   try {
     await deleteDivider(id);
   } catch (err) {
@@ -168,8 +168,8 @@ function handleNavigate(item: FavoriteItem) {
 
 <template>
   <TuiWindow 
-    title="ARCHIVIO PREFERITI" 
-    :badge="`${favoritesState.containers.length} CATEGORIE`" 
+    title="FAVORITES ARCHIVE" 
+    :badge="`${favoritesState.containers.length} CATEGORIES`" 
     hotkey="F4"
     variant="red"
   >
@@ -177,14 +177,14 @@ function handleNavigate(item: FavoriteItem) {
       <!-- Top Action Bar -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#33111a] pb-2">
         <div class="text-[11px] text-[#aa4466]">
-          &gt; Organizza artisti, album, brani e playlist con Drag &amp; Drop (Tasto rapido: [F4] o [3])
+          &gt; Organize artists, albums, tracks and playlists with Drag &amp; Drop (Hotkey: [F4] or [3])
         </div>
 
         <button
           @click="showNewDividerDialog = true"
           class="bg-[#ff3366] hover:bg-[#ff6688] text-black font-extrabold px-3 py-1 text-xs border border-[#ff3366] transition-colors cursor-pointer self-start sm:self-auto"
         >
-          <span>[+ CREA CATEGORIA]</span>
+          <span>[+ CREATE CATEGORY]</span>
         </button>
       </div>
 
@@ -193,11 +193,11 @@ function handleNavigate(item: FavoriteItem) {
         v-if="showNewDividerDialog"
         class="p-2.5 border-2 border-[#ff3366] bg-[#1a0008] flex flex-col sm:flex-row items-stretch sm:items-center gap-2"
       >
-        <span class="text-[#ff3366] text-xs font-bold">&gt; NOME CATEGORIA:</span>
+        <span class="text-[#ff3366] text-xs font-bold">&gt; CATEGORY NAME:</span>
         <input
           v-model="newDividerTitle"
           type="text"
-          placeholder="Es: Heavy Metal, Chillout..."
+          placeholder="E.g. Heavy Metal, Chillout..."
           class="flex-1 bg-black text-xs text-[#ffff00] px-2 py-1 border border-[#ff3366]/60 focus:outline-none focus:border-[#ffff00] font-mono"
           @keyup.enter="handleCreateDivider"
           autofocus
@@ -208,13 +208,13 @@ function handleNavigate(item: FavoriteItem) {
             :disabled="!newDividerTitle.trim()"
             class="bg-[#ff3366] hover:bg-[#ff6688] text-black font-bold px-2.5 py-1 text-xs border border-[#ff3366] cursor-pointer"
           >
-            [SALVA]
+            [SAVE]
           </button>
           <button
             @click="showNewDividerDialog = false"
             class="bg-[#2a0010] text-[#aaaaaa] hover:text-white px-2 py-1 text-xs border border-[#441122] cursor-pointer"
           >
-            [ANNULLA]
+            [CANCEL]
           </button>
         </div>
       </div>
@@ -279,14 +279,14 @@ function handleNavigate(item: FavoriteItem) {
                 <div class="flex items-center gap-1 opacity-0 group-hover/divider:opacity-100 transition-opacity ml-1">
                   <button
                     @click="startRename(container)"
-                    title="Rinomina categoria"
+                    title="Rename category"
                     class="text-[10px] text-[#888888] hover:text-[#00ffff] cursor-pointer"
                   >
                     [✎]
                   </button>
                   <button
                     @click="handleDeleteContainer(container.id, container.title)"
-                    title="Elimina categoria"
+                    title="Delete category"
                     class="text-[10px] text-[#888888] hover:text-[#ff3366] cursor-pointer"
                   >
                     [✕]
@@ -312,7 +312,7 @@ function handleNavigate(item: FavoriteItem) {
             ]"
           >
             <p class="text-xs font-bold">
-              {{ dragOverContainerId === container.id ? '&gt;&gt; RILASCIA QUI PER SPOSTARE &lt;&lt;' : '+-- [ TRASCINA QUI UN ELEMENTO DA UN\'ALTRA CATEGORIA ] --+' }}
+              {{ dragOverContainerId === container.id ? '&gt;&gt; DROP HERE TO MOVE &lt;&lt;' : '+-- [ DRAG AN ITEM FROM ANOTHER CATEGORY HERE ] --+' }}
             </p>
           </div>
 
@@ -338,7 +338,7 @@ function handleNavigate(item: FavoriteItem) {
                 <div class="flex items-center gap-1.5 min-w-0 flex-1">
                   <span 
                     class="text-[#663344] group-hover:text-[#00ffff] cursor-grab font-bold px-0.5 shrink-0" 
-                    title="Trascina per spostare in un'altra categoria"
+                    title="Drag to move to another category"
                   >
                     [::]
                   </span>
@@ -352,7 +352,7 @@ function handleNavigate(item: FavoriteItem) {
                     </span>
                     <div class="min-w-0 flex-1">
                       <p class="font-bold text-[#d4d4d4] group-hover:text-[#ffff00] truncate">
-                        {{ item.track?.title || 'Brano' }}
+                        {{ item.track?.title || 'Track' }}
                       </p>
                       <p class="text-[9px] text-[#00ffff] opacity-80 truncate">
                         {{ item.track?.artistName }} • {{ item.track?.albumTitle }}
@@ -366,7 +366,7 @@ function handleNavigate(item: FavoriteItem) {
                   <button
                     @click.stop="toggleFavorite('track', item.itemId)"
                     class="text-[#ff3366] text-xs font-bold cursor-pointer"
-                    title="Rimuovi dai preferiti"
+                    title="Remove from favorites"
                   >
                     [★]
                   </button>
@@ -399,7 +399,7 @@ function handleNavigate(item: FavoriteItem) {
                   <div class="flex items-center gap-1 min-w-0">
                     <span 
                       class="text-[#663344] group-hover:text-[#00ffff] cursor-grab font-bold shrink-0 text-xs" 
-                      title="Trascina per spostare"
+                      title="Drag to move"
                     >
                       [::]
                     </span>
@@ -412,14 +412,14 @@ function handleNavigate(item: FavoriteItem) {
                         'bg-[#00ff66]'
                       ]"
                     >
-                      {{ item.itemType === 'artist' ? 'ARTISTA' : item.itemType === 'album' ? 'ALBUM' : 'PLAYLIST' }}
+                      {{ item.itemType === 'artist' ? 'ARTIST' : item.itemType === 'album' ? 'ALBUM' : 'PLAYLIST' }}
                     </span>
                   </div>
 
                   <button
                     @click.stop="toggleFavorite(item.itemType, item.itemId)"
                     class="text-[#ff3366] text-xs font-bold cursor-pointer"
-                    title="Rimuovi dai preferiti"
+                    title="Remove from favorites"
                   >
                     [★]
                   </button>
@@ -431,16 +431,16 @@ function handleNavigate(item: FavoriteItem) {
                   <div class="w-16 h-16 bg-black border border-[#33111a] group-hover:border-[#00ffff] overflow-hidden mb-1">
                     <img
                       :src="item.artist?.imageUrl || `/api/artists/${item.itemId}/image`"
-                      :alt="item.artist?.name || 'Artista'"
+                      :alt="item.artist?.name || 'Artist'"
                       class="w-full h-full object-cover pointer-events-none"
                       loading="lazy"
                     />
                   </div>
                   <h4 class="text-xs font-bold text-[#d4d4d4] group-hover:text-[#ffff00] truncate w-full">
-                    {{ item.artist?.name || 'Artista' }}
+                    {{ item.artist?.name || 'Artist' }}
                   </h4>
                   <p class="text-[9px] text-[#00ffff]/80">
-                    [{{ item.artist?.albumCount || 0 }} ALBUM]
+                    [{{ item.artist?.albumCount || 0 }} ALBUMS]
                   </p>
                 </div>
 
@@ -456,7 +456,7 @@ function handleNavigate(item: FavoriteItem) {
                     <button
                       @click.stop="playAlbumItem(item.itemId)"
                       class="absolute bottom-1 right-1 bg-[#ffff00] text-black font-bold px-1 text-[8px] opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                      title="Riproduci album"
+                      title="Play album"
                     >
                       [▶]
                     </button>
@@ -481,7 +481,7 @@ function handleNavigate(item: FavoriteItem) {
                     <button
                       @click.stop="playPlaylistItem(item.itemId)"
                       class="absolute bottom-1 right-1 bg-[#00ff66] text-black font-bold px-1 text-[8px] opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                      title="Riproduci playlist"
+                      title="Play playlist"
                     >
                       [▶]
                     </button>
@@ -490,7 +490,7 @@ function handleNavigate(item: FavoriteItem) {
                     {{ item.playlist?.name || 'Playlist' }}
                   </h4>
                   <p class="text-[9px] text-[#888888]">
-                    [{{ item.playlist?.trackCount || 0 }} BRANI]
+                    [{{ item.playlist?.trackCount || 0 }} TRACKS]
                   </p>
                 </div>
               </div>

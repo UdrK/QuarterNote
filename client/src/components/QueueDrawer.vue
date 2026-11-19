@@ -15,7 +15,7 @@ function close() {
     <!-- Header -->
     <div class="h-9 px-2 border-b border-[#00ffff]/60 bg-[#001726] flex items-center justify-between shrink-0 text-[#00ffff]">
       <div class="flex items-center gap-1.5 font-bold">
-        <span>┌──[ CODA DI RIPRODUZIONE ]</span>
+        <span>┌──[ PLAYBACK QUEUE ]</span>
         <span class="text-[#ffff00]">({{ playerState.queue.length }})</span>
       </div>
 
@@ -24,14 +24,14 @@ function close() {
           v-if="playerState.queue.length > 0"
           @click="playerActions.clearQueue()"
           class="text-[10px] px-1 bg-[#330011] text-[#ff3366] hover:bg-[#ff3366] hover:text-black font-bold border border-[#661122] transition-colors cursor-pointer"
-          title="Svuota coda"
+          title="Clear queue"
         >
-          [SVUOTA]
+          [CLEAR]
         </button>
         <button
           @click="close"
           class="text-[10px] px-1 bg-[#111c26] text-[#00ffff] hover:bg-[#00ffff] hover:text-black font-bold border border-[#223d54] transition-colors cursor-pointer"
-          title="Chiudi (ESC)"
+          title="Close (ESC)"
         >
           [X]─┐
         </button>
@@ -45,7 +45,7 @@ function close() {
         class="h-full flex flex-col items-center justify-center text-center p-4 text-[#556677] text-xs"
       >
         <Disc3 class="w-8 h-8 mb-2 opacity-30 text-[#00ffff]" />
-        &gt;&gt; CODA VUOTA &lt;&lt;<br />Aggiungi dei brani per iniziare.
+        &gt;&gt; QUEUE EMPTY &lt;&lt;<br />Add tracks to get started.
       </div>
 
       <div
@@ -92,7 +92,7 @@ function close() {
             @click.stop="playerActions.removeFromQueue(index)"
             class="text-xs font-bold px-1 transition-colors cursor-pointer"
             :class="index === playerState.queueIndex ? 'text-black hover:text-[#ff3366]' : 'text-[#667788] hover:text-[#ff3366]'"
-            title="Rimuovi"
+            title="Remove"
           >
             [X]
           </button>

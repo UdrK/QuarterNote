@@ -140,10 +140,10 @@ export function initDatabase(dataDir: string): DatabaseSync {
   const containerCountRow = db.prepare('SELECT COUNT(*) as count FROM favorite_containers').get() as unknown as { count: number };
   if (!containerCountRow || Number(containerCountRow.count) === 0) {
     const defaultContainers = [
-      { id: 'default-artists', title: 'Artisti', position: 0 },
-      { id: 'default-albums', title: 'Album', position: 1 },
-      { id: 'default-tracks', title: 'Brani', position: 2 },
-      { id: 'default-playlists', title: 'Playlist', position: 3 },
+      { id: 'default-artists', title: 'Artists', position: 0 },
+      { id: 'default-albums', title: 'Albums', position: 1 },
+      { id: 'default-tracks', title: 'Tracks', position: 2 },
+      { id: 'default-playlists', title: 'Playlists', position: 3 },
     ];
     const insertStmt = db.prepare('INSERT INTO favorite_containers (id, title, position, is_default, created_at) VALUES (?, ?, ?, 1, ?)');
     const now = Date.now();

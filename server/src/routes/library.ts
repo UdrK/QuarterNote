@@ -88,12 +88,12 @@ export const libraryRoutes = (dataDir: string): FastifyPluginAsync => {
       const { image } = request.body || {};
 
       if (!image || typeof image !== 'string') {
-        return reply.code(400).send({ error: 'Payload immagine mancante o non valido' });
+        return reply.code(400).send({ error: 'Missing or invalid image payload' });
       }
 
       const artist = getArtistById(id);
       if (!artist) {
-        return reply.code(404).send({ error: 'Artista non trovato' });
+        return reply.code(404).send({ error: 'Artist not found' });
       }
 
       try {
@@ -118,7 +118,7 @@ export const libraryRoutes = (dataDir: string): FastifyPluginAsync => {
         };
       } catch (err) {
         fastify.log.error(err);
-        return reply.code(500).send({ error: 'Errore durante l\'elaborazione dell\'immagine dell\'artista' });
+        return reply.code(500).send({ error: 'Error processing artist image' });
       }
     });
 

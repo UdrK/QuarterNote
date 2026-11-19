@@ -45,27 +45,27 @@ const totalResults = computed(() =>
 
 <template>
   <TuiWindow 
-    title="RISULTATI RICERCA" 
-    :badge="`${totalResults} OCCORRENZE`" 
+    title="SEARCH RESULTS" 
+    :badge="`${totalResults} MATCHES`" 
     variant="cyan"
   >
     <div class="space-y-4 font-mono select-none">
       <!-- Search Summary -->
       <div class="border-b border-[#1c2936] pb-2 text-xs">
-        <span class="text-[#6688aa]">&gt; Termine cercato: </span>
+        <span class="text-[#6688aa]">&gt; Search query: </span>
         <span class="text-[#ffff00] font-bold">"{{ query }}"</span>
       </div>
 
       <!-- Empty Results -->
       <div v-if="!isLoading && totalResults === 0 && query" class="border border-dashed border-[#223d54] p-10 text-center text-[#556677]">
         <Search class="w-8 h-8 mx-auto mb-2 opacity-30 text-[#00ffff]" />
-        <p class="text-xs">&gt;&gt; NESSUN RISULTATO TROVATO PER "{{ query }}" &lt;&lt;</p>
+        <p class="text-xs">&gt;&gt; NO RESULTS FOUND FOR "{{ query }}" &lt;&lt;</p>
       </div>
 
       <!-- Artists Results -->
       <div v-if="results.artists.length > 0" class="space-y-2">
         <div class="border-b border-[#1c2936] pb-1 flex items-center justify-between text-xs font-bold text-[#00ffff]">
-          <span>┌──[ ARTISTI CORRISPONDENTI ]────────────────────</span>
+          <span>┌──[ MATCHING ARTISTS ]────────────────────</span>
           <span class="text-[#ffff00]">({{ results.artists.length }})─┐</span>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2">
@@ -82,7 +82,7 @@ const totalResults = computed(() =>
               <p class="text-xs font-bold text-[#d4d4d4] truncate group-hover:text-[#ffff00] transition-colors">
                 {{ artist.name }}
               </p>
-              <p class="text-[9px] text-[#6688aa]">[{{ artist.albumCount }} ALBUM]</p>
+              <p class="text-[9px] text-[#6688aa]">[{{ artist.albumCount }} ALBUMS]</p>
             </div>
           </div>
         </div>
@@ -91,7 +91,7 @@ const totalResults = computed(() =>
       <!-- Albums Results -->
       <div v-if="results.albums.length > 0" class="space-y-2">
         <div class="border-b border-[#1c2936] pb-1 flex items-center justify-between text-xs font-bold text-[#ffff00]">
-          <span>┌──[ ALBUM CORRISPONDENTI ]──────────────────────</span>
+          <span>┌──[ MATCHING ALBUMS ]──────────────────────</span>
           <span class="text-[#ffff00]">({{ results.albums.length }})─┐</span>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2">
@@ -115,7 +115,7 @@ const totalResults = computed(() =>
       <!-- Tracks Results -->
       <div v-if="results.tracks.length > 0" class="space-y-2">
         <div class="border-b border-[#1c2936] pb-1 flex items-center justify-between text-xs font-bold text-[#00ff66]">
-          <span>┌──[ BRANI CORRISPONDENTI ]─────────────────────</span>
+          <span>┌──[ MATCHING TRACKS ]─────────────────────</span>
           <span class="text-[#ffff00]">({{ results.tracks.length }})─┐</span>
         </div>
         <div class="border border-[#1a2b3c] bg-[#050a12]">

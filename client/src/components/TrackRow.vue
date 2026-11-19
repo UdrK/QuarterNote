@@ -74,7 +74,7 @@ function play() {
           @click.stop="playerActions.playNext(track)"
           class="px-1 text-[10px] font-bold border transition-colors"
           :class="playerState.currentTrack?.id === track.id ? 'bg-black text-[#00ffff] border-black' : 'bg-[#0d1622] text-[#00ffff] border-[#224466] hover:bg-[#00ffff] hover:text-black'"
-          title="Riproduci dopo questo brano (↳)"
+          title="Play next (↳)"
         >
           [↳]
         </button>
@@ -82,7 +82,7 @@ function play() {
           @click.stop="playerActions.addToQueue(track)"
           class="px-1 text-[10px] font-bold border transition-colors"
           :class="playerState.currentTrack?.id === track.id ? 'bg-black text-[#00ffff] border-black' : 'bg-[#0d1622] text-[#00ffff] border-[#224466] hover:bg-[#00ffff] hover:text-black'"
-          title="Aggiungi alla coda (+CODA)"
+          title="Add to queue (+QUEUE)"
         >
           [+C]
         </button>
@@ -90,7 +90,7 @@ function play() {
           @click.stop="showPlaylistModal = true"
           class="px-1 text-[10px] font-bold border transition-colors"
           :class="playerState.currentTrack?.id === track.id ? 'bg-black text-[#00ffff] border-black' : 'bg-[#0d1622] text-[#00ffff] border-[#224466] hover:bg-[#00ffff] hover:text-black'"
-          title="Aggiungi a playlist (+LIST)"
+          title="Add to playlist (+LIST)"
         >
           [+L]
         </button>
@@ -105,7 +105,7 @@ function play() {
             ? (playerState.currentTrack?.id === track.id ? 'text-black' : 'text-[#ff3366]')
             : 'text-[#445566] hover:text-[#ff3366] opacity-40 group-hover:opacity-100'
         ]"
-        :title="isFavorite('track', track.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+        :title="isFavorite('track', track.id) ? 'Remove from favorites' : 'Add to favorites'"
       >
         <span>{{ isFavorite('track', track.id) ? '[★]' : '[☆]' }}</span>
       </button>

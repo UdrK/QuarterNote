@@ -45,8 +45,8 @@ function playShuffled() {
 
 <template>
   <TuiWindow 
-    :title="album ? `ALBUM: ${album.title}` : 'CARICAMENTO...'" 
-    :badge="album ? `${tracks.length} BRANI / ${formatTime(album.duration)}` : ''"
+    :title="album ? `ALBUM: ${album.title}` : 'LOADING...'" 
+    :badge="album ? `${tracks.length} TRACKS / ${formatTime(album.duration)}` : ''"
     variant="yellow"
   >
     <div class="space-y-4 font-mono select-none">
@@ -56,9 +56,9 @@ function playShuffled() {
           @click="router.back()"
           class="bg-[#1a1700] hover:bg-[#ffff00] hover:text-black text-[#ffff00] border border-[#555500] px-2 py-0.5 text-xs font-bold transition-colors cursor-pointer"
         >
-          <span>[&lt; INDIETRO]</span>
+          <span>[&lt; BACK]</span>
         </button>
-        <span class="text-[#666600]">&gt; CATALOGO &gt; ALBUM &gt;</span>
+        <span class="text-[#666600]">&gt; CATALOG &gt; ALBUMS &gt;</span>
         <span class="text-[#ffff00] font-bold" v-if="album">[{{ album.title }}]</span>
       </div>
 
@@ -70,7 +70,7 @@ function playShuffled() {
 
         <div class="space-y-1.5 min-w-0 flex-1 text-center sm:text-left">
           <div class="text-[10px] text-[#ffff00] font-bold">
-            ┌──[ SCHEDA DISCOGRAFICA ]
+            ┌──[ ALBUM DETAILS ]
           </div>
           <h1 class="text-xl sm:text-2xl font-bold text-[#ffff00] truncate">
             {{ album.title }}
@@ -79,15 +79,15 @@ function playShuffled() {
             @click="router.push(`/artists/${album.artistId}`)" 
             class="text-xs font-bold text-[#00ffff] hover:underline cursor-pointer"
           >
-            &gt; ARTISTA: {{ album.artistName }}
+            &gt; ARTIST: {{ album.artistName }}
           </p>
 
           <div class="text-[11px] text-[#888800] space-x-2 pt-0.5">
-            <span>ANNO: <span class="text-[#ffff00] font-bold">{{ album.year || 'N/D' }}</span></span>
+            <span>YEAR: <span class="text-[#ffff00] font-bold">{{ album.year || 'N/A' }}</span></span>
             <span>|</span>
-            <span>BRANI: <span class="text-[#00ff66] font-bold">{{ tracks.length }}</span></span>
+            <span>TRACKS: <span class="text-[#00ff66] font-bold">{{ tracks.length }}</span></span>
             <span>|</span>
-            <span>DURATA: {{ formatTime(album.duration) }}</span>
+            <span>DURATION: {{ formatTime(album.duration) }}</span>
           </div>
 
           <!-- Action buttons -->
@@ -96,20 +96,20 @@ function playShuffled() {
               @click="playAll"
               class="bg-[#00ff66] hover:bg-[#55ff99] text-black font-extrabold px-3 py-1 text-xs border border-[#00ff66] transition-colors cursor-pointer"
             >
-              <span>[ ▶ RIPRODUCI TUTTO ]</span>
+              <span>[ ▶ PLAY ALL ]</span>
             </button>
             <button
               @click="playShuffled"
               class="bg-[#1a1700] hover:bg-[#ffff00] hover:text-black text-[#ffff00] border border-[#555500] px-3 py-1 text-xs font-bold transition-colors cursor-pointer"
             >
-              <span>[ ⇄ CASUALE ]</span>
+              <span>[ ⇄ SHUFFLE ]</span>
             </button>
             <button
               @click="toggleFavorite('album', album.id)"
               class="px-3 py-1 text-xs font-bold border transition-colors cursor-pointer"
               :class="isFavorite('album', album.id) ? 'bg-[#ff3366] text-black border-[#ff3366]' : 'bg-[#1a1700] text-[#aaaaaa] border-[#555500] hover:border-[#ffff00] hover:text-[#ffff00]'"
             >
-              <span>{{ isFavorite('album', album.id) ? '[★ NEI PREFERITI]' : '[☆ AGGIUNGI PREFERITI]' }}</span>
+              <span>{{ isFavorite('album', album.id) ? '[★ IN FAVORITES]' : '[☆ ADD FAVORITE]' }}</span>
             </button>
           </div>
         </div>
@@ -119,7 +119,7 @@ function playShuffled() {
       <div class="space-y-2">
         <div class="border-b border-[#2a2a00] pb-1 flex items-center justify-between text-xs font-bold text-[#00ff66]">
           <span>┌──[ TRACKLIST ]───────────────────────────────────</span>
-          <span class="text-[#ffff00]">({{ tracks.length }} BRANI)─┐</span>
+          <span class="text-[#ffff00]">({{ tracks.length }} TRACKS)─┐</span>
         </div>
         <div class="border border-[#333300] bg-[#090800]">
           <TrackRow

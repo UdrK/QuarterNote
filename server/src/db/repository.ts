@@ -884,14 +884,15 @@ export function toggleFavorite(
   let targetContainerId = containerId;
   if (!targetContainerId) {
     // Match by item type title or is_default
-    const defaultTitleMap: Record<FavoriteItemType, string> = {
-      artist: 'Artisti',
-      album: 'Album',
-      track: 'Brani',
-      playlist: 'Playlist',
+    const defaultTitleMap: Record<FavoriteItemType, string[]> = {
+      artist: ['Artists', 'Artisti'],
+      album: ['Albums', 'Album'],
+      track: ['Tracks', 'Brani'],
+      playlist: ['Playlists', 'Playlist'],
     };
-    const defaultTitle = defaultTitleMap[itemType];
-    const container = db.prepare('SELECT id FROM favorite_containers WHERE title = ? ORDER BY position ASC LIMIT 1').get(defaultTitle) as unknown as { id: string } | undefined;
+    const titles = defaultTitleMap[itemType];
+    const placeholders = titles.map(() => '?').join(',');
+    const container = db.prepare(`SELECT id FROM favorite_containers WHERE title IN (${placeholders}) ORDER BY position ASC LIMIT 1`).get(...titles) as unknown as { id: string } | undefined;
 
     if (container) {
       targetContainerId = container.id;
@@ -902,7 +903,7 @@ export function toggleFavorite(
         targetContainerId = firstContainer.id;
       } else {
         // Create container if none exists
-        const newContainer = createFavoriteContainer(defaultTitle);
+        const newContainer = createFavoriteContainer(titles[0]);
         targetContainerId = newContainer.id;
       }
     }

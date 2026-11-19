@@ -74,7 +74,7 @@ export const favoriteRoutes: FastifyPluginAsync = async (fastify) => {
 
       const updated = updateFavoriteContainer(id, { title, position });
       if (!updated) {
-        return reply.code(404).send({ error: 'Contenitore non trovato' });
+        return reply.code(404).send({ error: 'Container not found' });
       }
 
       return updated;
@@ -86,7 +86,7 @@ export const favoriteRoutes: FastifyPluginAsync = async (fastify) => {
     const { id } = request.params;
     const deleted = deleteFavoriteContainer(id);
     if (!deleted) {
-      return reply.code(404).send({ error: 'Contenitore non trovato' });
+      return reply.code(404).send({ error: 'Container not found' });
     }
 
     return { success: true };
@@ -100,12 +100,12 @@ export const favoriteRoutes: FastifyPluginAsync = async (fastify) => {
       const { targetContainerId, position } = request.body || {};
 
       if (!targetContainerId) {
-        return reply.code(400).send({ error: 'targetContainerId è obbligatorio' });
+        return reply.code(400).send({ error: 'targetContainerId is required' });
       }
 
       const moved = moveFavoriteItem(id, targetContainerId, position);
       if (!moved) {
-        return reply.code(404).send({ error: 'Elemento preferito non trovato' });
+        return reply.code(404).send({ error: 'Favorite item not found' });
       }
 
       return { success: true };

@@ -59,34 +59,34 @@ function handleKeyAction(key: string) {
         class="inline-flex items-center hover:opacity-80 transition-opacity cursor-pointer group"
       >
         <span class="bg-[#00ffff] text-black font-extrabold px-1 text-[10px] leading-tight mr-1">F1</span>
-        <span class="text-[#cccccc] group-hover:text-[#ffffff]">Aiuto</span>
+        <span class="text-[#cccccc] group-hover:text-[#ffffff]">Help</span>
       </button>
 
-      <!-- F2 Artisti -->
+      <!-- F2 Artists -->
       <button 
         @click="handleKeyAction('F2')" 
         class="inline-flex items-center hover:opacity-80 transition-opacity cursor-pointer group"
       >
         <span class="bg-[#00ffff] text-black font-extrabold px-1 text-[10px] leading-tight mr-1">F2</span>
-        <span class="text-[#cccccc] group-hover:text-[#ffffff]">Artisti</span>
+        <span class="text-[#cccccc] group-hover:text-[#ffffff]">Artists</span>
       </button>
 
-      <!-- F3 Album -->
+      <!-- F3 Albums -->
       <button 
         @click="handleKeyAction('F3')" 
         class="inline-flex items-center hover:opacity-80 transition-opacity cursor-pointer group"
       >
         <span class="bg-[#00ffff] text-black font-extrabold px-1 text-[10px] leading-tight mr-1">F3</span>
-        <span class="text-[#cccccc] group-hover:text-[#ffffff]">Album</span>
+        <span class="text-[#cccccc] group-hover:text-[#ffffff]">Albums</span>
       </button>
 
-      <!-- F4 Preferiti -->
+      <!-- F4 Favorites -->
       <button 
         @click="handleKeyAction('F4')" 
         class="inline-flex items-center hover:opacity-80 transition-opacity cursor-pointer group"
       >
         <span class="bg-[#00ffff] text-black font-extrabold px-1 text-[10px] leading-tight mr-1">F4</span>
-        <span class="text-[#cccccc] group-hover:text-[#ffffff]">Preferiti</span>
+        <span class="text-[#cccccc] group-hover:text-[#ffffff]">Favorites</span>
       </button>
 
       <!-- F5 Playlist -->
@@ -95,7 +95,7 @@ function handleKeyAction(key: string) {
         class="inline-flex items-center hover:opacity-80 transition-opacity cursor-pointer group"
       >
         <span class="bg-[#00ffff] text-black font-extrabold px-1 text-[10px] leading-tight mr-1">F5</span>
-        <span class="text-[#cccccc] group-hover:text-[#ffffff]">Playlist</span>
+        <span class="text-[#cccccc] group-hover:text-[#ffffff]">Playlists</span>
       </button>
 
       <!-- F6 Config -->
@@ -113,7 +113,7 @@ function handleKeyAction(key: string) {
         class="inline-flex items-center hover:opacity-80 transition-opacity cursor-pointer group"
       >
         <span class="bg-[#ffff00] text-black font-extrabold px-1 text-[10px] leading-tight mr-1">Space</span>
-        <span class="text-[#ffff00] group-hover:text-[#ffffff]">{{ playerState.isPlaying ? 'Pausa' : 'Play' }}</span>
+        <span class="text-[#ffff00] group-hover:text-[#ffffff]">{{ playerState.isPlaying ? 'Pause' : 'Play' }}</span>
       </button>
 
       <!-- / Search -->
@@ -122,7 +122,7 @@ function handleKeyAction(key: string) {
         class="inline-flex items-center hover:opacity-80 transition-opacity cursor-pointer group"
       >
         <span class="bg-[#00ff66] text-black font-extrabold px-1 text-[10px] leading-tight mr-1">/</span>
-        <span class="text-[#cccccc] group-hover:text-[#ffffff]">Cerca</span>
+        <span class="text-[#cccccc] group-hover:text-[#ffffff]">Search</span>
       </button>
     </div>
 
@@ -134,7 +134,7 @@ function handleKeyAction(key: string) {
         class="inline-flex items-center hover:opacity-80 transition-opacity cursor-pointer group"
       >
         <span class="bg-[#ff00aa] text-white font-extrabold px-1 text-[10px] leading-tight mr-1">Q</span>
-        <span class="text-[#cccccc] group-hover:text-[#ffffff]">Coda ({{ playerState.queue.length }})</span>
+        <span class="text-[#cccccc] group-hover:text-[#ffffff]">Queue ({{ playerState.queue.length }})</span>
       </button>
 
       <!-- C CRT -->
