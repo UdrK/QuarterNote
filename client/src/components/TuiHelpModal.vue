@@ -18,15 +18,17 @@ const emit = defineEmits<{
       <!-- Content -->
       <div class="p-4 space-y-4 text-xs text-[#d4d4d4] overflow-y-auto max-h-[80vh]">
         <!-- ASCII Banner -->
-        <pre class="text-[#00ffff] text-[10px] leading-none text-center font-bold">
+        <div class="flex justify-center overflow-x-auto py-1">
+          <pre class="text-[#00ffff] text-[10px] leading-none font-mono text-left inline-block select-none font-bold" style="font-family: 'Consolas', 'Courier New', Monaco, monospace;">
 ╔════════════════════════════════════════════════════════════════════════╗
-║   ____               __              _   __      __                    ║
-║  / __ \__  ______ _____/ /____  _____  / | / /___  / /____   TUI       ║
-║ / / / / / / / __ `/ ___/ __/ _ \/ ___/ /  |/ / __ \/ __/ _ \  v2.0     ║
+║   ____                  __               _   __      __                ║
+║  / __ \__  ______ _____/ /____  _____   / | / /___  / /____   TUI      ║
+║ / / / / / / / __ `/ ___/ __/ _ \/ ___/  /  |/ / __ \/ __/ _ \  v2.0     ║
 ║/ /_/ / /_/ / /_/ / /  / /_/  __/ /    / /|  / /_/ / /_/  __/  BBS      ║
 ║\___\_\__,_/\__,_/_/   \__/\___/_/    /_/ |_/\____/\__/\___/   EDITION  ║
 ╚════════════════════════════════════════════════════════════════════════╝
-        </pre>
+          </pre>
+        </div>
 
         <!-- Keybindings Table -->
         <div class="border border-[#2a2a2a] p-3 bg-[#070707] space-y-2">
