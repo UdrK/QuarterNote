@@ -65,12 +65,12 @@ export const playlistRoutes = (dataDir: string): FastifyPluginAsync => {
 
       if (fs.existsSync(customFile)) {
         reply.header('Content-Type', 'image/webp');
-        reply.header('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
+        reply.header('Cache-Control', 'public, max-age=3600');
         return reply.send(fs.createReadStream(customFile));
       }
 
       reply.header('Content-Type', 'image/svg+xml');
-      reply.header('Cache-Control', 'public, max-age=86400');
+      reply.header('Cache-Control', 'no-cache, no-store, must-revalidate');
       return reply.send(PLAYLIST_PLACEHOLDER_SVG);
     });
 

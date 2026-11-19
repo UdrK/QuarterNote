@@ -407,7 +407,7 @@ export function getPlaylists(): Playlist[] {
     updatedAt: r.updated_at,
     trackCount: Number(r.track_count),
     totalDuration: Number(r.total_duration),
-    coverUrl: `/api/playlists/${r.id}/cover`,
+    coverUrl: `/api/playlists/${r.id}/cover?t=${r.updated_at || r.created_at}`,
   }));
 }
 
@@ -474,7 +474,7 @@ export function getPlaylistById(id: string): { playlist: Playlist; tracks: Playl
       updatedAt: playlistRow.updated_at,
       trackCount: Number(playlistRow.track_count),
       totalDuration: Number(playlistRow.total_duration),
-      coverUrl: `/api/playlists/${playlistRow.id}/cover`,
+      coverUrl: `/api/playlists/${playlistRow.id}/cover?t=${playlistRow.updated_at || playlistRow.created_at}`,
     },
     tracks,
   };
@@ -488,7 +488,8 @@ export function getPlaylistImagePath(id: string): string | null {
 
 export function updatePlaylistImage(id: string, imagePath: string): void {
   const db = getDatabase();
-  db.prepare('UPDATE playlists SET image_path = ? WHERE id = ?').run(imagePath, id);
+  const now = Date.now();
+  db.prepare('UPDATE playlists SET image_path = ?, updated_at = ? WHERE id = ?').run(imagePath, now, id);
 }
 
 export function createPlaylist(name: string): Playlist {

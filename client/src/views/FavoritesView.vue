@@ -473,7 +473,7 @@ function handleNavigate(item: FavoriteItem) {
                 <div v-else-if="item.itemType === 'playlist'" class="flex flex-col">
                   <div class="relative aspect-square bg-black border border-[#33111a] group-hover:border-[#00ff66] overflow-hidden mb-1">
                     <img
-                      :src="`/api/playlists/${item.itemId}/cover`"
+                      :src="item.playlist?.coverUrl || `/api/playlists/${item.itemId}/cover`"
                       :alt="item.playlist?.name || 'Playlist'"
                       class="w-full h-full object-cover pointer-events-none"
                       loading="lazy"

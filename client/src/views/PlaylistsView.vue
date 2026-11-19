@@ -114,7 +114,7 @@ onMounted(load);
           <div class="space-y-1.5">
             <div class="aspect-square bg-black border border-[#003311] group-hover:border-[#00ff66] overflow-hidden">
               <img
-                :src="`/api/playlists/${pl.id}/cover`"
+                :src="pl.coverUrl || `/api/playlists/${pl.id}/cover`"
                 :alt="pl.name"
                 class="w-full h-full object-cover"
                 loading="lazy"
