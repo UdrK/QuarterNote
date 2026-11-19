@@ -7,7 +7,6 @@ import {
   Trash2, 
   Edit2, 
   Play, 
-  FolderInput, 
   Check, 
   X,
   GripVertical
@@ -32,9 +31,6 @@ const newDividerTitle = ref('');
 const editingDividerId = ref<string | null>(null);
 const editingTitle = ref('');
 
-// Popover state for alternative click-based moving
-const activeMoveMenuFavoriteId = ref<string | null>(null);
-
 // HTML5 Drag and Drop states
 const draggedItem = ref<FavoriteItem | null>(null);
 const draggedFromContainerId = ref<string | null>(null);
@@ -48,7 +44,6 @@ onMounted(async () => {
 function handleDragStart(event: DragEvent, item: FavoriteItem, containerId: string) {
   draggedItem.value = item;
   draggedFromContainerId.value = containerId;
-  activeMoveMenuFavoriteId.value = null;
 
   if (event.dataTransfer) {
     event.dataTransfer.setData('text/plain', item.id);
@@ -56,10 +51,18 @@ function handleDragStart(event: DragEvent, item: FavoriteItem, containerId: stri
   }
 }
 
-function handleDragEnd() {
+function handleDragEnd(event?: DragEvent) {
   draggedItem.value = null;
   draggedFromContainerId.value = null;
   dragOverContainerId.value = null;
+
+  // Clear any stuck :active or focus states in browser
+  if (event?.target && (event.target as HTMLElement).blur) {
+    (event.target as HTMLElement).blur();
+  }
+  if (document.activeElement && (document.activeElement as HTMLElement).blur) {
+    (document.activeElement as HTMLElement).blur();
+  }
 }
 
 function handleDragEnter(containerId: string) {
@@ -93,9 +96,7 @@ async function handleDrop(event: DragEvent, targetContainerId: string) {
   const favoriteId = draggedItem.value?.id || event.dataTransfer?.getData('text/plain');
   const fromContainerId = draggedFromContainerId.value;
 
-  dragOverContainerId.value = null;
-  draggedItem.value = null;
-  draggedFromContainerId.value = null;
+  handleDragEnd(event);
 
   if (!favoriteId || fromContainerId === targetContainerId) return;
 
@@ -139,29 +140,11 @@ async function saveRename(id: string) {
 }
 
 async function handleDeleteContainer(id: string, title: string) {
-  if (!confirm(`Vuoi davvero eliminare il divisore "${title}" e i suoi elementi preferiti?`)) return;
+  if (!confirm(`Vuoi davvero eliminare la categoria "${title}" e i suoi elementi preferiti?`)) return;
   try {
     await deleteDivider(id);
   } catch (err) {
     console.error('Failed to delete divider:', err);
-  }
-}
-
-async function handleMove(favoriteId: string, targetContainerId: string) {
-  activeMoveMenuFavoriteId.value = null;
-  try {
-    await moveItem(favoriteId, targetContainerId);
-  } catch (err) {
-    console.error('Failed to move favorite item:', err);
-  }
-}
-
-function toggleMoveMenu(favoriteId: string, event: Event) {
-  event.stopPropagation();
-  if (activeMoveMenuFavoriteId.value === favoriteId) {
-    activeMoveMenuFavoriteId.value = null;
-  } else {
-    activeMoveMenuFavoriteId.value = favoriteId;
   }
 }
 
@@ -203,7 +186,7 @@ function handleNavigate(item: FavoriteItem) {
 </script>
 
 <template>
-  <div class="p-6 space-y-8 max-w-7xl mx-auto" @click="activeMoveMenuFavoriteId = null">
+  <div class="p-6 space-y-8 max-w-7xl mx-auto">
     <!-- View Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div class="flex items-center gap-3">
@@ -212,26 +195,23 @@ function handleNavigate(item: FavoriteItem) {
         </div>
         <div>
           <h1 class="text-2xl font-bold tracking-tight text-slate-100">Preferiti</h1>
-          <p class="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
-            <span>Organizza artisti, album, brani e playlist con divisori personalizzati.</span>
-            <span class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 font-semibold text-[10px] border border-sky-500/20">
-              <GripVertical class="w-2.5 h-2.5" /> Trascina gli elementi per spostarli
-            </span>
+          <p class="text-xs text-slate-400 mt-0.5">
+            Organizza artisti, album, brani e playlist in categorie personalizzate
           </p>
         </div>
       </div>
 
-      <!-- Add Divider Button -->
+      <!-- Create Category Button -->
       <button
         @click="showNewDividerDialog = true"
         class="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 font-bold text-xs rounded-xl shadow transition-all hover:scale-105 self-start sm:self-auto cursor-pointer"
       >
         <Plus class="w-4 h-4 text-sky-400" />
-        <span>Aggiungi Divisore</span>
+        <span>Crea categoria</span>
       </button>
     </div>
 
-    <!-- Create Divider Modal/Dialog -->
+    <!-- Create Category Modal/Dialog -->
     <div
       v-if="showNewDividerDialog"
       class="p-4 rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl flex flex-col sm:flex-row items-stretch sm:items-center gap-3 animate-in fade-in"
@@ -239,7 +219,7 @@ function handleNavigate(item: FavoriteItem) {
       <input
         v-model="newDividerTitle"
         type="text"
-        placeholder="Nome del nuovo divisore (es: Colonna sonora, Rock preferito...)"
+        placeholder="Nome della nuova categoria (es: Colonna sonora, Rock preferito...)"
         class="flex-1 bg-slate-950 text-xs text-slate-100 px-3.5 py-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-sky-500 font-medium"
         @keyup.enter="handleCreateDivider"
         autofocus
@@ -250,7 +230,7 @@ function handleNavigate(item: FavoriteItem) {
           :disabled="!newDividerTitle.trim()"
           class="px-4 py-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs rounded-xl disabled:opacity-50 transition-colors cursor-pointer"
         >
-          Crea Divisore
+          Crea Categoria
         </button>
         <button
           @click="showNewDividerDialog = false"
@@ -292,7 +272,7 @@ function handleNavigate(item: FavoriteItem) {
             :class="dragOverContainerId === container.id ? 'border-sky-500/60' : 'border-slate-800 group-hover/divider:border-slate-700/80'"
           />
 
-          <!-- Divider Center Pill -->
+          <!-- Divider Center Pill (Title only, no count) -->
           <div 
             class="flex items-center gap-2.5 px-5 py-1.5 rounded-full bg-slate-900 border transition-all select-none"
             :class="[
@@ -319,27 +299,24 @@ function handleNavigate(item: FavoriteItem) {
               </button>
             </template>
 
-            <!-- Normal Title -->
+            <!-- Normal Title (Count removed) -->
             <template v-else>
               <span class="text-xs font-extrabold uppercase tracking-widest text-slate-200">
                 {{ container.title }}
               </span>
-              <span class="text-[10px] font-mono font-semibold text-slate-500 bg-slate-950 px-2 py-0.5 rounded-full border border-slate-800">
-                {{ container.items.length }}
-              </span>
 
-              <!-- Divider Action Buttons -->
+              <!-- Category Action Buttons (Rename, Delete) -->
               <div class="flex items-center gap-1 opacity-0 group-hover/divider:opacity-100 transition-opacity ml-1">
                 <button
                   @click="startRename(container)"
-                  title="Rinomina divisore"
+                  title="Rinomina categoria"
                   class="p-1 text-slate-400 hover:text-sky-400 rounded transition-colors cursor-pointer"
                 >
                   <Edit2 class="w-3 h-3" />
                 </button>
                 <button
                   @click="handleDeleteContainer(container.id, container.title)"
-                  title="Elimina divisore"
+                  title="Elimina categoria"
                   class="p-1 text-slate-400 hover:text-red-400 rounded transition-colors cursor-pointer"
                 >
                   <Trash2 class="w-3 h-3" />
@@ -366,13 +343,13 @@ function handleNavigate(item: FavoriteItem) {
           ]"
         >
           <p class="text-xs font-semibold">
-            {{ dragOverContainerId === container.id ? '✦ Rilascia qui per spostare in questo divisore' : 'Nessun elemento in questo contenitore.' }}
+            {{ dragOverContainerId === container.id ? '✦ Rilascia qui per spostare in questa categoria' : 'Nessun elemento in questa categoria.' }}
           </p>
           <p 
             class="text-[11px] mt-1" 
             :class="dragOverContainerId === container.id ? 'text-sky-400' : 'text-slate-600'"
           >
-            Trascina e rilascia qui qualsiasi elemento da un altro divisore, oppure usa il pulsante "Sposta in".
+            Trascina e rilascia qui qualsiasi elemento da un'altra categoria per spostarlo.
           </p>
         </div>
 
@@ -388,22 +365,25 @@ function handleNavigate(item: FavoriteItem) {
               :key="item.id"
               draggable="true"
               @dragstart="handleDragStart($event, item, container.id)"
-              @dragend="handleDragEnd"
-              class="group flex items-center justify-between px-2.5 py-2 rounded-lg text-xs hover:bg-slate-800/70 select-none transition-all relative cursor-grab active:cursor-grabbing border border-transparent hover:border-slate-800"
+              @dragend="handleDragEnd($event)"
+              class="group flex items-center justify-between px-2.5 py-2 rounded-lg text-xs hover:bg-slate-800/70 select-none transition-all relative border border-transparent hover:border-slate-800 cursor-pointer"
               :class="[
                 draggedItem?.id === item.id ? 'opacity-30 scale-98 bg-sky-950/40 ring-1 ring-sky-500' : ''
               ]"
             >
               <!-- Left: Drag Grip Handle + Play & Info -->
               <div class="flex items-center gap-2 min-w-0 flex-1">
-                <!-- Grip handle icon -->
-                <span class="text-slate-600 group-hover:text-slate-400 cursor-grab active:cursor-grabbing p-0.5 shrink-0" title="Trascina per spostare in un altro divisore">
+                <!-- Grip handle icon (has cursor-grab) -->
+                <span 
+                  class="text-slate-600 group-hover:text-slate-400 cursor-grab p-0.5 shrink-0" 
+                  title="Trascina per spostare in un'altra categoria"
+                >
                   <GripVertical class="w-3.5 h-3.5" />
                 </span>
 
                 <div 
                   @click="item.track && playerActions.playTrack(item.track)"
-                  class="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer"
+                  class="flex items-center gap-2.5 min-w-0 flex-1"
                 >
                   <span class="w-5 text-center text-slate-500 font-mono text-[11px] group-hover:hidden">
                     {{ idx + 1 }}
@@ -421,36 +401,6 @@ function handleNavigate(item: FavoriteItem) {
 
               <!-- Track Actions -->
               <div class="flex items-center gap-2 shrink-0 ml-3">
-                <!-- Move to container button (alternative click option) -->
-                <div class="relative">
-                  <button
-                    @click="toggleMoveMenu(item.id, $event)"
-                    class="p-1.5 text-slate-400 hover:text-sky-400 rounded hover:bg-slate-700/60 transition-colors cursor-pointer"
-                    title="Sposta in un altro contenitore"
-                  >
-                    <FolderInput class="w-3.5 h-3.5" />
-                  </button>
-
-                  <!-- Move Popover Menu -->
-                  <div
-                    v-if="activeMoveMenuFavoriteId === item.id"
-                    class="absolute right-0 top-8 z-50 w-48 bg-slate-900 border border-slate-700/80 rounded-xl shadow-2xl py-1 backdrop-blur"
-                  >
-                    <div class="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 border-b border-slate-800">
-                      Sposta in contenitore:
-                    </div>
-                    <button
-                      v-for="targetC in favoritesState.containers.filter(c => c.id !== container.id)"
-                      :key="targetC.id"
-                      @click="handleMove(item.id, targetC.id)"
-                      class="w-full text-left px-3 py-1.5 text-xs text-slate-200 hover:bg-sky-500/10 hover:text-sky-300 flex items-center justify-between transition-colors cursor-pointer"
-                    >
-                      <span class="truncate">{{ targetC.title }}</span>
-                      <span class="text-[10px] text-slate-500">({{ targetC.items.length }})</span>
-                    </button>
-                  </div>
-                </div>
-
                 <!-- Un-favorite heart -->
                 <button
                   @click.stop="toggleFavorite('track', item.itemId)"
@@ -478,18 +428,21 @@ function handleNavigate(item: FavoriteItem) {
               :key="item.id"
               draggable="true"
               @dragstart="handleDragStart($event, item, container.id)"
-              @dragend="handleDragEnd"
-              class="group relative flex flex-col p-3 rounded-2xl bg-slate-900/40 hover:bg-slate-900 border border-slate-800/50 hover:border-slate-700 transition-all cursor-grab active:cursor-grabbing shadow-sm hover:shadow-xl select-none"
+              @dragend="handleDragEnd($event)"
+              class="group relative flex flex-col p-3 rounded-2xl bg-slate-900/40 hover:bg-slate-900 border border-slate-800/50 hover:border-slate-700 transition-all cursor-pointer shadow-sm hover:shadow-xl select-none"
               :class="[
                 draggedItem?.id === item.id ? 'opacity-30 scale-95 ring-2 ring-sky-500 bg-sky-950/40' : ''
               ]"
               @click="handleNavigate(item)"
             >
-              <!-- Top bar with grip icon, badges and actions -->
+              <!-- Top bar with grip icon, badges and remove favorite action -->
               <div class="flex items-center justify-between mb-2 z-10">
                 <div class="flex items-center gap-1.5 min-w-0">
-                  <!-- Drag Handle Icon -->
-                  <GripVertical class="w-3.5 h-3.5 text-slate-600 group-hover:text-slate-400 cursor-grab active:cursor-grabbing shrink-0" title="Trascina per spostare in un altro divisore" />
+                  <!-- Drag Handle Icon (has cursor-grab) -->
+                  <GripVertical 
+                    class="w-3.5 h-3.5 text-slate-600 group-hover:text-slate-400 cursor-grab shrink-0" 
+                    title="Trascina per spostare in un'altra categoria" 
+                  />
 
                   <span
                     class="text-[9px] uppercase font-bold px-2 py-0.5 rounded-full truncate"
@@ -504,37 +457,6 @@ function handleNavigate(item: FavoriteItem) {
                 </div>
 
                 <div class="flex items-center gap-1 shrink-0">
-                  <!-- Move button -->
-                  <div class="relative">
-                    <button
-                      @click="toggleMoveMenu(item.id, $event)"
-                      class="p-1 rounded-full bg-slate-950/70 hover:bg-slate-800 text-slate-400 hover:text-sky-400 transition-colors cursor-pointer"
-                      title="Sposta in un altro contenitore"
-                    >
-                      <FolderInput class="w-3 h-3" />
-                    </button>
-
-                    <!-- Move Popover Menu -->
-                    <div
-                      v-if="activeMoveMenuFavoriteId === item.id"
-                      class="absolute right-0 top-7 z-50 w-44 bg-slate-900 border border-slate-700/80 rounded-xl shadow-2xl py-1 backdrop-blur"
-                      @click.stop
-                    >
-                      <div class="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 border-b border-slate-800">
-                        Sposta in:
-                      </div>
-                      <button
-                        v-for="targetC in favoritesState.containers.filter(c => c.id !== container.id)"
-                        :key="targetC.id"
-                        @click="handleMove(item.id, targetC.id)"
-                        class="w-full text-left px-3 py-1.5 text-xs text-slate-200 hover:bg-sky-500/10 hover:text-sky-300 flex items-center justify-between transition-colors cursor-pointer"
-                      >
-                        <span class="truncate">{{ targetC.title }}</span>
-                        <span class="text-[10px] text-slate-500">({{ targetC.items.length }})</span>
-                      </button>
-                    </div>
-                  </div>
-
                   <!-- Remove Favorite Heart -->
                   <button
                     @click.stop="toggleFavorite(item.itemType, item.itemId)"
