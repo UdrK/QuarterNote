@@ -244,4 +244,11 @@ export const playerActions = {
       playerState.queueIndex++;
     }
   },
+
+  jumpToQueueIndex(index: number) {
+    if (index >= 0 && index < playerState.queue.length) {
+      playerState.queueIndex = index;
+      this.playTrack(playerState.queue[index]);
+    }
+  },
 };

@@ -44,87 +44,87 @@ function playShuffled() {
 </script>
 
 <template>
-  <div class="p-6 space-y-6">
-    <!-- Back button -->
-    <button
-      @click="router.back()"
-      class="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-100 transition-colors"
-    >
-      <ArrowLeft class="w-3.5 h-3.5" /> Torna indietro
-    </button>
+  <div class="space-y-4 font-mono select-none">
+    <!-- Breadcrumb / Back button -->
+    <div class="flex items-center gap-2 text-xs">
+      <button
+        @click="router.back()"
+        class="bbs-btn py-0.5 px-2 text-xs border-[#333333]"
+      >
+        <span>[&lt; INDIETRO]</span>
+      </button>
+      <span class="text-[#555555]">&gt; MENU &gt; ALBUM &gt;</span>
+      <span class="text-[#ffff00] font-bold" v-if="album">[{{ album.title }}]</span>
+    </div>
 
-    <!-- Album Hero Card -->
-    <div v-if="album" class="flex flex-col sm:flex-row items-center sm:items-end gap-6 bg-slate-900/60 p-6 rounded-2xl border border-slate-800/60 shadow-xl backdrop-blur">
-      <div class="w-44 h-44 rounded-xl overflow-hidden bg-slate-800 shadow-2xl shrink-0">
+    <!-- Album Hero Card in BBS Box -->
+    <div v-if="album" class="border border-[#2a2a2a] bg-[#070707] p-4 flex flex-col sm:flex-row items-center sm:items-start gap-4">
+      <div class="w-36 h-36 sm:w-44 sm:h-44 bg-black border-2 border-[#00ffff] overflow-hidden shrink-0">
         <img :src="album.coverUrl" :alt="album.title" class="w-full h-full object-cover" />
       </div>
 
-      <div class="space-y-3 min-w-0 flex-1 text-center sm:text-left">
-        <div>
-          <span class="text-[10px] font-bold uppercase tracking-wider text-sky-400">Album</span>
-          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight mt-1 truncate">
-            {{ album.title }}
-          </h1>
-          <p 
-            @click="router.push(`/artists/${album.artistId}`)" 
-            class="text-sm font-semibold text-slate-300 hover:text-sky-400 cursor-pointer transition-colors mt-1"
-          >
-            {{ album.artistName }}
-          </p>
-          <div class="flex items-center justify-center sm:justify-start gap-2 text-xs text-slate-400 mt-2">
-            <span v-if="album.year">{{ album.year }}</span>
-            <span v-if="album.year">•</span>
-            <span>{{ tracks.length }} brani</span>
-            <span>•</span>
-            <span>{{ formatTime(album.duration) }}</span>
-          </div>
+      <div class="space-y-1.5 min-w-0 flex-1 text-center sm:text-left">
+        <div class="text-[10px] text-[#00ffff] font-bold">
+          ■ ALBUM DETTAGLI
+        </div>
+        <h1 class="text-xl sm:text-2xl font-bold text-[#ffff00] truncate">
+          {{ album.title }}
+        </h1>
+        <p 
+          @click="router.push(`/artists/${album.artistId}`)" 
+          class="text-xs font-bold text-[#00ffff] hover:underline cursor-pointer transition-colors"
+        >
+          &gt; ARTISTA: {{ album.artistName }}
+        </p>
+
+        <div class="text-[11px] text-[#888888] space-x-2 pt-0.5">
+          <span>ANNO: <span class="text-[#ffff00]">{{ album.year || 'N/D' }}</span></span>
+          <span>|</span>
+          <span>BRANI: <span class="text-[#00ff66]">{{ tracks.length }}</span></span>
+          <span>|</span>
+          <span>DURATA: {{ formatTime(album.duration) }}</span>
         </div>
 
-        <!-- Action buttons -->
-        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-2">
+        <!-- Action buttons in bracketed BBS style -->
+        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-2">
           <button
             @click="playAll"
-            class="flex items-center gap-2 px-5 py-2.5 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-sky-500/20 hover:scale-105 transition-all"
+            class="bbs-btn bbs-btn-green py-1.5 px-3 text-xs"
           >
-            <Play class="w-4 h-4 fill-current translate-x-0.5" />
-            <span>Riproduci</span>
+            <span>[ ▶ RIPRODUCI TUTTO ]</span>
           </button>
           <button
             @click="playShuffled"
-            class="flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs rounded-xl border border-slate-700/60 hover:scale-105 transition-all"
+            class="bbs-btn py-1.5 px-3 text-xs border-[#333333] text-[#cccccc]"
           >
-            <Shuffle class="w-3.5 h-3.5" />
-            <span>Casuale</span>
+            <span>[ ⇄ CASUALE ]</span>
           </button>
           <button
-            v-if="album"
             @click="toggleFavorite('album', album.id)"
-            class="flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-semibold transition-all"
-            :class="[
-              isFavorite('album', album.id)
-                ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
-                : 'bg-slate-800/80 hover:bg-slate-800 border-slate-700/80 text-slate-300'
-            ]"
+            class="bbs-btn py-1.5 px-3 text-xs"
+            :class="isFavorite('album', album.id) ? 'bbs-btn-red' : 'border-[#333333] text-[#aaaaaa]'"
           >
-            <Heart
-              class="w-4 h-4"
-              :class="{ 'fill-rose-500 text-rose-500': isFavorite('album', album.id) }"
-            />
-            <span>{{ isFavorite('album', album.id) ? 'Nei Preferiti' : 'Aggiungi ai Preferiti' }}</span>
+            <span>{{ isFavorite('album', album.id) ? '[★ NEI PREFERITI]' : '[☆ AGGIUNGI PREFERITI]' }}</span>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Tracks List -->
-    <div class="bg-slate-900/40 rounded-xl border border-slate-800/40 p-2 space-y-1">
-      <TrackRow
-        v-for="(track, idx) in tracks"
-        :key="track.id"
-        :track="track"
-        :index="idx"
-        :playlistContext="tracks"
-      />
+    <!-- Tracks List Table in BBS style -->
+    <div class="space-y-2">
+      <div class="border-b border-[#222222] pb-1 flex items-center justify-between text-xs font-bold text-[#00ff66]">
+        <span>■ [ TRACKLIST ] ───────────────────────────────────</span>
+        <span class="text-[#ffff00]">({{ tracks.length }} BRANI)</span>
+      </div>
+      <div class="border border-[#222222] bg-[#070707]">
+        <TrackRow
+          v-for="(track, idx) in tracks"
+          :key="track.id"
+          :track="track"
+          :index="idx"
+          :playlistContext="tracks"
+        />
+      </div>
     </div>
   </div>
 </template>

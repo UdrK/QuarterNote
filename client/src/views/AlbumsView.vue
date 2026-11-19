@@ -52,105 +52,99 @@ async function playAlbum(album: Album) {
 </script>
 
 <template>
-  <div class="p-6 space-y-6">
+  <div class="space-y-4 font-mono select-none">
     <!-- View Header & Controls -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="border border-[#2a2a2a] bg-[#070707] p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div>
-        <h1 class="text-2xl font-bold tracking-tight text-slate-100">Album</h1>
-        <p class="text-xs text-slate-400">{{ albums.length }} album in libreria</p>
+        <div class="flex items-center gap-2">
+          <span class="text-[#00ffff] font-bold text-sm">■ [ CATALOGO DISCOGRAFICO ]</span>
+          <span class="text-xs text-[#ffff00]">[{{ albums.length }} ALBUM]</span>
+        </div>
+        <p class="text-[11px] text-[#777777] mt-0.5">&gt; Naviga tra gli album catalogati nel server</p>
       </div>
 
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2">
         <!-- Filter search -->
-        <input
-          v-model="filterText"
-          type="text"
-          placeholder="Filtra album..."
-          class="bg-slate-900 border border-slate-800 text-xs text-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-sky-500 w-44"
-        />
+        <div class="flex items-center bg-black border border-[#333333] px-2 py-1 focus-within:border-[#00ffff]">
+          <span class="text-[#00ffff] text-xs font-bold mr-1">&gt;</span>
+          <input
+            v-model="filterText"
+            type="text"
+            placeholder="Filtra album/artista..."
+            class="bg-transparent text-xs text-[#ffff00] placeholder-[#555555] focus:outline-none w-36 sm:w-44"
+          />
+        </div>
 
         <!-- Sort selector -->
         <select
           v-model="sortBy"
-          class="bg-slate-900 border border-slate-800 text-xs text-slate-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-sky-500 cursor-pointer"
+          class="bg-black border border-[#333333] text-xs text-[#00ffff] px-2 py-1 focus:outline-none focus:border-[#00ffff] cursor-pointer"
         >
-          <option value="title">Titolo</option>
-          <option value="artist">Artista</option>
-          <option value="year">Anno</option>
+          <option value="title">[ORD: TITOLO]</option>
+          <option value="artist">[ORD: ARTISTA]</option>
+          <option value="year">[ORD: ANNO]</option>
         </select>
       </div>
     </div>
 
-    <!-- Loading State -->
-    <div v-if="isLoading" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-      <div v-for="n in 12" :key="n" class="animate-pulse space-y-2">
-        <div class="bg-slate-800/60 aspect-square rounded-xl" />
-        <div class="h-3 bg-slate-800/80 rounded w-3/4" />
-        <div class="h-2.5 bg-slate-800/50 rounded w-1/2" />
-      </div>
-    </div>
-
     <!-- Empty State -->
-    <div v-else-if="filteredAlbums.length === 0" class="text-center py-20 text-slate-500">
-      <Disc3 class="w-12 h-12 mx-auto mb-3 opacity-40" />
-      <p class="text-sm">Nessun album trovato.</p>
-      <p class="text-xs text-slate-600 mt-1">Premi "Riscansiona Libreria" nella barra laterale per caricare i tuoi brani.</p>
+    <div v-if="!isLoading && filteredAlbums.length === 0" class="border border-[#222222] p-12 text-center text-[#666666]">
+      <Disc3 class="w-10 h-10 mx-auto mb-2 opacity-30 text-[#00ffff]" />
+      <p class="text-xs">&gt; NESSUN ALBUM TROVATO &lt;</p>
+      <p class="text-[10px] text-[#555555] mt-1">Usa [RISCANSIONA] nel menu laterale per importare la musica.</p>
     </div>
 
-    <!-- Albums Grid -->
-    <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+    <!-- Albums Grid in BBS Style -->
+    <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
       <div
         v-for="album in filteredAlbums"
         :key="album.id"
-        class="group flex flex-col p-2.5 rounded-xl bg-slate-900/40 hover:bg-slate-900 border border-slate-800/40 hover:border-slate-800 transition-all cursor-pointer"
+        class="group flex flex-col p-2 bg-[#070707] border border-[#222222] hover:border-[#00ffff] hover:bg-[#001726] transition-colors cursor-pointer"
         @click="router.push(`/albums/${album.id}`)"
       >
         <!-- Cover thumbnail -->
-        <div class="relative aspect-square rounded-lg overflow-hidden bg-slate-800 mb-2.5 shadow-md">
+        <div class="relative aspect-square bg-black border border-[#333333] group-hover:border-[#00ffff] overflow-hidden mb-2">
           <img
             :src="album.coverUrl"
             :alt="album.title"
             loading="lazy"
-            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            class="w-full h-full object-cover"
           />
 
           <!-- Favorite Button Overlay -->
           <button
             type="button"
             @click.stop="toggleFavorite('album', album.id)"
-            class="absolute top-2 right-2 p-1.5 rounded-full bg-slate-950/70 hover:bg-slate-900 text-slate-400 hover:text-rose-400 backdrop-blur transition-all z-10"
+            class="absolute top-1 right-1 text-xs font-bold z-10 transition-colors"
             :class="[
               isFavorite('album', album.id)
-                ? 'opacity-100 text-rose-500'
-                : 'opacity-0 group-hover:opacity-100'
+                ? 'text-[#ff3366]'
+                : 'text-[#444444] hover:text-[#ff3366] opacity-0 group-hover:opacity-100'
             ]"
             :title="isFavorite('album', album.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
           >
-            <Heart
-              class="w-3.5 h-3.5 transition-transform hover:scale-110"
-              :class="{ 'fill-rose-500 text-rose-500': isFavorite('album', album.id) }"
-            />
+            <span>{{ isFavorite('album', album.id) ? '[★]' : '[☆]' }}</span>
           </button>
 
           <!-- Quick Play Overlay Button -->
           <button
             @click.stop="playAlbum(album)"
-            class="absolute bottom-2 right-2 w-9 h-9 rounded-full bg-sky-500 hover:bg-sky-400 text-slate-950 flex items-center justify-center shadow-lg opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200"
+            class="absolute bottom-1 right-1 bbs-btn bbs-btn-green py-0.5 px-1.5 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"
             title="Riproduci album"
           >
-            <Play class="w-4 h-4 fill-current translate-x-0.5" />
+            <span>[▶ PLAY]</span>
           </button>
         </div>
 
         <!-- Info -->
-        <h3 class="text-xs font-semibold text-slate-100 truncate group-hover:text-sky-400 transition-colors" :title="album.title">
+        <h3 class="text-xs font-bold text-[#d4d4d4] truncate group-hover:text-[#ffff00] transition-colors" :title="album.title">
           {{ album.title }}
         </h3>
-        <p class="text-[11px] text-slate-400 truncate mt-0.5" :title="album.artistName">
-          {{ album.artistName }}
+        <p class="text-[11px] text-[#00ffff] truncate mt-0.5 opacity-80" :title="album.artistName">
+          &gt; {{ album.artistName }}
         </p>
-        <span v-if="album.year" class="text-[10px] text-slate-500 mt-1">
-          {{ album.year }}
+        <span v-if="album.year" class="text-[10px] text-[#777777] mt-1">
+          ANNO: {{ album.year }}
         </span>
       </div>
     </div>

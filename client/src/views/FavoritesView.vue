@@ -60,31 +60,26 @@ function handleDragEnd(event?: DragEvent) {
   if (event?.target && (event.target as HTMLElement).blur) {
     (event.target as HTMLElement).blur();
   }
-  if (document.activeElement && (document.activeElement as HTMLElement).blur) {
-    (document.activeElement as HTMLElement).blur();
+}
+
+function handleDragOver(event: DragEvent, containerId: string) {
+  event.preventDefault();
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = 'move';
+  }
+  if (dragOverContainerId.value !== containerId) {
+    dragOverContainerId.value = containerId;
   }
 }
 
 function handleDragEnter(containerId: string) {
-  if (draggedItem.value && draggedFromContainerId.value !== containerId) {
-    dragOverContainerId.value = containerId;
-  }
-}
-
-function handleDragOver(event: DragEvent, containerId: string) {
-  if (draggedItem.value && draggedFromContainerId.value !== containerId) {
-    event.preventDefault();
-    if (event.dataTransfer) {
-      event.dataTransfer.dropEffect = 'move';
-    }
-    dragOverContainerId.value = containerId;
-  }
+  dragOverContainerId.value = containerId;
 }
 
 function handleDragLeave(event: DragEvent, containerId: string) {
-  const currentTarget = event.currentTarget as HTMLElement | null;
-  const relatedTarget = event.relatedTarget as Node | null;
-  if (currentTarget && !currentTarget.contains(relatedTarget)) {
+  const currentTarget = event.currentTarget as HTMLElement;
+  const relatedTarget = event.relatedTarget as HTMLElement;
+  if (!currentTarget.contains(relatedTarget)) {
     if (dragOverContainerId.value === containerId) {
       dragOverContainerId.value = null;
     }
@@ -93,25 +88,26 @@ function handleDragLeave(event: DragEvent, containerId: string) {
 
 async function handleDrop(event: DragEvent, targetContainerId: string) {
   event.preventDefault();
-  const favoriteId = draggedItem.value?.id || event.dataTransfer?.getData('text/plain');
+  const item = draggedItem.value;
   const fromContainerId = draggedFromContainerId.value;
 
   handleDragEnd(event);
 
-  if (!favoriteId || fromContainerId === targetContainerId) return;
+  if (!item || !fromContainerId) return;
+  if (fromContainerId === targetContainerId) return;
 
   try {
-    await moveItem(favoriteId, targetContainerId);
+    await moveItem(item.id, targetContainerId);
   } catch (err) {
-    console.error('Failed to move favorite item via drag and drop:', err);
+    console.error('Failed to move favorite item:', err);
   }
 }
 
+// Category handlers
 async function handleCreateDivider() {
-  const title = newDividerTitle.value.trim();
-  if (!title) return;
+  if (!newDividerTitle.value.trim()) return;
   try {
-    await createDivider(title);
+    await createDivider(newDividerTitle.value.trim());
     newDividerTitle.value = '';
     showNewDividerDialog.value = false;
   } catch (err) {
@@ -125,17 +121,12 @@ function startRename(container: FavoriteContainer) {
 }
 
 async function saveRename(id: string) {
-  const title = editingTitle.value.trim();
-  if (!title) {
-    editingDividerId.value = null;
-    return;
-  }
+  if (!editingTitle.value.trim()) return;
   try {
-    await renameDivider(id, title);
+    await renameDivider(id, editingTitle.value.trim());
+    editingDividerId.value = null;
   } catch (err) {
     console.error('Failed to rename divider:', err);
-  } finally {
-    editingDividerId.value = null;
   }
 }
 
@@ -186,41 +177,37 @@ function handleNavigate(item: FavoriteItem) {
 </script>
 
 <template>
-  <div class="p-6 space-y-8 max-w-7xl mx-auto">
-    <!-- View Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center border border-rose-500/20 shadow-sm">
-          <Heart class="w-5 h-5 fill-rose-500" />
+  <div class="space-y-6 font-mono select-none">
+    <!-- View Header in BBS Style -->
+    <div class="border border-[#2a2a2a] bg-[#070707] p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="text-[#ff3366] font-bold text-sm">■ [ ARCHIVIO PREFERITI ]</span>
+          <span class="text-xs text-[#ffff00]">[{{ favoritesState.containers.length }} CATEGORIE]</span>
         </div>
-        <div>
-          <h1 class="text-2xl font-bold tracking-tight text-slate-100">Preferiti</h1>
-          <p class="text-xs text-slate-400 mt-0.5">
-            Organizza artisti, album, brani e playlist in categorie personalizzate
-          </p>
-        </div>
+        <p class="text-[11px] text-[#777777] mt-0.5">&gt; Organizza artisti, album, brani e playlist con il drag &amp; drop</p>
       </div>
 
       <!-- Create Category Button -->
       <button
         @click="showNewDividerDialog = true"
-        class="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 font-bold text-xs rounded-xl shadow transition-all hover:scale-105 self-start sm:self-auto cursor-pointer"
+        class="bbs-btn bbs-btn-yellow py-1.5 px-3 text-xs self-start sm:self-auto"
       >
-        <Plus class="w-4 h-4 text-sky-400" />
-        <span>Crea categoria</span>
+        <span>[+ CREA CATEGORIA]</span>
       </button>
     </div>
 
-    <!-- Create Category Modal/Dialog -->
+    <!-- Create Category Dialog in BBS Box -->
     <div
       v-if="showNewDividerDialog"
-      class="p-4 rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl flex flex-col sm:flex-row items-stretch sm:items-center gap-3 animate-in fade-in"
+      class="p-3 border-2 border-[#ffff00] bg-black shadow-[0_0_15px_rgba(255,255,0,0.15)] flex flex-col sm:flex-row items-stretch sm:items-center gap-2"
     >
+      <span class="text-[#ffff00] text-xs font-bold">&gt; NOME CATEGORIA:</span>
       <input
         v-model="newDividerTitle"
         type="text"
-        placeholder="Nome della nuova categoria (es: Colonna sonora, Rock preferito...)"
-        class="flex-1 bg-slate-950 text-xs text-slate-100 px-3.5 py-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-sky-500 font-medium"
+        placeholder="Es: Heavy Metal, Chillout, In Viaggio..."
+        class="flex-1 bg-[#0a0a0a] text-xs text-[#ffff00] px-3 py-1.5 border border-[#333333] focus:outline-none focus:border-[#ffff00]"
         @keyup.enter="handleCreateDivider"
         autofocus
       />
@@ -228,57 +215,54 @@ function handleNavigate(item: FavoriteItem) {
         <button
           @click="handleCreateDivider"
           :disabled="!newDividerTitle.trim()"
-          class="px-4 py-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs rounded-xl disabled:opacity-50 transition-colors cursor-pointer"
+          class="bbs-btn bbs-btn-yellow py-1 px-3 text-xs"
         >
-          Crea Categoria
+          [SALVA]
         </button>
         <button
           @click="showNewDividerDialog = false"
-          class="px-3 py-2 text-xs text-slate-400 hover:text-slate-200 cursor-pointer"
+          class="bbs-btn py-1 px-2 text-xs border-[#333333] text-[#888888]"
         >
-          Annulla
+          [ANNULLA]
         </button>
       </div>
     </div>
 
-    <!-- Loading State -->
-    <div v-if="favoritesState.isLoading && favoritesState.containers.length === 0" class="space-y-6 animate-pulse">
-      <div class="h-6 bg-slate-800/60 rounded w-1/4 mx-auto" />
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div v-for="n in 4" :key="n" class="h-32 bg-slate-900/40 rounded-xl" />
-      </div>
+    <!-- Empty Global State -->
+    <div v-if="!favoritesState.isLoading && favoritesState.containers.length === 0" class="border border-[#222222] p-12 text-center text-[#666666]">
+      <p class="text-xs">&gt; NESSUNA CATEGORIA NEI PREFERITI &lt;</p>
     </div>
 
     <!-- Containers List -->
-    <div v-else class="space-y-10">
+    <div v-else class="space-y-8">
       <section
         v-for="container in favoritesState.containers"
         :key="container.id"
-        class="space-y-4 p-3.5 -mx-3.5 rounded-2xl transition-all duration-200"
+        class="space-y-3 p-2 transition-colors border"
         :class="[
           dragOverContainerId === container.id
-            ? 'bg-sky-500/10 ring-2 ring-sky-500/70 shadow-2xl shadow-sky-500/10'
-            : ''
+            ? 'border-[#00ffff] bg-[#001726]'
+            : 'border-transparent'
         ]"
         @dragover="handleDragOver($event, container.id)"
         @dragenter="handleDragEnter(container.id)"
         @dragleave="handleDragLeave($event, container.id)"
         @drop="handleDrop($event, container.id)"
       >
-        <!-- Horizontal Divider with Title in the Center -->
-        <div class="relative flex items-center py-3 group/divider">
+        <!-- Horizontal ASCII Divider with Title in the Center -->
+        <div class="relative flex items-center py-2 group/divider">
           <div 
-            class="flex-grow border-t transition-colors"
-            :class="dragOverContainerId === container.id ? 'border-sky-500/60' : 'border-slate-800 group-hover/divider:border-slate-700/80'"
+            class="flex-grow border-t"
+            :class="dragOverContainerId === container.id ? 'border-[#00ffff]' : 'border-[#333333] group-hover/divider:border-[#555555]'"
           />
 
-          <!-- Divider Center Pill (Title only, no count) -->
+          <!-- Divider Center Box -->
           <div 
-            class="flex items-center gap-2.5 px-5 py-1.5 rounded-full bg-slate-900 border transition-all select-none"
+            class="flex items-center gap-2 px-3 py-1 bg-black border transition-all"
             :class="[
               dragOverContainerId === container.id
-                ? 'border-sky-400 bg-sky-500/20 text-sky-300 scale-105 shadow-lg shadow-sky-500/20 ring-1 ring-sky-400'
-                : 'border-slate-800 group-hover/divider:border-sky-500/50 shadow-md'
+                ? 'border-[#00ffff] text-[#ffff00] bg-[#002b4d]'
+                : 'border-[#333333] group-hover/divider:border-[#00ffff]'
             ]"
           >
             <!-- Inline Edit Title -->
@@ -286,23 +270,23 @@ function handleNavigate(item: FavoriteItem) {
               <input
                 v-model="editingTitle"
                 type="text"
-                class="bg-slate-950 text-xs text-slate-100 font-bold px-2 py-0.5 rounded border border-sky-500 focus:outline-none w-36 uppercase tracking-wider"
+                class="bg-black text-xs text-[#ffff00] font-bold px-1.5 py-0.5 border border-[#ffff00] focus:outline-none w-36 uppercase"
                 @keyup.enter="saveRename(container.id)"
                 @keyup.esc="editingDividerId = null"
                 autofocus
               />
-              <button @click="saveRename(container.id)" class="text-emerald-400 hover:text-emerald-300 p-0.5 cursor-pointer">
-                <Check class="w-3.5 h-3.5" />
+              <button @click="saveRename(container.id)" class="text-[#00ff66] text-xs font-bold px-1">
+                [✓]
               </button>
-              <button @click="editingDividerId = null" class="text-slate-400 hover:text-slate-300 p-0.5 cursor-pointer">
-                <X class="w-3.5 h-3.5" />
+              <button @click="editingDividerId = null" class="text-[#888888] text-xs font-bold px-1">
+                [X]
               </button>
             </template>
 
-            <!-- Normal Title (Count removed) -->
+            <!-- Normal Title -->
             <template v-else>
-              <span class="text-xs font-extrabold uppercase tracking-widest text-slate-200">
-                {{ container.title }}
+              <span class="text-xs font-bold uppercase tracking-wider" :class="dragOverContainerId === container.id ? 'text-[#ffff00]' : 'text-[#d4d4d4]'">
+                ■ [ {{ container.title }} ]
               </span>
 
               <!-- Category Action Buttons (Rename, Delete) -->
@@ -310,55 +294,51 @@ function handleNavigate(item: FavoriteItem) {
                 <button
                   @click="startRename(container)"
                   title="Rinomina categoria"
-                  class="p-1 text-slate-400 hover:text-sky-400 rounded transition-colors cursor-pointer"
+                  class="text-[10px] text-[#888888] hover:text-[#00ffff]"
                 >
-                  <Edit2 class="w-3 h-3" />
+                  [✎]
                 </button>
                 <button
                   @click="handleDeleteContainer(container.id, container.title)"
                   title="Elimina categoria"
-                  class="p-1 text-slate-400 hover:text-red-400 rounded transition-colors cursor-pointer"
+                  class="text-[10px] text-[#888888] hover:text-[#ff3366]"
                 >
-                  <Trash2 class="w-3 h-3" />
+                  [✕]
                 </button>
               </div>
             </template>
           </div>
 
           <div 
-            class="flex-grow border-t transition-colors"
-            :class="dragOverContainerId === container.id ? 'border-sky-500/60' : 'border-slate-800 group-hover/divider:border-slate-700/80'"
+            class="flex-grow border-t"
+            :class="dragOverContainerId === container.id ? 'border-[#00ffff]' : 'border-[#333333] group-hover/divider:border-[#555555]'"
           />
         </div>
 
-        <!-- Container Items Area -->
-        <!-- Empty state for this container (Interactive Drop Zone) -->
+        <!-- Empty Container Drop Zone in BBS Box -->
         <div
           v-if="container.items.length === 0"
-          class="border border-dashed rounded-2xl p-8 text-center transition-all duration-200"
+          class="border border-dashed p-6 text-center transition-colors"
           :class="[
             dragOverContainerId === container.id
-              ? 'border-sky-400 bg-sky-500/15 text-sky-300 scale-[1.01] shadow-inner shadow-sky-500/20'
-              : 'border-slate-800/80 bg-slate-950/20 text-slate-500'
+              ? 'border-[#00ffff] bg-[#002233] text-[#00ffff]'
+              : 'border-[#222222] text-[#555555]'
           ]"
         >
-          <p class="text-xs font-semibold">
-            {{ dragOverContainerId === container.id ? '✦ Rilascia qui per spostare in questa categoria' : 'Nessun elemento in questa categoria.' }}
+          <p class="text-xs">
+            {{ dragOverContainerId === container.id ? '&gt;&gt; RILASCIA QUI PER SPOSTARE &lt;&lt;' : '+-- [ NESSUN ELEMENTO NELLA CATEGORIA ] --+' }}
           </p>
-          <p 
-            class="text-[11px] mt-1" 
-            :class="dragOverContainerId === container.id ? 'text-sky-400' : 'text-slate-600'"
-          >
-            Trascina e rilascia qui qualsiasi elemento da un'altra categoria per spostarlo.
+          <p class="text-[10px] text-[#666666] mt-1">
+            Trascina qui qualsiasi elemento da un'altra categoria.
           </p>
         </div>
 
-        <!-- Items display -->
+        <!-- Items Display -->
         <div v-else class="space-y-3">
-          <!-- Tracks within container (rendered in a playlist-like table) -->
+          <!-- Tracks within container -->
           <div
             v-if="container.items.some(i => i.itemType === 'track')"
-            class="bg-slate-900/40 rounded-xl border border-slate-800/40 p-2 space-y-1 mb-4"
+            class="border border-[#222222] bg-[#070707] space-y-0.5 mb-3"
           >
             <div
               v-for="(item, idx) in container.items.filter(i => i.itemType === 'track')"
@@ -366,52 +346,48 @@ function handleNavigate(item: FavoriteItem) {
               draggable="true"
               @dragstart="handleDragStart($event, item, container.id)"
               @dragend="handleDragEnd($event)"
-              class="group flex items-center justify-between px-2.5 py-2 rounded-lg text-xs hover:bg-slate-800/70 select-none transition-all relative border border-transparent hover:border-slate-800 cursor-pointer"
+              class="group flex items-center justify-between px-2.5 py-1.5 text-xs select-none transition-colors border-b border-[#181818] hover:bg-[#001726] hover:border-[#00ffff]"
               :class="[
-                draggedItem?.id === item.id ? 'opacity-30 scale-98 bg-sky-950/40 ring-1 ring-sky-500' : ''
+                draggedItem?.id === item.id ? 'opacity-30 bg-[#002b4d] border-[#00ffff]' : ''
               ]"
             >
-              <!-- Left: Drag Grip Handle + Play & Info -->
+              <!-- Left: Grip Handle + Info -->
               <div class="flex items-center gap-2 min-w-0 flex-1">
-                <!-- Grip handle icon (has cursor-grab) -->
                 <span 
-                  class="text-slate-600 group-hover:text-slate-400 cursor-grab p-0.5 shrink-0" 
-                  title="Trascina per spostare in un'altra categoria"
+                  class="text-[#555555] group-hover:text-[#00ffff] cursor-grab font-bold p-0.5 shrink-0" 
+                  title="Trascina per spostare"
                 >
-                  <GripVertical class="w-3.5 h-3.5" />
+                  [::]
                 </span>
 
                 <div 
                   @click="item.track && playerActions.playTrack(item.track)"
-                  class="flex items-center gap-2.5 min-w-0 flex-1"
+                  class="flex items-center gap-2 min-w-0 flex-1 cursor-pointer"
                 >
-                  <span class="w-5 text-center text-slate-500 font-mono text-[11px] group-hover:hidden">
-                    {{ idx + 1 }}
+                  <span class="w-5 text-center text-[#777777] text-[10px]">
+                    {{ String(idx + 1).padStart(2, '0') }}.
                   </span>
-                  <span class="w-5 hidden group-hover:flex items-center justify-center text-sky-400">
-                    <Play class="w-3.5 h-3.5 fill-current" />
-                  </span>
-
                   <div class="min-w-0 flex-1">
-                    <p class="font-semibold text-slate-200 truncate">{{ item.track?.title || 'Brano' }}</p>
-                    <p class="text-[11px] text-slate-400 truncate">{{ item.track?.artistName }} • {{ item.track?.albumTitle }}</p>
+                    <p class="font-bold text-[#d4d4d4] group-hover:text-[#ffff00] truncate">
+                      {{ item.track?.title || 'Brano' }}
+                    </p>
+                    <p class="text-[10px] text-[#00ffff] opacity-80 truncate">
+                      {{ item.track?.artistName }} • {{ item.track?.albumTitle }}
+                    </p>
                   </div>
                 </div>
               </div>
 
-              <!-- Track Actions -->
-              <div class="flex items-center gap-2 shrink-0 ml-3">
-                <!-- Un-favorite heart -->
+              <!-- Right: Actions -->
+              <div class="flex items-center gap-2 shrink-0 ml-2">
                 <button
                   @click.stop="toggleFavorite('track', item.itemId)"
-                  class="p-1.5 text-rose-500 hover:text-rose-400 transition-colors cursor-pointer"
+                  class="text-[#ff3366] text-xs font-bold"
                   title="Rimuovi dai preferiti"
                 >
-                  <Heart class="w-3.5 h-3.5 fill-rose-500" />
+                  [★]
                 </button>
-
-                <!-- Duration -->
-                <span v-if="item.track" class="w-12 text-right font-mono text-[11px] text-slate-400">
+                <span v-if="item.track" class="w-12 text-right text-[10px] text-[#777777] tabular-nums">
                   {{ formatTime(item.track.duration) }}
                 </span>
               </div>
@@ -421,7 +397,7 @@ function handleNavigate(item: FavoriteItem) {
           <!-- Cards (Artists, Albums, Playlists) within container -->
           <div
             v-if="container.items.some(i => i.itemType !== 'track')"
-            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
+            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3"
           >
             <div
               v-for="item in container.items.filter(i => i.itemType !== 'track')"
@@ -429,49 +405,47 @@ function handleNavigate(item: FavoriteItem) {
               draggable="true"
               @dragstart="handleDragStart($event, item, container.id)"
               @dragend="handleDragEnd($event)"
-              class="group relative flex flex-col p-3 rounded-2xl bg-slate-900/40 hover:bg-slate-900 border border-slate-800/50 hover:border-slate-700 transition-all cursor-pointer shadow-sm hover:shadow-xl select-none"
+              class="group relative flex flex-col p-2.5 bg-[#070707] border border-[#222222] hover:border-[#00ffff] hover:bg-[#001726] transition-colors cursor-pointer select-none"
               :class="[
-                draggedItem?.id === item.id ? 'opacity-30 scale-95 ring-2 ring-sky-500 bg-sky-950/40' : ''
+                draggedItem?.id === item.id ? 'opacity-30 bg-[#002b4d] border-[#00ffff]' : ''
               ]"
               @click="handleNavigate(item)"
             >
-              <!-- Top bar with grip icon, badges and remove favorite action -->
-              <div class="flex items-center justify-between mb-2 z-10">
+              <!-- Top bar with grip icon, type badge and un-favorite -->
+              <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center gap-1.5 min-w-0">
-                  <!-- Drag Handle Icon (has cursor-grab) -->
-                  <GripVertical 
-                    class="w-3.5 h-3.5 text-slate-600 group-hover:text-slate-400 cursor-grab shrink-0" 
-                    title="Trascina per spostare in un'altra categoria" 
-                  />
+                  <span 
+                    class="text-[#555555] group-hover:text-[#00ffff] cursor-grab font-bold shrink-0 text-xs" 
+                    title="Trascina per spostare"
+                  >
+                    [::]
+                  </span>
 
                   <span
-                    class="text-[9px] uppercase font-bold px-2 py-0.5 rounded-full truncate"
+                    class="text-[9px] font-bold px-1 text-black uppercase"
                     :class="[
-                      item.itemType === 'artist' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
-                      item.itemType === 'album' ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30' :
-                      'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                      item.itemType === 'artist' ? 'bg-[#00ffff]' :
+                      item.itemType === 'album' ? 'bg-[#ffff00]' :
+                      'bg-[#00ff66]'
                     ]"
                   >
-                    {{ item.itemType === 'artist' ? 'Artista' : item.itemType === 'album' ? 'Album' : 'Playlist' }}
+                    {{ item.itemType === 'artist' ? 'ARTISTA' : item.itemType === 'album' ? 'ALBUM' : 'PLAYLIST' }}
                   </span>
                 </div>
 
-                <div class="flex items-center gap-1 shrink-0">
-                  <!-- Remove Favorite Heart -->
-                  <button
-                    @click.stop="toggleFavorite(item.itemType, item.itemId)"
-                    class="p-1 rounded-full bg-slate-950/70 hover:bg-slate-800 text-rose-500 hover:text-rose-400 transition-colors cursor-pointer"
-                    title="Rimuovi dai preferiti"
-                  >
-                    <Heart class="w-3 h-3 fill-rose-500" />
-                  </button>
-                </div>
+                <button
+                  @click.stop="toggleFavorite(item.itemType, item.itemId)"
+                  class="text-[#ff3366] text-xs font-bold"
+                  title="Rimuovi dai preferiti"
+                >
+                  [★]
+                </button>
               </div>
 
               <!-- Media thumbnail -->
-              <!-- Artist (Circular) -->
-              <div v-if="item.itemType === 'artist'" class="flex flex-col items-center text-center my-2">
-                <div class="w-20 h-20 rounded-full overflow-hidden bg-slate-800 border-2 border-slate-700/60 group-hover:border-purple-400/80 group-hover:scale-105 transition-all shadow-md mb-2">
+              <!-- Artist -->
+              <div v-if="item.itemType === 'artist'" class="flex flex-col items-center text-center my-1">
+                <div class="w-20 h-20 bg-black border border-[#333333] group-hover:border-[#00ffff] overflow-hidden mb-1.5">
                   <img
                     :src="item.artist?.imageUrl || `/api/artists/${item.itemId}/image`"
                     :alt="item.artist?.name || 'Artista'"
@@ -479,63 +453,63 @@ function handleNavigate(item: FavoriteItem) {
                     loading="lazy"
                   />
                 </div>
-                <h4 class="text-xs font-bold text-slate-100 truncate w-full group-hover:text-purple-300 transition-colors">
+                <h4 class="text-xs font-bold text-[#d4d4d4] group-hover:text-[#ffff00] truncate w-full">
                   {{ item.artist?.name || 'Artista' }}
                 </h4>
-                <p class="text-[10px] text-slate-400 mt-0.5">
-                  {{ item.artist?.albumCount || 0 }} album
+                <p class="text-[10px] text-[#00ffff]/80 mt-0.5">
+                  [{{ item.artist?.albumCount || 0 }} ALBUM]
                 </p>
               </div>
 
-              <!-- Album (Square) -->
+              <!-- Album -->
               <div v-else-if="item.itemType === 'album'" class="flex flex-col">
-                <div class="relative aspect-square rounded-xl overflow-hidden bg-slate-800 mb-2 shadow-md">
+                <div class="relative aspect-square bg-black border border-[#333333] group-hover:border-[#00ffff] overflow-hidden mb-1.5">
                   <img
                     :src="`/api/cover/${item.itemId}`"
                     :alt="item.album?.title || 'Album'"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform pointer-events-none"
+                    class="w-full h-full object-cover pointer-events-none"
                     loading="lazy"
                   />
                   <!-- Quick play button -->
                   <button
                     @click.stop="playAlbumItem(item.itemId)"
-                    class="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-sky-500 hover:bg-sky-400 text-slate-950 flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    class="absolute bottom-1 right-1 bbs-btn bbs-btn-green py-0.5 px-1 text-[9px] opacity-0 group-hover:opacity-100 transition-opacity"
                     title="Riproduci album"
                   >
-                    <Play class="w-3.5 h-3.5 fill-current translate-x-0.5" />
+                    [▶]
                   </button>
                 </div>
-                <h4 class="text-xs font-bold text-slate-100 truncate group-hover:text-sky-300 transition-colors" :title="item.album?.title">
+                <h4 class="text-xs font-bold text-[#d4d4d4] group-hover:text-[#ffff00] truncate" :title="item.album?.title">
                   {{ item.album?.title || 'Album' }}
                 </h4>
-                <p class="text-[11px] text-slate-400 truncate mt-0.5">
-                  {{ item.album?.artistName }}
+                <p class="text-[10px] text-[#00ffff] truncate mt-0.5 opacity-80">
+                  &gt; {{ item.album?.artistName }}
                 </p>
               </div>
 
               <!-- Playlist -->
               <div v-else-if="item.itemType === 'playlist'" class="flex flex-col">
-                <div class="relative aspect-square rounded-xl overflow-hidden bg-slate-800 mb-2 shadow-md">
+                <div class="relative aspect-square bg-black border border-[#333333] group-hover:border-[#00ffff] overflow-hidden mb-1.5">
                   <img
                     :src="`/api/playlists/${item.itemId}/cover`"
                     :alt="item.playlist?.name || 'Playlist'"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform pointer-events-none"
+                    class="w-full h-full object-cover pointer-events-none"
                     loading="lazy"
                   />
                   <!-- Quick play button -->
                   <button
                     @click.stop="playPlaylistItem(item.itemId)"
-                    class="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    class="absolute bottom-1 right-1 bbs-btn bbs-btn-green py-0.5 px-1 text-[9px] opacity-0 group-hover:opacity-100 transition-opacity"
                     title="Riproduci playlist"
                   >
-                    <Play class="w-3.5 h-3.5 fill-current translate-x-0.5" />
+                    [▶]
                   </button>
                 </div>
-                <h4 class="text-xs font-bold text-slate-100 truncate group-hover:text-emerald-300 transition-colors">
+                <h4 class="text-xs font-bold text-[#d4d4d4] group-hover:text-[#00ff66] truncate">
                   {{ item.playlist?.name || 'Playlist' }}
                 </h4>
-                <p class="text-[10px] text-slate-400 mt-0.5">
-                  {{ item.playlist?.trackCount || 0 }} brani
+                <p class="text-[10px] text-[#888888] mt-0.5">
+                  [{{ item.playlist?.trackCount || 0 }} BRANI]
                 </p>
               </div>
             </div>

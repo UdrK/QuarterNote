@@ -58,41 +58,41 @@ onMounted(load);
 </script>
 
 <template>
-  <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-sm shadow-2xl overflow-hidden select-none animate-in fade-in zoom-in-95 duration-150">
+  <div class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 font-mono">
+    <div class="bg-black border-2 border-[#00ffff] w-full max-w-sm shadow-[0_0_20px_rgba(0,255,255,0.2)] overflow-hidden select-none">
       <!-- Header -->
-      <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+      <div class="px-4 py-2 border-b border-[#222222] bg-[#0a0a0a] flex items-center justify-between">
         <div>
-          <h3 class="text-sm font-bold text-slate-100">Aggiungi a playlist</h3>
-          <p class="text-[11px] text-slate-400 truncate max-w-[240px]">{{ track.title }} - {{ track.artistName }}</p>
+          <h3 class="text-xs font-bold text-[#00ffff]">■ [ AGGIUNGI A PLAYLIST ]</h3>
+          <p class="text-[10px] text-[#888888] truncate max-w-[240px]">&gt; {{ track.title }}</p>
         </div>
-        <button @click="emit('close')" class="text-slate-400 hover:text-slate-100 p-1 rounded-md">
-          <X class="w-4 h-4" />
+        <button @click="emit('close')" class="bbs-btn py-0.5 px-1.5 text-xs border-[#333333]">
+          [X]
         </button>
       </div>
 
       <!-- New playlist form -->
-      <div class="p-3 border-b border-slate-800/60 bg-slate-950/40">
+      <div class="p-3 border-b border-[#222222] bg-[#060606]">
         <form @submit.prevent="handleCreateAndAdd" class="flex items-center gap-2">
           <input
             v-model="newName"
             type="text"
-            placeholder="Nuova playlist..."
-            class="flex-1 bg-slate-800 text-xs text-slate-100 px-3 py-1.5 rounded-lg border border-slate-700 focus:outline-none focus:border-sky-500"
+            placeholder="Nome nuova playlist..."
+            class="flex-1 bg-black text-xs text-[#ffff00] px-2.5 py-1.5 border border-[#333333] focus:outline-none focus:border-[#00ffff]"
           />
           <button
             type="submit"
             :disabled="!newName.trim() || isCreating"
-            class="px-3 py-1.5 bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-xs rounded-lg disabled:opacity-50 transition-colors"
+            class="bbs-btn bbs-btn-yellow py-1.5 px-3 text-xs"
           >
-            Crea
+            [+ CREA]
           </button>
         </form>
       </div>
 
       <!-- Playlists list -->
       <div class="max-h-60 overflow-y-auto p-2 space-y-1">
-        <div v-if="playlists.length === 0" class="text-center py-6 text-xs text-slate-500 italic">
+        <div v-if="playlists.length === 0" class="text-center py-6 text-xs text-[#666666] italic">
           Nessuna playlist creata.
         </div>
 
@@ -100,14 +100,14 @@ onMounted(load);
           v-for="pl in playlists"
           :key="pl.id"
           @click="handleAddTo(pl.id)"
-          class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-200 hover:bg-slate-800/80 transition-colors group"
+          class="w-full flex items-center justify-between px-2.5 py-2 text-xs text-[#cccccc] border border-[#1a1a1a] hover:bg-[#002b4d] hover:border-[#00ffff] hover:text-[#ffff00] transition-colors group"
         >
-          <span class="truncate">{{ pl.name }}</span>
-          <span v-if="addedTo === pl.id" class="text-sky-400 flex items-center gap-1 font-semibold">
-            <Check class="w-3.5 h-3.5" /> Aggiunto!
+          <span class="truncate">&gt; {{ pl.name }}</span>
+          <span v-if="addedTo === pl.id" class="text-[#00ff66] font-bold">
+            [✓ AGGIUNTO]
           </span>
-          <span v-else class="text-[11px] text-slate-500 group-hover:text-slate-400">
-            {{ pl.trackCount }} brani
+          <span v-else class="text-[10px] text-[#777777] group-hover:text-[#00ffff]">
+            [{{ pl.trackCount }} brani]
           </span>
         </button>
       </div>

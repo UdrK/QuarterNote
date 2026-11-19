@@ -2,45 +2,148 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Sleek custom scrollbars */
+/* Base BBS Terminal Styling */
+:root {
+  --bbs-bg: #000000;
+  --bbs-fg: #d4d4d4;
+  --bbs-yellow: #ffff00;
+  --bbs-cyan: #00ffff;
+  --bbs-green: #00ff66;
+  --bbs-red: #ff3366;
+  --bbs-border: #2e2e2e;
+}
+
+body {
+  background-color: #000000;
+  color: #d4d4d4;
+  font-family: 'Consolas', 'Courier New', Monaco, monospace;
+}
+
+/* Sharp BBS scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #000000;
+  border: 1px solid #222222;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.2);
-  border-radius: 9999px;
+  background: #00aaaa;
+  border-radius: 0px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.4);
+  background: #00ffff;
 }
 
-/* Custom range input styling */
+/* BBS blocky range inputs */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
-  background: #334155;
-  border-radius: 9999px;
+  background: #1a1a1a;
+  border: 1px solid #333333;
+  border-radius: 0px;
   cursor: pointer;
+  height: 8px;
 }
 
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #38bdf8;
+  width: 10px;
+  height: 14px;
+  border-radius: 0px;
+  background: #00ffff;
+  border: 1px solid #ffffff;
   cursor: pointer;
-  transition: transform 0.1s ease;
+  transition: transform 0.05s ease;
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.25);
+  background: #ffff00;
+}
+
+/* BBS ASCII UI helpers */
+.bbs-card {
+  background-color: #080808;
+  border: 1px solid #2a2a2a;
+  border-radius: 0px;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.bbs-card:hover {
+  border-color: #00ffff;
+  background-color: #0d0d0d;
+}
+
+.bbs-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: 0px;
+  border: 1px solid #3a3a3a;
+  background-color: #0d0d0d;
+  color: #00ffff;
+  transition: all 0.1s ease;
+}
+
+.bbs-btn:hover:not(:disabled) {
+  background-color: #00ffff;
+  color: #000000;
+  border-color: #00ffff;
+}
+
+.bbs-btn-yellow {
+  color: #ffff00;
+  border-color: #555500;
+}
+
+.bbs-btn-yellow:hover:not(:disabled) {
+  background-color: #ffff00;
+  color: #000000;
+  border-color: #ffff00;
+}
+
+.bbs-btn-green {
+  color: #00ff66;
+  border-color: #005522;
+}
+
+.bbs-btn-green:hover:not(:disabled) {
+  background-color: #00ff66;
+  color: #000000;
+  border-color: #00ff66;
+}
+
+.bbs-btn-red {
+  color: #ff3366;
+  border-color: #661122;
+}
+
+.bbs-btn-red:hover:not(:disabled) {
+  background-color: #ff3366;
+  color: #000000;
+  border-color: #ff3366;
+}
+
+/* Optional CRT scanline effect */
+.crt-scanlines::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+  background-size: 100% 3px;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.6;
 }

@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { ChevronLeft, ChevronRight, Search, X } from '@lucide/vue';
+import { ChevronLeft, ChevronRight, Search, X, Monitor } from '@lucide/vue';
+
+const props = defineProps<{
+  crtMode?: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: 'toggleCrt'): void;
+}>();
 
 const router = useRouter();
 const route = useRoute();
@@ -29,45 +37,61 @@ function clearSearch() {
 </script>
 
 <template>
-  <header class="h-12 border-b border-slate-800/80 bg-slate-900/60 backdrop-blur px-4 flex items-center justify-between shrink-0 select-none">
+  <header class="h-12 border-b border-[#222222] bg-black px-4 flex items-center justify-between shrink-0 select-none font-mono">
     <!-- History navigation buttons -->
-    <div class="flex items-center gap-1">
+    <div class="flex items-center gap-1.5">
       <button 
         @click="router.back()"
-        class="w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors"
+        class="bbs-btn py-1 px-2 text-xs border-[#333333] hover:border-[#00ffff]"
         title="Indietro"
       >
-        <ChevronLeft class="w-4 h-4" />
+        <span>[&lt;]</span>
       </button>
       <button 
         @click="router.forward()"
-        class="w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors"
+        class="bbs-btn py-1 px-2 text-xs border-[#333333] hover:border-[#00ffff]"
         title="Avanti"
       >
-        <ChevronRight class="w-4 h-4" />
+        <span>[&gt;]</span>
       </button>
+
+      <span class="hidden md:inline-block ml-3 text-[11px] text-[#555555]">
+        | NODE: <span class="text-[#00ffff]">DISP.BBS</span> | STATUS: <span class="text-[#00ff66]">ONLINE</span>
+      </span>
     </div>
 
     <!-- Search Input -->
     <div class="relative w-80">
-      <Search class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-      <input
-        v-model="searchQuery"
-        @input="handleSearchInput"
-        type="text"
-        placeholder="Cerca brani, album o artisti..."
-        class="w-full bg-slate-800/70 text-xs text-slate-200 placeholder-slate-500 rounded-lg pl-8 pr-7 py-1.5 border border-slate-700/50 focus:outline-none focus:border-sky-500/80 focus:ring-1 focus:ring-sky-500/50 transition-all"
-      />
-      <button
-        v-if="searchQuery"
-        @click="clearSearch"
-        class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200"
-      >
-        <X class="w-3.5 h-3.5" />
-      </button>
+      <div class="flex items-center bg-[#0a0a0a] border border-[#333333] focus-within:border-[#00ffff] px-2 py-1">
+        <span class="text-[#00ffff] text-xs font-bold mr-1">&gt;</span>
+        <input
+          v-model="searchQuery"
+          @input="handleSearchInput"
+          type="text"
+          placeholder="CERCA: brani, album, artisti..."
+          class="w-full bg-transparent text-xs text-[#ffff00] placeholder-[#555555] font-mono focus:outline-none"
+        />
+        <button
+          v-if="searchQuery"
+          @click="clearSearch"
+          class="text-[#888888] hover:text-[#ff3366] text-xs font-bold ml-1"
+        >
+          [X]
+        </button>
+      </div>
     </div>
 
-    <!-- Empty spacer for balanced layout -->
-    <div class="w-16" />
+    <!-- Right Controls: CRT scanlines toggle -->
+    <div class="flex items-center gap-2">
+      <button
+        @click="emit('toggleCrt')"
+        class="bbs-btn py-1 px-2.5 text-[11px]"
+        :class="props.crtMode ? 'bbs-btn-green' : 'text-[#888888] border-[#333333]'"
+        title="Attiva/disattiva effetto monitor CRT"
+      >
+        <Monitor class="w-3.5 h-3.5" />
+        <span>[ CRT: {{ props.crtMode ? 'ON' : 'OFF' }} ]</span>
+      </button>
+    </div>
   </header>
 </template>

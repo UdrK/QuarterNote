@@ -49,100 +49,102 @@ onMounted(load);
 </script>
 
 <template>
-  <div class="p-6 space-y-6">
+  <div class="space-y-4 font-mono select-none">
     <!-- Header -->
-    <div class="flex items-center justify-between">
+    <div class="border border-[#2a2a2a] bg-[#070707] p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div>
-        <h1 class="text-2xl font-bold tracking-tight text-slate-100">Playlist</h1>
-        <p class="text-xs text-slate-400">{{ playlists.length }} playlist create</p>
+        <div class="flex items-center gap-2">
+          <span class="text-[#00ff66] font-bold text-sm">■ [ ARCHIVIO PLAYLIST ]</span>
+          <span class="text-xs text-[#ffff00]">[{{ playlists.length }} PLAYLIST]</span>
+        </div>
+        <p class="text-[11px] text-[#777777] mt-0.5">&gt; Raccolte musicali personalizzate dell'utente</p>
       </div>
 
       <button
         @click="showCreate = true"
-        class="flex items-center gap-2 px-3.5 py-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-sky-500/20 transition-all"
+        class="bbs-btn bbs-btn-green py-1.5 px-3 text-xs self-start sm:self-auto"
       >
-        <Plus class="w-4 h-4" />
-        <span>Nuova Playlist</span>
+        <span>[+ NUOVA PLAYLIST]</span>
       </button>
     </div>
 
-    <!-- Create Inline/Modal Form -->
-    <div v-if="showCreate" class="p-4 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-3">
+    <!-- Create Inline Form in BBS Box -->
+    <div v-if="showCreate" class="p-3 border-2 border-[#00ff66] bg-black shadow-[0_0_15px_rgba(0,255,102,0.15)] flex items-center gap-2">
+      <span class="text-[#00ff66] text-xs font-bold">&gt; NOME PLAYLIST:</span>
       <input
         v-model="newName"
         type="text"
-        placeholder="Nome della playlist..."
-        class="flex-1 bg-slate-800 text-xs text-slate-100 px-3 py-2 rounded-lg border border-slate-700 focus:outline-none focus:border-sky-500"
+        placeholder="Es: Workout, Notte, Top Tracks..."
+        class="flex-1 bg-[#0a0a0a] text-xs text-[#ffff00] px-3 py-1.5 border border-[#333333] focus:outline-none focus:border-[#00ff66]"
         @keyup.enter="handleCreate"
+        autofocus
       />
       <button
         @click="handleCreate"
         :disabled="!newName.trim()"
-        class="px-4 py-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs rounded-lg disabled:opacity-50 transition-colors"
+        class="bbs-btn bbs-btn-green py-1 px-3 text-xs"
       >
-        Salva
+        [SALVA]
       </button>
       <button
         @click="showCreate = false"
-        class="px-3 py-2 text-xs text-slate-400 hover:text-slate-200"
+        class="bbs-btn py-1 px-2 text-xs border-[#333333] text-[#888888]"
       >
-        Annulla
+        [ANNULLA]
       </button>
     </div>
 
     <!-- Empty State -->
-    <div v-if="!isLoading && playlists.length === 0" class="text-center py-20 text-slate-500">
-      <ListMusic class="w-12 h-12 mx-auto mb-3 opacity-40" />
-      <p class="text-sm">Nessuna playlist creata.</p>
-      <p class="text-xs text-slate-600 mt-1">Crea la tua prima playlist usando il pulsante in alto a destra.</p>
+    <div v-if="!isLoading && playlists.length === 0" class="border border-[#222222] p-12 text-center text-[#666666]">
+      <ListMusic class="w-10 h-10 mx-auto mb-2 opacity-30 text-[#00ff66]" />
+      <p class="text-xs">&gt; NESSUNA PLAYLIST SALVATA &lt;</p>
+      <p class="text-[10px] text-[#555555] mt-1">Premi [+ NUOVA PLAYLIST] per crearne una.</p>
     </div>
 
     <!-- Playlists Grid -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
       <div
         v-for="pl in playlists"
         :key="pl.id"
         @click="router.push(`/playlists/${pl.id}`)"
-        class="group p-4 rounded-xl bg-slate-900/40 hover:bg-slate-900 border border-slate-800/40 hover:border-slate-800 transition-all cursor-pointer flex flex-col justify-between"
+        class="group p-2.5 bg-[#070707] border border-[#222222] hover:border-[#00ff66] hover:bg-[#001710] transition-colors cursor-pointer flex flex-col justify-between"
       >
-        <div class="space-y-3">
-          <div class="aspect-square rounded-xl overflow-hidden bg-slate-800 border border-slate-800 shadow-md">
+        <div class="space-y-2">
+          <div class="aspect-square bg-black border border-[#333333] group-hover:border-[#00ff66] overflow-hidden">
             <img
               :src="`/api/playlists/${pl.id}/cover`"
               :alt="pl.name"
-              class="w-full h-full object-cover group-hover:scale-105 transition-transform"
+              class="w-full h-full object-cover"
               loading="lazy"
             />
           </div>
 
           <div>
-            <h3 class="text-sm font-semibold text-slate-100 truncate group-hover:text-emerald-400 transition-colors">
+            <h3 class="text-xs font-bold text-[#d4d4d4] truncate group-hover:text-[#00ff66] transition-colors">
               {{ pl.name }}
             </h3>
-            <p class="text-xs text-slate-400 mt-0.5">
-              {{ pl.trackCount }} brani • {{ formatTime(pl.totalDuration) }}
+            <p class="text-[10px] text-[#888888] mt-0.5">
+              [{{ pl.trackCount }} BRANI] • {{ formatTime(pl.totalDuration) }}
             </p>
           </div>
         </div>
 
-        <div class="pt-3 border-t border-slate-800/60 mt-4 flex items-center justify-between">
+        <div class="pt-2 border-t border-[#1f1f1f] mt-2 flex items-center justify-between text-xs">
           <button
             @click.stop="toggleFavorite('playlist', pl.id)"
-            class="text-slate-500 hover:text-rose-400 p-1 rounded transition-colors"
+            class="font-bold transition-colors"
+            :class="isFavorite('playlist', pl.id) ? 'text-[#ff3366]' : 'text-[#555555] hover:text-[#ff3366]'"
             :title="isFavorite('playlist', pl.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
           >
-            <Heart
-              class="w-3.5 h-3.5"
-              :class="{ 'fill-rose-500 text-rose-500': isFavorite('playlist', pl.id) }"
-            />
+            <span>{{ isFavorite('playlist', pl.id) ? '[★]' : '[☆]' }}</span>
           </button>
 
           <button
             @click.stop="handleDelete(pl.id)"
-            class="text-slate-500 hover:text-red-400 p-1 rounded transition-colors"
+            class="text-[#555555] hover:text-[#ff3366] text-[10px] font-bold"
             title="Elimina playlist"
           >
-            <Trash2 class="w-3.5 h-3.5" />
+            [ELIMINA]
           </button>
         </div>
       </div>

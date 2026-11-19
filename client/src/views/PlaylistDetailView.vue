@@ -111,13 +111,18 @@ onMounted(load);
 </script>
 
 <template>
-  <div class="p-6 space-y-6">
-    <button
-      @click="router.back()"
-      class="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-100 transition-colors cursor-pointer"
-    >
-      <ArrowLeft class="w-3.5 h-3.5" /> Torna indietro
-    </button>
+  <div class="space-y-4 font-mono select-none">
+    <!-- Breadcrumb -->
+    <div class="flex items-center gap-2 text-xs">
+      <button
+        @click="router.back()"
+        class="bbs-btn py-0.5 px-2 text-xs border-[#333333]"
+      >
+        <span>[&lt; INDIETRO]</span>
+      </button>
+      <span class="text-[#555555]">&gt; MENU &gt; PLAYLIST &gt;</span>
+      <span class="text-[#00ff66] font-bold" v-if="playlist">[{{ playlist.name }}]</span>
+    </div>
 
     <!-- Hidden file input for uploading custom playlist photo -->
     <input
@@ -128,11 +133,11 @@ onMounted(load);
       @change="handleFileSelected"
     />
 
-    <!-- Playlist Hero Card -->
-    <div v-if="playlist" class="flex flex-col sm:flex-row items-center sm:items-end gap-6 bg-slate-900/60 p-6 rounded-2xl border border-slate-800/60 shadow-xl backdrop-blur">
+    <!-- Playlist Hero Card in BBS Box -->
+    <div v-if="playlist" class="border border-[#2a2a2a] bg-[#070707] p-4 flex flex-col sm:flex-row items-center sm:items-start gap-4">
       <!-- Playlist Cover with Upload Overlay -->
       <div class="relative group shrink-0">
-        <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-2xl overflow-hidden bg-slate-800 border-2 border-slate-700/80 shadow-2xl">
+        <div class="w-32 h-32 sm:w-36 sm:h-36 bg-black border-2 border-[#00ff66] overflow-hidden">
           <img
             :src="playlistCoverUrl"
             :alt="playlist.name"
@@ -145,69 +150,59 @@ onMounted(load);
           @click="triggerPhotoUpload"
           :disabled="isUploading"
           type="button"
-          class="absolute inset-0 rounded-2xl bg-slate-950/70 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 text-slate-200 transition-opacity backdrop-blur-xs cursor-pointer border-2 border-emerald-400/80"
+          class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 text-[#00ff66] transition-opacity cursor-pointer border-2 border-[#00ff66]"
           title="Cambia copertina playlist"
         >
-          <Loader2 v-if="isUploading" class="w-6 h-6 animate-spin text-emerald-400" />
+          <Loader2 v-if="isUploading" class="w-5 h-5 animate-spin" />
           <template v-else>
-            <Camera class="w-6 h-6 text-emerald-400" />
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-200">Cambia Foto</span>
+            <Camera class="w-5 h-5" />
+            <span class="text-[9px] font-bold">[CAMBIA COVER]</span>
           </template>
         </button>
       </div>
 
-      <div class="space-y-3 min-w-0 flex-1 text-center sm:text-left">
-        <div>
-          <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400">Playlist</span>
-          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight mt-1 truncate">
-            {{ playlist.name }}
-          </h1>
-          <div class="flex items-center justify-center sm:justify-start gap-2 text-xs text-slate-400 mt-2">
-            <span>{{ playlistTracks.length }} brani</span>
-            <span>•</span>
-            <span>{{ formatTime(playlist.totalDuration) }}</span>
-          </div>
+      <div class="space-y-1.5 min-w-0 flex-1 text-center sm:text-left">
+        <div class="text-[10px] text-[#00ff66] font-bold">
+          ■ PLAYLIST UTENTE
+        </div>
+        <h1 class="text-xl sm:text-2xl font-bold text-[#ffff00] truncate">
+          {{ playlist.name }}
+        </h1>
+        <div class="text-[11px] text-[#888888] space-x-2">
+          <span>BRANI: <span class="text-[#00ff66]">{{ playlistTracks.length }}</span></span>
+          <span>|</span>
+          <span>DURATA: {{ formatTime(playlist.totalDuration) }}</span>
         </div>
 
-        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-2">
+        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-2">
           <button
             @click="playAll"
             :disabled="rawTracks.length === 0"
-            class="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all disabled:opacity-40 cursor-pointer"
+            class="bbs-btn bbs-btn-green py-1.5 px-3 text-xs disabled:opacity-40"
           >
-            <Play class="w-4 h-4 fill-current translate-x-0.5" />
-            <span>Riproduci</span>
+            <span>[ ▶ RIPRODUCI ]</span>
           </button>
           <button
             @click="playShuffled"
             :disabled="rawTracks.length === 0"
-            class="flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs rounded-xl border border-slate-700/60 hover:scale-105 transition-all disabled:opacity-40 cursor-pointer"
+            class="bbs-btn py-1.5 px-3 text-xs border-[#333333] text-[#cccccc] disabled:opacity-40"
           >
-            <Shuffle class="w-3.5 h-3.5" />
-            <span>Casuale</span>
+            <span>[ ⇄ CASUALE ]</span>
           </button>
           <button
             v-if="playlist"
             @click="toggleFavorite('playlist', playlist.id)"
-            class="flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer"
-            :class="[
-              isFavorite('playlist', playlist.id)
-                ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
-                : 'bg-slate-800/80 hover:bg-slate-800 border-slate-700/80 text-slate-300'
-            ]"
+            class="bbs-btn py-1.5 px-3 text-xs"
+            :class="isFavorite('playlist', playlist.id) ? 'bbs-btn-red' : 'border-[#333333] text-[#aaaaaa]'"
           >
-            <Heart
-              class="w-4 h-4"
-              :class="{ 'fill-rose-500 text-rose-500': isFavorite('playlist', playlist.id) }"
-            />
-            <span>{{ isFavorite('playlist', playlist.id) ? 'Nei Preferiti' : 'Aggiungi ai Preferiti' }}</span>
+            <span>{{ isFavorite('playlist', playlist.id) ? '[★ NEI PREFERITI]' : '[☆ AGGIUNGI PREFERITI]' }}</span>
           </button>
           <button
             @click="handleDelete"
-            class="p-2.5 text-slate-400 hover:text-red-400 rounded-xl hover:bg-slate-800 transition-colors cursor-pointer"
+            class="bbs-btn bbs-btn-red py-1.5 px-3 text-xs"
             title="Elimina playlist"
           >
-            <Trash2 class="w-4 h-4" />
+            <span>[ELIMINA PLAYLIST]</span>
           </button>
         </div>
       </div>
@@ -215,12 +210,15 @@ onMounted(load);
 
     <!-- Tracks List -->
     <div v-if="playlistTracks.length > 0" class="space-y-2">
-      <h2 class="text-sm font-bold text-slate-200 tracking-wide">Brani della Playlist</h2>
-      <div class="bg-slate-900/40 rounded-xl border border-slate-800/40 p-2 space-y-1">
+      <div class="border-b border-[#222222] pb-1 flex items-center justify-between text-xs font-bold text-[#00ff66]">
+        <span>■ [ BRANI IN PLAYLIST ] ──────────────────────────</span>
+        <span class="text-[#ffff00]">({{ playlistTracks.length }})</span>
+      </div>
+      <div class="border border-[#222222] bg-[#070707]">
         <div
           v-for="(pt, idx) in playlistTracks"
           :key="pt.id"
-          class="group flex items-center justify-between"
+          class="flex items-center justify-between border-b border-[#1c1c1c] hover:bg-[#001710] group"
         >
           <div class="flex-1 min-w-0">
             <TrackRow
@@ -232,19 +230,19 @@ onMounted(load);
           </div>
           <button
             @click="handleRemove(pt.id)"
-            class="p-2 text-slate-500 hover:text-red-400 rounded-lg hover:bg-slate-800 transition-colors ml-2 cursor-pointer"
+            class="text-[#555555] hover:text-[#ff3366] text-xs font-bold px-2 py-1 mr-1"
             title="Rimuovi dalla playlist"
           >
-            <X class="w-3.5 h-3.5" />
+            [X]
           </button>
         </div>
       </div>
     </div>
 
-    <div v-else-if="!isLoading" class="text-center py-20 text-slate-500">
-      <ListMusic class="w-12 h-12 mx-auto mb-3 opacity-40 text-emerald-400" />
-      <p class="text-sm">Questa playlist è vuota.</p>
-      <p class="text-xs text-slate-600 mt-1">Puoi aggiungere brani da qualsiasi album usando il pulsante "+" sulla riga del brano.</p>
+    <div v-else-if="!isLoading" class="border border-[#222222] p-12 text-center text-[#666666]">
+      <ListMusic class="w-10 h-10 mx-auto mb-2 opacity-30 text-[#00ff66]" />
+      <p class="text-xs">&gt; PLAYLIST VUOTA &lt;</p>
+      <p class="text-[10px] text-[#555555] mt-1">Aggiungi brani usando il pulsante [+LIST] sui singoli brani.</p>
     </div>
   </div>
 </template>

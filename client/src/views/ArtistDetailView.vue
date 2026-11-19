@@ -93,13 +93,18 @@ async function handleFileSelected(event: Event) {
 </script>
 
 <template>
-  <div class="p-6 space-y-6">
-    <button
-      @click="router.back()"
-      class="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-100 transition-colors"
-    >
-      <ArrowLeft class="w-3.5 h-3.5" /> Torna indietro
-    </button>
+  <div class="space-y-4 font-mono select-none">
+    <!-- Breadcrumb / Back button -->
+    <div class="flex items-center gap-2 text-xs">
+      <button
+        @click="router.back()"
+        class="bbs-btn py-0.5 px-2 text-xs border-[#333333]"
+      >
+        <span>[&lt; INDIETRO]</span>
+      </button>
+      <span class="text-[#555555]">&gt; MENU &gt; ARTISTI &gt;</span>
+      <span class="text-[#ffff00] font-bold" v-if="artist">[{{ artist.name }}]</span>
+    </div>
 
     <!-- Hidden file input for uploading custom artist photo -->
     <input
@@ -110,11 +115,11 @@ async function handleFileSelected(event: Event) {
       @change="handleFileSelected"
     />
 
-    <!-- Artist Banner -->
-    <div v-if="artist" class="flex flex-col sm:flex-row items-center sm:items-start gap-6 bg-slate-900/60 p-6 rounded-2xl border border-slate-800/60 shadow-xl backdrop-blur">
-      <!-- Avatar with Upload Overlay -->
+    <!-- Artist BBS Info Header Box -->
+    <div v-if="artist" class="border border-[#2a2a2a] bg-[#070707] p-4 flex flex-col sm:flex-row items-center sm:items-start gap-4">
+      <!-- Square photo frame in BBS style -->
       <div class="relative group shrink-0">
-        <div class="w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden bg-slate-800 border-2 border-slate-700/80 shadow-2xl">
+        <div class="w-28 h-28 sm:w-32 sm:h-32 bg-black border-2 border-[#00ffff] overflow-hidden">
           <img
             :src="artistImageUrl"
             :alt="artist.name"
@@ -127,98 +132,95 @@ async function handleFileSelected(event: Event) {
           @click="triggerPhotoUpload"
           :disabled="isUploading"
           type="button"
-          class="absolute inset-0 rounded-full bg-slate-950/70 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 text-slate-200 transition-opacity backdrop-blur-xs cursor-pointer border-2 border-sky-400/80"
+          class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 text-[#00ffff] transition-opacity cursor-pointer border-2 border-[#00ffff]"
           title="Cambia foto artista"
         >
-          <Loader2 v-if="isUploading" class="w-6 h-6 animate-spin text-sky-400" />
+          <Loader2 v-if="isUploading" class="w-5 h-5 animate-spin" />
           <template v-else>
-            <Camera class="w-6 h-6 text-sky-400" />
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-200">Cambia Foto</span>
+            <Camera class="w-5 h-5" />
+            <span class="text-[9px] font-bold">[CAMBIA FOTO]</span>
           </template>
         </button>
       </div>
 
-      <div class="space-y-2 min-w-0 flex-1 text-center sm:text-left">
-        <span class="text-[10px] font-bold uppercase tracking-wider text-sky-400">Artista</span>
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight truncate">
+      <div class="space-y-1.5 min-w-0 flex-1 text-center sm:text-left">
+        <div class="text-[10px] text-[#00ffff] font-bold">
+          ■ ARTISTA PROFILO
+        </div>
+        <h1 class="text-xl sm:text-2xl font-bold text-[#ffff00] truncate">
           {{ artist.name }}
         </h1>
-        <p class="text-xs text-slate-400">
-          {{ albums.length }} album • {{ tracks.length }} brani
+        <p class="text-xs text-[#888888]">
+          STATISTICHE: <span class="text-[#00ffff]">{{ albums.length }} ALBUM</span> | <span class="text-[#00ff66]">{{ tracks.length }} BRANI</span>
         </p>
 
         <!-- Actions: Play All & Favorite -->
-        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-2">
+        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-2">
           <button
             @click="playAll"
-            class="flex items-center gap-2 px-5 py-2.5 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-sky-500/20 hover:scale-105 transition-all"
+            class="bbs-btn bbs-btn-green py-1.5 px-3 text-xs"
           >
-            <Play class="w-4 h-4 fill-current translate-x-0.5" />
-            <span>Riproduci tutti i brani</span>
+            <span>[ ▶ RIPRODUCI TUTTO ]</span>
           </button>
 
           <button
             @click="handleToggleFavorite"
-            class="flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-semibold transition-all"
-            :class="[
-              isFavorite('artist', artist.id)
-                ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
-                : 'bg-slate-800/80 hover:bg-slate-800 border-slate-700/80 text-slate-300'
-            ]"
+            class="bbs-btn py-1.5 px-3 text-xs"
+            :class="isFavorite('artist', artist.id) ? 'bbs-btn-red' : 'border-[#333333] text-[#aaaaaa]'"
           >
-            <Heart
-              class="w-4 h-4"
-              :class="{ 'fill-rose-500 text-rose-500': isFavorite('artist', artist.id) }"
-            />
-            <span>{{ isFavorite('artist', artist.id) ? 'Nei Preferiti' : 'Aggiungi ai Preferiti' }}</span>
+            <span>{{ isFavorite('artist', artist.id) ? '[★ NEI PREFERITI]' : '[☆ AGGIUNGI PREFERITI]' }}</span>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Albums section -->
-    <div v-if="albums.length > 0" class="space-y-3">
-      <h2 class="text-sm font-bold text-slate-200 tracking-wide">Album</h2>
+    <!-- Albums section in BBS style -->
+    <div v-if="albums.length > 0" class="space-y-2">
+      <div class="border-b border-[#222222] pb-1 flex items-center justify-between text-xs font-bold text-[#00ffff]">
+        <span>■ [ ALBUM DISPONIBILI ] ─────────────────────────</span>
+        <span class="text-[#ffff00]">({{ albums.length }})</span>
+      </div>
+
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
         <div
           v-for="alb in albums"
           :key="alb.id"
           @click="router.push(`/albums/${alb.id}`)"
-          class="group p-2.5 rounded-xl bg-slate-900/40 hover:bg-slate-900 border border-slate-800/40 hover:border-slate-800 transition-all cursor-pointer relative"
+          class="group p-2 bg-[#070707] border border-[#222222] hover:border-[#00ffff] hover:bg-[#001726] transition-colors cursor-pointer relative"
         >
-          <div class="relative aspect-square rounded-lg overflow-hidden bg-slate-800 mb-2 shadow">
-            <img :src="alb.coverUrl" :alt="alb.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+          <div class="relative aspect-square bg-black border border-[#333333] group-hover:border-[#00ffff] overflow-hidden mb-1.5">
+            <img :src="alb.coverUrl" :alt="alb.title" class="w-full h-full object-cover" />
 
             <!-- Favorite Button Overlay -->
             <button
               type="button"
               @click.stop="toggleFavorite('album', alb.id)"
-              class="absolute top-1.5 right-1.5 p-1.5 rounded-full bg-slate-950/70 hover:bg-slate-900 text-slate-400 hover:text-rose-400 backdrop-blur transition-all z-10"
+              class="absolute top-1 right-1 text-xs font-bold z-10 transition-colors"
               :class="[
                 isFavorite('album', alb.id)
-                  ? 'opacity-100 text-rose-500'
-                  : 'opacity-0 group-hover:opacity-100'
+                  ? 'text-[#ff3366]'
+                  : 'text-[#444444] hover:text-[#ff3366] opacity-0 group-hover:opacity-100'
               ]"
               :title="isFavorite('album', alb.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
             >
-              <Heart
-                class="w-3.5 h-3.5 transition-transform hover:scale-110"
-                :class="{ 'fill-rose-500 text-rose-500': isFavorite('album', alb.id) }"
-              />
+              <span>{{ isFavorite('album', alb.id) ? '[★]' : '[☆]' }}</span>
             </button>
           </div>
-          <p class="text-xs font-semibold text-slate-100 truncate group-hover:text-sky-400 transition-colors">
+          <p class="text-xs font-bold text-[#d4d4d4] group-hover:text-[#ffff00] truncate transition-colors">
             {{ alb.title }}
           </p>
-          <p class="text-[11px] text-slate-400">{{ alb.year || '' }}</p>
+          <p class="text-[10px] text-[#888888]">ANNO: {{ alb.year || 'N/D' }}</p>
         </div>
       </div>
     </div>
 
-    <!-- Tracks section -->
-    <div v-if="tracks.length > 0" class="space-y-3">
-      <h2 class="text-sm font-bold text-slate-200 tracking-wide">Tutti i Brani</h2>
-      <div class="bg-slate-900/40 rounded-xl border border-slate-800/40 p-2 space-y-1">
+    <!-- Tracks section in BBS style -->
+    <div v-if="tracks.length > 0" class="space-y-2">
+      <div class="border-b border-[#222222] pb-1 flex items-center justify-between text-xs font-bold text-[#00ff66]">
+        <span>■ [ TUTTI I BRANI DELL'ARTISTA ] ────────────────</span>
+        <span class="text-[#ffff00]">({{ tracks.length }})</span>
+      </div>
+      <div class="border border-[#222222] bg-[#070707]">
         <TrackRow
           v-for="(track, idx) in tracks"
           :key="track.id"
