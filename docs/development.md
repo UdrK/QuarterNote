@@ -51,6 +51,7 @@ Documenti di riferimento:
     - [x] Divisori personalizzati con linea orizzontale e titolo centrale ("Artisti", "Album", "Brani", "Playlist" predefiniti)
     - [x] Creazione, rinomina ed eliminazione dei divisori/contenitori
     - [x] Menu "Sposta in..." per riorganizzare qualsiasi preferito tra i contenitori
+    - [x] Supporto Drag & Drop nativo HTML5 per trascinare artisti, album, brani e playlist da un divisore all'altro con highlight visivo dei target e drop zone interattiva
 
 ---
 
