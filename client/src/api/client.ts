@@ -38,6 +38,19 @@ export async function uploadArtistImage(artistId: string, image: string): Promis
   return res.json();
 }
 
+export async function uploadPlaylistImage(playlistId: string, image: string): Promise<{ success: boolean; coverUrl: string }> {
+  const res = await fetch(`${API_BASE}/playlists/${playlistId}/cover`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ image }),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || 'Impossibile caricare l\'immagine della playlist');
+  }
+  return res.json();
+}
+
 export async function fetchAlbums(artistId?: string): Promise<Album[]> {
   const url = artistId ? `${API_BASE}/albums?artistId=${artistId}` : `${API_BASE}/albums`;
   const res = await fetch(url);

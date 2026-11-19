@@ -14,7 +14,7 @@ export function initDatabase(dataDir: string): DatabaseSync {
     fs.mkdirSync(dataDir, { recursive: true });
   }
 
-  // Ensure covers and artists directories exist inside data directory
+  // Ensure covers, artists, and playlists directories exist inside data directory
   const coversDir = path.join(dataDir, 'covers');
   if (!fs.existsSync(coversDir)) {
     fs.mkdirSync(coversDir, { recursive: true });
@@ -22,6 +22,10 @@ export function initDatabase(dataDir: string): DatabaseSync {
   const artistsDir = path.join(dataDir, 'artists');
   if (!fs.existsSync(artistsDir)) {
     fs.mkdirSync(artistsDir, { recursive: true });
+  }
+  const playlistsDir = path.join(dataDir, 'playlists');
+  if (!fs.existsSync(playlistsDir)) {
+    fs.mkdirSync(playlistsDir, { recursive: true });
   }
 
   const dbPath = path.join(dataDir, 'quarter.db');
@@ -72,6 +76,7 @@ export function initDatabase(dataDir: string): DatabaseSync {
     CREATE TABLE IF NOT EXISTS playlists (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
+      image_path TEXT,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL
     );
@@ -119,9 +124,14 @@ export function initDatabase(dataDir: string): DatabaseSync {
     CREATE INDEX IF NOT EXISTS idx_favorites_item ON favorites(item_type, item_id);
   `);
 
-  // Migration: Ensure image_path exists in artists table if created previously without it
+  // Migration: Ensure image_path exists in artists and playlists tables if created previously without it
   try {
     db.exec('ALTER TABLE artists ADD COLUMN image_path TEXT;');
+  } catch {
+    // Ignore error if column already exists
+  }
+  try {
+    db.exec('ALTER TABLE playlists ADD COLUMN image_path TEXT;');
   } catch {
     // Ignore error if column already exists
   }

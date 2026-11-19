@@ -28,6 +28,7 @@ const ARTIST_PLACEHOLDER_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox=
 
 export const libraryRoutes = (dataDir: string): FastifyPluginAsync => {
   const artistsDir = path.join(dataDir, 'artists');
+  const coversDir = path.join(dataDir, 'covers');
 
   return async (fastify) => {
     // Artists
@@ -55,10 +56,25 @@ export const libraryRoutes = (dataDir: string): FastifyPluginAsync => {
       }
 
       const imgInfo = getArtistImagePath(id);
-      if (imgInfo?.fallbackCoverPath && fs.existsSync(imgInfo.fallbackCoverPath)) {
-        reply.header('Content-Type', 'image/webp');
-        reply.header('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
-        return reply.send(fs.createReadStream(imgInfo.fallbackCoverPath));
+      if (imgInfo?.fallbackCoverPath) {
+        const coverFile = path.isAbsolute(imgInfo.fallbackCoverPath)
+          ? imgInfo.fallbackCoverPath
+          : path.join(coversDir, imgInfo.fallbackCoverPath);
+
+        if (fs.existsSync(coverFile)) {
+          reply.header('Content-Type', 'image/webp');
+          reply.header('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
+          return reply.send(fs.createReadStream(coverFile));
+        }
+      }
+
+      if (imgInfo?.firstAlbumId) {
+        const albumCoverFile = path.join(coversDir, `${imgInfo.firstAlbumId}.webp`);
+        if (fs.existsSync(albumCoverFile)) {
+          reply.header('Content-Type', 'image/webp');
+          reply.header('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
+          return reply.send(fs.createReadStream(albumCoverFile));
+        }
       }
 
       reply.header('Content-Type', 'image/svg+xml');

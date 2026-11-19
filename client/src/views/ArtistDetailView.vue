@@ -184,10 +184,28 @@ async function handleFileSelected(event: Event) {
           v-for="alb in albums"
           :key="alb.id"
           @click="router.push(`/albums/${alb.id}`)"
-          class="group p-2.5 rounded-xl bg-slate-900/40 hover:bg-slate-900 border border-slate-800/40 hover:border-slate-800 transition-all cursor-pointer"
+          class="group p-2.5 rounded-xl bg-slate-900/40 hover:bg-slate-900 border border-slate-800/40 hover:border-slate-800 transition-all cursor-pointer relative"
         >
-          <div class="aspect-square rounded-lg overflow-hidden bg-slate-800 mb-2 shadow">
+          <div class="relative aspect-square rounded-lg overflow-hidden bg-slate-800 mb-2 shadow">
             <img :src="alb.coverUrl" :alt="alb.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+
+            <!-- Favorite Button Overlay -->
+            <button
+              type="button"
+              @click.stop="toggleFavorite('album', alb.id)"
+              class="absolute top-1.5 right-1.5 p-1.5 rounded-full bg-slate-950/70 hover:bg-slate-900 text-slate-400 hover:text-rose-400 backdrop-blur transition-all z-10"
+              :class="[
+                isFavorite('album', alb.id)
+                  ? 'opacity-100 text-rose-500'
+                  : 'opacity-0 group-hover:opacity-100'
+              ]"
+              :title="isFavorite('album', alb.id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+            >
+              <Heart
+                class="w-3.5 h-3.5 transition-transform hover:scale-110"
+                :class="{ 'fill-rose-500 text-rose-500': isFavorite('album', alb.id) }"
+              />
+            </button>
           </div>
           <p class="text-xs font-semibold text-slate-100 truncate group-hover:text-sky-400 transition-colors">
             {{ alb.title }}

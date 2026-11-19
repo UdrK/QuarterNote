@@ -66,7 +66,7 @@ async function main() {
   await fastify.register(libraryRoutes(DATA_DIR), { prefix: '/api' });
   await fastify.register(streamRoutes, { prefix: '/api' });
   await fastify.register(coverRoutes(DATA_DIR), { prefix: '/api' });
-  await fastify.register(playlistRoutes, { prefix: '/api' });
+  await fastify.register(playlistRoutes(DATA_DIR), { prefix: '/api' });
   await fastify.register(favoriteRoutes, { prefix: '/api' });
   await fastify.register(scanRoutes(scanner), { prefix: '/api' });
   await fastify.register(settingsRoutes(scanner, DATA_DIR), { prefix: '/api' });

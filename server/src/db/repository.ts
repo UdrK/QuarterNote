@@ -102,25 +102,44 @@ export function getArtistById(id: string): { artist: Artist; albums: Album[]; tr
   };
 }
 
-export function getArtistImagePath(id: string): { customImagePath: string | null; fallbackCoverPath: string | null } | null {
+export function getArtistImagePath(id: string): { 
+  customImagePath: string | null; 
+  fallbackCoverPath: string | null;
+  firstAlbumId: string | null;
+} | null {
   const db = getDatabase();
   const artistRow = db.prepare('SELECT id, image_path FROM artists WHERE id = ?').get(id) as unknown as { id: string; image_path: string | null } | undefined;
   if (!artistRow) return null;
 
   let fallbackCoverPath: string | null = null;
+  let firstAlbumId: string | null = null;
+
+  // First try album with cover_path
   const albumWithCover = db.prepare(`
-    SELECT cover_path FROM albums 
+    SELECT id, cover_path FROM albums 
     WHERE artist_id = ? AND cover_path IS NOT NULL AND cover_path != '' 
     ORDER BY year DESC, title ASC LIMIT 1
-  `).get(id) as unknown as { cover_path: string } | undefined;
+  `).get(id) as unknown as { id: string; cover_path: string } | undefined;
 
   if (albumWithCover) {
     fallbackCoverPath = albumWithCover.cover_path;
+    firstAlbumId = albumWithCover.id;
+  } else {
+    // Try any album of this artist
+    const anyAlbum = db.prepare(`
+      SELECT id FROM albums 
+      WHERE artist_id = ? 
+      ORDER BY year DESC, title ASC LIMIT 1
+    `).get(id) as unknown as { id: string } | undefined;
+    if (anyAlbum) {
+      firstAlbumId = anyAlbum.id;
+    }
   }
 
   return {
     customImagePath: artistRow.image_path,
     fallbackCoverPath,
+    firstAlbumId,
   };
 }
 
@@ -360,6 +379,7 @@ export function getPlaylists(): Playlist[] {
     updatedAt: r.updated_at,
     trackCount: Number(r.track_count),
     totalDuration: Number(r.total_duration),
+    coverUrl: `/api/playlists/${r.id}/cover`,
   }));
 }
 
@@ -426,9 +446,21 @@ export function getPlaylistById(id: string): { playlist: Playlist; tracks: Playl
       updatedAt: playlistRow.updated_at,
       trackCount: Number(playlistRow.track_count),
       totalDuration: Number(playlistRow.total_duration),
+      coverUrl: `/api/playlists/${playlistRow.id}/cover`,
     },
     tracks,
   };
+}
+
+export function getPlaylistImagePath(id: string): string | null {
+  const db = getDatabase();
+  const row = db.prepare('SELECT image_path FROM playlists WHERE id = ?').get(id) as unknown as { image_path: string | null } | undefined;
+  return row?.image_path || null;
+}
+
+export function updatePlaylistImage(id: string, imagePath: string): void {
+  const db = getDatabase();
+  db.prepare('UPDATE playlists SET image_path = ? WHERE id = ?').run(imagePath, id);
 }
 
 export function createPlaylist(name: string): Playlist {

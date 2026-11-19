@@ -46,6 +46,7 @@ export interface Playlist {
   updatedAt: number;
   trackCount: number;
   totalDuration: number;
+  coverUrl?: string;
 }
 
 export interface PlaylistTrack {

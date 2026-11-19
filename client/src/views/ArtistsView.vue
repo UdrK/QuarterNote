@@ -93,7 +93,6 @@ async function handleToggleFavorite(e: Event, artistId: string) {
             :alt="artist.name"
             class="w-full h-full object-cover"
             loading="lazy"
-            @error="(e: any) => { e.target.style.display = 'none'; }"
           />
         </div>
 

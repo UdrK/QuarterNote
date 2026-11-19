@@ -106,12 +106,17 @@ onMounted(load);
         class="group p-4 rounded-xl bg-slate-900/40 hover:bg-slate-900 border border-slate-800/40 hover:border-slate-800 transition-all cursor-pointer flex flex-col justify-between"
       >
         <div class="space-y-3">
-          <div class="w-12 h-12 rounded-lg bg-sky-500/10 text-sky-400 flex items-center justify-center border border-sky-500/20 group-hover:scale-105 transition-transform">
-            <ListMusic class="w-6 h-6" />
+          <div class="aspect-square rounded-xl overflow-hidden bg-slate-800 border border-slate-800 shadow-md">
+            <img
+              :src="`/api/playlists/${pl.id}/cover`"
+              :alt="pl.name"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform"
+              loading="lazy"
+            />
           </div>
 
           <div>
-            <h3 class="text-sm font-semibold text-slate-100 truncate group-hover:text-sky-400 transition-colors">
+            <h3 class="text-sm font-semibold text-slate-100 truncate group-hover:text-emerald-400 transition-colors">
               {{ pl.name }}
             </h3>
             <p class="text-xs text-slate-400 mt-0.5">

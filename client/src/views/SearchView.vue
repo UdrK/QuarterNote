@@ -69,8 +69,8 @@ const totalResults = computed(() =>
           @click="router.push(`/artists/${artist.id}`)"
           class="flex items-center gap-2.5 p-2 rounded-xl bg-slate-900/40 hover:bg-slate-900 border border-slate-800/40 hover:border-slate-800 cursor-pointer group transition-all"
         >
-          <div class="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-sky-400 shrink-0">
-            <Users class="w-4 h-4" />
+          <div class="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-sky-400 shrink-0 overflow-hidden">
+            <img :src="`/api/artists/${artist.id}/image`" :alt="artist.name" class="w-full h-full object-cover" />
           </div>
           <div class="min-w-0 flex-1">
             <p class="text-xs font-semibold text-slate-100 truncate group-hover:text-sky-400 transition-colors">

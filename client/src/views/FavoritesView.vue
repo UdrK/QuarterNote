@@ -470,8 +470,13 @@ function handleNavigate(item: FavoriteItem) {
 
               <!-- Playlist -->
               <div v-else-if="item.itemType === 'playlist'" class="flex flex-col">
-                <div class="relative aspect-square rounded-xl overflow-hidden bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-2 shadow-md">
-                  <ListMusic class="w-10 h-10" />
+                <div class="relative aspect-square rounded-xl overflow-hidden bg-slate-800 mb-2 shadow-md">
+                  <img
+                    :src="`/api/playlists/${item.itemId}/cover`"
+                    :alt="item.playlist?.name || 'Playlist'"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                    loading="lazy"
+                  />
                   <!-- Quick play button -->
                   <button
                     @click.stop="playPlaylistItem(item.itemId)"
