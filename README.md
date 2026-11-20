@@ -4,6 +4,10 @@
 
 ---
 
+## AI Advisory
+
+I built this project purely off of _vibes_. It probably contains a few bugs and feature that can be easily be improved upon. The aim of this project wasn't to exercise my programming skills or learn new ones, it was to get a usable application as soon as possible for my self-hosting needs.
+
 ## Key Features
 
 - ⚡ **Zero Bloat & Extreme Performance**: Built with TypeScript using **Fastify**, **Vue 3**, and Node 24's native **`node:sqlite`** module. Instant startup and minimal RAM footprint (~30-50 MB).
