@@ -48,8 +48,7 @@ COPY --from=builder /app/shared/dist ./shared/dist
 COPY --from=builder /app/server/dist ./server/dist
 COPY --from=builder /app/client/dist ./client/dist
 
-# Expose ports & volumes for ZimaBlade
-VOLUME ["/music", "/data"]
+# Expose port for ZimaBlade
 EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
