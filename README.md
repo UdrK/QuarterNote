@@ -2,11 +2,13 @@
 
 **Quarter Note** is a minimal, blazing-fast, and responsive self-hosted music streamer for your local music library, designed specifically to run on **ZimaBlade** (and any Docker-capable host), featuring an authentic **retro BBS / curses TUI (Terminal User Interface)** aesthetic.
 
+![Quarter Note TUI Preview](readme_preview.png)
+
 ---
 
 ## AI Advisory
 
-I built this project purely off of _vibes_. It probably contains a few bugs and feature that can be easily be improved upon. The aim of this project wasn't to exercise my programming skills or learn new ones, it was to get a usable application as soon as possible for my self-hosting needs.
+I built this project purely off of _vibes_. It probably contains a few bugs and features that can be easily be improved upon. The aim of this project wasn't to exercise my programming skills or learn new ones, it was to get a usable application as soon as possible for my self-hosting needs.
 
 ## Key Features
 
