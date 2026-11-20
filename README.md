@@ -18,22 +18,27 @@
 
 ---
 
-## Quick Start with Docker (ZimaBlade)
+## Quick Start with Docker & CasaOS (ZimaBlade)
 
-The easiest way to deploy Quarter Note on ZimaBlade (or any Linux server) is via Docker Compose:
+The easiest way to deploy Quarter Note on ZimaBlade (or any Linux server running Docker / CasaOS) is via Docker Compose:
 
-1. Clone the repository or copy the project folder to your server.
-2. Update the music directory mount in `docker-compose.yml`:
+1. Clone the repository or copy the project folder to your server:
+   ```sh
+   git clone https://github.com/Costa92/Quarter_Note.git
+   cd Quarter_Note
+   ```
+2. Update the music directory mount in `docker-compose.yml` to point to your media drive:
    ```yaml
    volumes:
      - /media/my-drive/Music:/music:ro
      - ./data:/data
    ```
+   *(Note: On CasaOS, you can also easily configure this directory via the CasaOS App Settings Web GUI).*
 3. Start the container:
    ```sh
    docker compose up -d --build
    ```
-4. Open your browser at `http://<ZIMABLADE-IP>:8080`.
+4. Open your browser at `http://<ZIMABLADE-IP>:8080` (or click the Quarter Note app icon directly from your CasaOS dashboard).
 5. Click **"[ RESCAN LIBRARY ]"** in the sidebar to start indexing your music collection.
 
 ---

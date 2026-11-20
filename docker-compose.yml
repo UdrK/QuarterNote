@@ -1,17 +1,73 @@
+name: quarter-note
+
 services:
   quarter-note:
+    image: quarter-note:latest
     build: .
     container_name: quarter-note
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - target: 8080
+        published: "8080"
+        protocol: tcp
     environment:
       - PORT=8080
       - HOST=0.0.0.0
       - MUSIC_DIR=/music
       - DATA_DIR=/data
     volumes:
-      # Sostituisci il percorso con la cartella della tua musica sulla ZimaBlade
+      # Sostituisci il percorso host con la cartella della tua musica sulla ZimaBlade
       - /path/to/my/music:/music:ro
       # Volume persistente per il database SQLite e le copertine
       - ./data:/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    x-casaos:
+      envs:
+        - container: PORT
+          description:
+            en_US: Web server port
+        - container: HOST
+          description:
+            en_US: Bind address
+        - container: MUSIC_DIR
+          description:
+            en_US: Path to music library inside container
+        - container: DATA_DIR
+          description:
+            en_US: Path to database and cache directory
+      ports:
+        - container: "8080"
+          description:
+            en_US: Web UI port
+      volumes:
+        - container: /music
+          description:
+            en_US: Host folder containing your music library
+        - container: /data
+          description:
+            en_US: Host folder for database and cached album art
+
+x-casaos:
+  architectures:
+    - amd64
+    - arm64
+    - arm
+  main: quarter-note
+  scheme: http
+  index: /
+  port_map: "8080"
+  title:
+    en_US: Quarter Note
+  tagline:
+    en_US: Retro BBS/TUI local music streamer
+  description:
+    en_US: Minimal, blazing-fast local music streamer with an authentic retro BBS / curses TUI aesthetic, bit-perfect streaming, zero login, and instant search.
+  icon: https://raw.githubusercontent.com/IceWhaleTech/CasaOS-AppStore/main/Apps/Navidrome/icon.png
+  category: Media
+  author: Quarter Note
+  developer: Quarter Note
