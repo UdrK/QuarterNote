@@ -1,83 +1,61 @@
 # Project Scope: Minimal Self-Hosted Music Streamer
 
-Questo documento definisce gli obiettivi, l'architettura e lo scope funzionale del nuovo music streamer locale pensato per girare su ZimaBlade (e qualsiasi host Docker).
+This document defines the goals, technical decisions, and functional scope of **Quarter Note**, a local music streamer designed to run on ZimaBlade (and any Docker-capable host).
 
 ---
 
-## 1. Obiettivi Principali
-- **Semplicità e leggerezza**: Zero bloat, avvio istantaneo, basso consumo di RAM (~20-50 MB).
-- **Zero Login (Single User)**: Accesso immediato nella rete locale, nessun account, password o token da gestire.
-- **UX fluida ed efficiente**: Navigazione rapida tra Canzone / Album / Artista, pochi click, layout denso e leggibile.
-- **Controllo avanzato del playback**: Riproduzione a velocità variabile / rallentatore nativo (0.5x - 2.0x) per studio, trascrizione o ascolto personalizzato.
-- **Qualità audio intatta**: Streaming diretto dei file originali (senza transcodifica né perdita di qualità) con supporto scrubbing/seek HTTP Range.
-- **Deploy Docker "zero-hassle"**: Un unico container Docker leggero con bind mount per `/music` e `/data`.
+## 1. Primary Goals
+
+- **Simplicity & Extreme Lightweight**: Zero bloat, instant startup, low RAM consumption (~20-50 MB).
+- **Zero Login (Single User)**: Instant access across the local network with no accounts, passwords, or authentication tokens.
+- **Fluid & Dense UX**: Fast navigation across Artists, Albums, Playlists, and Favorites with an authentic retro BBS / curses TUI aesthetic.
+- **Advanced Playback Control**: Native variable speed controller / slow-down practice mode (`0.5x` - `2.0x`) for music transcription, instrument practice, or customized listening.
+- **Bit-Perfect Audio Quality**: Direct HTTP Range streaming (`206 Partial Content`) of original audio files without lossy transcoding.
+- **Zero-Hassle Docker & CasaOS Deployment**: A single lightweight container with bind mounts for `/music` (read-only) and `/data`.
 
 ---
 
-## 2. Decisioni sulle Funzionalità
+## 2. Feature Boundaries
 
-### A. Scansione Libreria & File System
-- `[SI]` **Directory Scanning ricorsivo**: Scansione dei file audio locali (.mp3, .flac, .m4a, .ogg, .wav, .opus).
-- `[SI]` **Estrazione Metadati (Tagging)**: Lettura di Titolo, Artista, Album, Numero traccia, Anno, Genere, Durata.
-- `[SI]` **Scansione manuale**: Pulsante nell'interfaccia (o chiamata API) per avviare o aggiornare la scansione quando si aggiunge musica.
-- `[NO]` **Watchdog in tempo reale**: Nessun demone che monitora costantemente il disco in background.
-- `[NO]` **Navigazione per cartelle (Folder view)**: Navigazione incentrata unicamente sui metadati (Artisti ➔ Album ➔ Brani).
-- `[NO]` **Normalizzazione aggressiva dei metadati**: Nessuna riscrittura forzata o alterazione dei tag originali.
-- `[NO]` **Album versioning automatico**: Nessun raggruppamento forzato di edizioni speciali.
+### A. Library Scanning & File System
+- `[YES]` **Recursive Directory Scanning**: Crawls local audio files (`.mp3`, `.flac`, `.m4a`, `.ogg`, `.wav`, `.opus`).
+- `[YES]` **Metadata Tagging**: Extracts Title, Artist, Album, Track Number, Year, Duration, and Bitrate.
+- `[YES]` **Manual Rescan**: Sidebar button and API endpoint to scan and update the library on demand.
+- `[NO]` **Real-time File Watchdog**: No background file watcher daemon constantly polling the disk.
+- `[NO]` **Folder View**: Navigation is strictly driven by metadata (Artists ➔ Albums ➔ Tracks).
+- `[NO]` **Aggressive Tag Normalization**: Original audio tags are never rewritten or altered on disk.
+- `[NO]` **Automatic Album Versioning**: No forced grouping or complex deduplication algorithms.
 
-### B. Immagini & Copertine
-- `[SI]` **Copertine incorporate (Embedded Cover Art)**: Estrazione della copertina memorizzata nei tag del file audio.
-- `[SI]` **Copertine da cartella (Folder Art)**: Se il file non ha copertina incorporata, ricerca automatica di `cover.jpg`, `cover.png`, `folder.jpg`, `front.jpg` nella cartella dell'album.
-- `[SI]` **Generazione miniature (Thumbnails)**: Generazione e cache di immagini ridimensionate (es. 250x250) per caricare istantaneamente le liste senza saturare la banda.
-- `[NO]` **Download da Internet**: Nessuna chiamata esterna a Last.fm/Spotify/MusicBrainz.
-- `[NO]` **Palette colori / Blurhash**: Nessuna elaborazione complessa di colori dinamici per la UI.
+### B. Cover Art & Imagery
+- `[YES]` **Embedded Cover Art**: Extracts album art embedded in audio file tags.
+- `[YES]` **Folder Art**: Fallback search for `cover.jpg`, `cover.png`, `folder.jpg`, `front.jpg` in the album directory.
+- `[YES]` **Cached WebP Thumbnails**: Generates 250x250 WebP thumbnails for albums, and 300x300 for artists/playlists using `sharp`.
+- `[NO]` **Cloud Metadata Downloads**: No outbound API calls to Last.fm, Spotify, or MusicBrainz.
+- `[NO]` **Color Palettes & Blurhash**: No dynamic blur effects that contradict the retro TUI aesthetic.
 
-### C. Riproduzione Audio & Player
-- `[SI]` **Streaming HTTP con supporto Range (`206 Partial Content`)**: Seek/scrubbing immediato lungo la traccia a qualità originale.
-- `[SI]` **Riproduzione a velocità variabile / Rallentatore**: Controllo slider o bottoni per il playback rate (`0.5x`, `0.75x`, `1.0x`, `1.25x`, `1.5x`, `2.0x`).
-- `[SI]` **Controlli base & Coda di riproduzione (Queue)**: Play/Pausa, Traccia successiva/precedente, Volume, Barra seek, Coda brani (Next up), Shuffle e Repeat.
-- `[NO]` **Transcodifica al volo**: Nessun overhead FFmpeg; i brani vengono sempre inviati a qualità originale bit-perfect.
-- `[NO]` **Silence detection**: Nessun taglio del silenzio o cross-fade forzato.
-- `[NO]` **Sincronizzazione playback multi-device (Remote play)**: Nessun bisogno di websocket complesse per pilotare altri dispositivi.
+### C. Audio Playback & Player
+- `[YES]` **HTTP Range Streaming (`206 Partial Content`)**: Instant seek and scrubbing through original files.
+- `[YES]` **Integrated Playback Rate Controller**: Native browser time-stretching with selectable speeds (`0.5x`, `0.75x`, `0.85x`, `1.0x`, `1.15x`, `1.25x`, `1.5x`, `2.0x`).
+- `[YES]` **Full Playback Controls & Queue**: Play/Pause, Next/Previous, Seek bar, Slide-over Queue drawer ('Q'), Shuffle, and Repeat modes.
+- `[NO]` **On-the-Fly Transcoding**: No FFmpeg overhead; tracks are delivered bit-perfect.
+- `[NO]` **Silence Detection / Crossfade**: No synthetic audio processing.
+- `[NO]` **Multi-Device Sync / Cast**: Single client local playback.
 
-### D. Organizzazione & Ricerca
-- `[SI]` **Navigazione Artisti / Album / Brani**: Viste dedicate, veloci e compatte.
-- `[SI]` **Ricerca istantanea (Search)**: Filtro rapido in tempo reale mentre si digita.
-- `[SI]` **Playlist personalizzate**: Creazione, modifica brani, riordino e riproduzione di playlist.
-- `[NO]` **Preferiti**: Nessun sistema a parte di "cuoricini" (le playlist coprono l'esigenza di collezionare brani).
-- `[NO]` **Collezioni complesse o suggerimenti simili**: Nessun algoritmo di raccomandazione.
+### D. Organization & Search
+- `[YES]` **Dedicated TUI Views**: Artists directory, Albums catalog, Playlists archive, and Favorites board.
+- `[YES]` **Instant Search**: Real-time filtering as you type, grouped by Artists, Albums, and Tracks.
+- `[YES]` **Custom Playlists**: Create, reorder, manage custom cover art, and play custom playlists.
+- `[YES]` **Favorites with Custom Dividers & Drag & Drop**: Categorize favorites across customizable containers.
 
-### E. Statistiche, Social & Testi
-- `[NO]` **Daily Mixes**: Nessuna generazione automatica di playlist.
-- `[NO]` **Cronologia di ascolto & Play Count**: Nessun tracciamento degli ascolti o database di conteggi.
-- `[NO]` **Last.fm Scrobbling**: Nessun invio dati all'esterno.
-- `[NO]` **Testi delle canzoni (Lyrics)**: Nessun visualizzatore o downloader di testi.
+### E. Social, Lyrics & Statistics
+- `[NO]` **Daily Mixes & Algorithmic Feeds**: No auto-generated playlists.
+- `[NO]` **Play Count & History Tracking**: No background metrics tracking.
+- `[NO]` **Last.fm Scrobbling**: No outbound tracking or telemetry.
+- `[NO]` **Lyrics Display**: No lyrics scrapers or synchronizers.
 
-### F. Utenti, Sicurezza & Deploy
-- `[SI]` **Zero Login (Single-user)**: L'app si apre subito, pronta all'uso senza inserire credenziali.
-- `[SI]` **Deploy Docker su ZimaBlade**: Un singolo `Dockerfile` multi-stage:
-  - Esposizione di una sola porta (es. `8080`).
-  - Volume `/music` (in sola lettura) per la propria libreria.
-  - Volume `/data` per il file SQLite e la cartella cache delle miniature.
-
----
-
-## 3. Architettura Tecnica & Stack Scelto: Full-Stack TypeScript
-
-- **Runtime & Linguaggio**: Node.js v24 (LTS) con TypeScript strict.
-- **Backend (`/server`)**:
-  - **Framework Web**: **Fastify** (estremamente veloce, basso consumo di memoria, supporto nativo a streaming e range requests con `@fastify/static` / stream pipelines).
-  - **Database**: **SQLite** tramite `better-sqlite3` (sincrono, performante, WAL mode per letture concorrenti).
-  - **Lettore Metadati Audio**: `music-metadata` (libreria leader per decodifica tag ID3v1, ID3v2, FLAC, Vorbis, MP4/M4A, Ogg, Opus ed estrazione immagini).
-  - **Generazione Thumbnail**: `sharp` (processamento immagini C/libvips ultra-veloce per ridimensionare le copertine a 250x250 webp/jpeg).
-- **Frontend (`/client`)**:
-  - **Framework**: **Vue 3** (Composition API) + **Vite** + **TypeScript**.
-  - **Styling**: **Tailwind CSS** (design compatto e scuro, spazi ben ottimizzati, pulsanti chiaramente visibili).
-  - **Icone**: `lucide-vue-next`.
-  - **Audio Engine**: HTML5 `Audio` nativo con `playbackRate` controllabile via slider UI.
-- **Condivisione Tipi (`/shared`)**: Interfacce TypeScript condivise (`Track`, `Album`, `Artist`, `Playlist`) tra backend e frontend per garanzia di consistenza API.
-- **Containerizzazione**:
-  - Singolo `Dockerfile` multi-stage:
-    1. Build del client Vue con Vite.
-    2. Build del server TypeScript.
-    3. Immagine finale Alpine/Slim con soli file di produzione, che serve il frontend e le API sulla porta 8080.
+### F. Security & Deployment
+- `[YES]` **Zero Login (Single-User)**: Ready to use immediately upon opening the Web UI.
+- `[YES]` **Docker & CasaOS Compatibility**:
+  - Single multi-stage `Dockerfile`.
+  - Service tagged as `quarter-note:latest` with full `x-casaos` metadata.
+  - Native Node.js container health checks.

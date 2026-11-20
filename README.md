@@ -89,4 +89,6 @@ The development client will be available at `http://localhost:5173` with an auto
 
 - [Scope & Requirements](file:///docs/scope.md)
 - [Technical Architecture](file:///docs/architecture.md)
-- [Implementation Plan](file:///docs/development.md)
+- [Implementation Roadmap](file:///docs/development.md)
+- [LLM & AI Developer Guide](file:///AGENTS.md)
+- [LLM Recipes & Extension Guide](file:///docs/llm-developer-guide.md)
