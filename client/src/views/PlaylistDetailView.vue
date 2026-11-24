@@ -105,19 +105,19 @@ onMounted(load);
   <TuiWindow 
     :title="playlist ? `PLAYLIST: ${playlist.name}` : 'LOADING...'" 
     :badge="playlist ? `${playlistTracks.length} TRACKS / ${formatTime(playlist.totalDuration)}` : ''"
-    variant="green"
+    variant="default"
   >
     <div class="space-y-4 font-mono select-none">
       <!-- Breadcrumb -->
-      <div class="flex items-center gap-2 text-xs border-b border-[#003311] pb-2">
+      <div class="flex items-center gap-2 text-xs border-b border-theme-border-subtle pb-2">
         <button
           @click="router.back()"
-          class="bg-[#001710] hover:bg-[#00ff66] hover:text-black text-[#00ff66] border border-[#005522] px-2 py-0.5 text-xs font-bold transition-colors cursor-pointer"
+          class="bg-theme-panel hover:bg-theme-accent hover:text-theme-accent-contrast text-theme-accent border border-theme-border-dim px-2 py-0.5 text-xs font-bold transition-colors cursor-pointer"
         >
           <span>[&lt; BACK]</span>
         </button>
-        <span class="text-[#006622]">&gt; COLLECTIONS &gt; PLAYLISTS &gt;</span>
-        <span class="text-[#00ff66] font-bold" v-if="playlist">[{{ playlist.name }}]</span>
+        <span class="text-theme-text-dim">&gt; COLLECTIONS &gt; PLAYLISTS &gt;</span>
+        <span class="text-theme-accent font-bold" v-if="playlist">[{{ playlist.name }}]</span>
       </div>
 
       <!-- Hidden file input for uploading custom playlist photo -->
@@ -130,10 +130,10 @@ onMounted(load);
       />
 
       <!-- Playlist Hero Card in Curses Box -->
-      <div v-if="playlist" class="border border-[#005522] bg-[#000d07] p-3 flex flex-col sm:flex-row items-center sm:items-start gap-4">
+      <div v-if="playlist" class="border border-theme-border-dim bg-theme-panel p-3 flex flex-col sm:flex-row items-center sm:items-start gap-4">
         <!-- Playlist Cover with Upload Overlay -->
         <div class="relative group shrink-0">
-          <div class="w-28 h-28 sm:w-32 sm:h-32 bg-black border-2 border-[#00ff66] overflow-hidden">
+          <div class="w-28 h-28 sm:w-32 sm:h-32 bg-black border-2 border-theme-border overflow-hidden">
             <img
               :src="playlistCoverUrl"
               :alt="playlist.name"
@@ -145,7 +145,7 @@ onMounted(load);
             @click="triggerPhotoUpload"
             :disabled="isUploading"
             type="button"
-            class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 text-[#00ff66] transition-opacity cursor-pointer border-2 border-[#00ff66]"
+            class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 text-theme-accent transition-opacity cursor-pointer border-2 border-theme-accent"
             title="Change playlist cover"
           >
             <Loader2 v-if="isUploading" class="w-5 h-5 animate-spin" />
@@ -157,14 +157,14 @@ onMounted(load);
         </div>
 
         <div class="space-y-1.5 min-w-0 flex-1 text-center sm:text-left">
-          <div class="text-[10px] text-[#00ff66] font-bold">
+          <div class="text-[10px] text-theme-accent font-bold">
             ┌──[ PLAYLIST DETAILS ]
           </div>
-          <h1 class="text-xl sm:text-2xl font-bold text-[#ffff00] truncate">
+          <h1 class="text-xl sm:text-2xl font-bold text-theme-text-bright truncate">
             {{ playlist.name }}
           </h1>
-          <div class="text-[11px] text-[#00aa44] space-x-2">
-            <span>TRACKS: <span class="text-[#00ff66] font-bold">{{ playlistTracks.length }}</span></span>
+          <div class="text-[11px] text-theme-text-dim space-x-2">
+            <span>TRACKS: <span class="text-theme-success font-bold">{{ playlistTracks.length }}</span></span>
             <span>|</span>
             <span>TOTAL DURATION: {{ formatTime(playlist.totalDuration) }}</span>
           </div>
@@ -173,14 +173,14 @@ onMounted(load);
             <button
               @click="playAll"
               :disabled="rawTracks.length === 0"
-              class="bg-[#00ff66] hover:bg-[#55ff99] text-black font-extrabold px-3 py-1 text-xs border border-[#00ff66] transition-colors cursor-pointer disabled:opacity-40"
+              class="bg-theme-success hover:opacity-90 text-white font-extrabold px-3 py-1 text-xs border border-theme-success transition-colors cursor-pointer disabled:opacity-40"
             >
               <span>[ ▶ PLAY ]</span>
             </button>
             <button
               @click="playShuffled"
               :disabled="rawTracks.length === 0"
-              class="bg-[#001710] hover:bg-[#00ff66] hover:text-black text-[#00ff66] border border-[#005522] px-3 py-1 text-xs font-bold transition-colors cursor-pointer disabled:opacity-40"
+              class="bg-theme-panel hover:bg-theme-accent hover:text-theme-accent-contrast text-theme-accent border border-theme-border-dim px-3 py-1 text-xs font-bold transition-colors cursor-pointer disabled:opacity-40"
             >
               <span>[ ⇄ SHUFFLE ]</span>
             </button>
@@ -188,13 +188,13 @@ onMounted(load);
               v-if="playlist"
               @click="toggleFavorite('playlist', playlist.id)"
               class="px-3 py-1 text-xs font-bold border transition-colors cursor-pointer"
-              :class="isFavorite('playlist', playlist.id) ? 'bg-[#ff3366] text-black border-[#ff3366]' : 'bg-[#001710] text-[#aaaaaa] border-[#005522] hover:border-[#ff3366] hover:text-[#ff3366]'"
+              :class="isFavorite('playlist', playlist.id) ? 'bg-theme-danger text-white border-theme-danger' : 'bg-theme-panel text-theme-text-dim border-theme-border-dim hover:border-theme-danger hover:text-theme-danger'"
             >
               <span>{{ isFavorite('playlist', playlist.id) ? '[★ IN FAVORITES]' : '[☆ ADD FAVORITE]' }}</span>
             </button>
             <button
               @click="handleDelete"
-              class="bg-[#2a0008] hover:bg-[#ff3366] text-[#ff3366] hover:text-black px-3 py-1 text-xs font-bold border border-[#661122] transition-colors cursor-pointer"
+              class="bg-theme-panel hover:bg-theme-danger hover:text-white text-theme-danger px-3 py-1 text-xs font-bold border border-theme-danger/40 transition-colors cursor-pointer"
               title="Delete playlist"
             >
               <span>[DELETE]</span>
@@ -205,15 +205,15 @@ onMounted(load);
 
       <!-- Tracks List Table -->
       <div v-if="playlistTracks.length > 0" class="space-y-2">
-        <div class="border-b border-[#003311] pb-1 flex items-center justify-between text-xs font-bold text-[#00ff66]">
+        <div class="border-b border-theme-border-subtle pb-1 flex items-center justify-between text-xs font-bold text-theme-accent">
           <span>┌──[ INCLUDED TRACKS ]───────────────────────────</span>
-          <span class="text-[#ffff00]">({{ playlistTracks.length }})─┐</span>
+          <span class="text-theme-highlight">({{ playlistTracks.length }})─┐</span>
         </div>
-        <div class="border border-[#003311] bg-[#000d07]">
+        <div class="border border-theme-border-dim bg-theme-surface">
           <div
             v-for="(pt, idx) in playlistTracks"
             :key="pt.id"
-            class="flex items-center justify-between border-b border-[#00220d] hover:bg-[#001f11] group"
+            class="flex items-center justify-between border-b border-theme-border-subtle hover:bg-theme-active-bg group"
           >
             <div class="flex-1 min-w-0">
               <TrackRow
@@ -225,7 +225,7 @@ onMounted(load);
             </div>
             <button
               @click="handleRemove(pt.id)"
-              class="text-[#446655] hover:text-[#ff3366] text-xs font-bold px-2 py-1 mr-1 cursor-pointer"
+              class="text-theme-text-dim hover:text-theme-danger text-xs font-bold px-2 py-1 mr-1 cursor-pointer group-hover:text-white/70"
               title="Remove from playlist"
             >
               [X]

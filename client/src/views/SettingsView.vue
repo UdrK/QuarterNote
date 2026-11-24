@@ -4,6 +4,8 @@ import { RefreshCw } from '@lucide/vue';
 import { fetchSettings, updateSettings, triggerScan } from '../api/client';
 import TuiWindow from '../components/TuiWindow.vue';
 import type { AppSettings, DefaultViewType } from '@quarter-note/shared';
+import { currentTheme, availableThemes, setTheme, type ThemeName } from '../composables/useTheme';
+import { currentLocale, availableLocales, setLocale, t, type Locale } from '../i18n';
 
 const settings = ref<AppSettings | null>(null);
 const musicDirInput = ref('');
@@ -12,11 +14,11 @@ const isSaving = ref(false);
 const message = ref<{ type: 'success' | 'error'; text: string } | null>(null);
 const isLoading = ref(true);
 
-const viewOptions: { id: DefaultViewType; label: string; desc: string; key: string }[] = [
-  { id: 'artists', label: 'Artists', desc: 'Browse artists with photos', key: 'F2' },
-  { id: 'albums', label: 'Albums', desc: 'Catalog of album covers', key: 'F3' },
-  { id: 'favorites', label: 'Favorites', desc: 'Categories and favorite items', key: 'F4' },
-  { id: 'playlists', label: 'Playlists', desc: 'Personal playlists', key: 'F5' },
+const viewOptions: { id: DefaultViewType; labelKey: string; desc: string; key: string }[] = [
+  { id: 'artists', labelKey: 'nav.artists', desc: 'Browse artists with photos', key: 'F2' },
+  { id: 'albums', labelKey: 'nav.albums', desc: 'Catalog of album covers', key: 'F3' },
+  { id: 'favorites', labelKey: 'nav.favorites', desc: 'Categories and favorite items', key: 'F4' },
+  { id: 'playlists', labelKey: 'nav.playlists', desc: 'Personal playlists', key: 'F5' },
 ];
 
 async function load() {
@@ -32,7 +34,7 @@ async function load() {
     console.error('Failed to load settings:', err);
     message.value = {
       type: 'error',
-      text: err instanceof Error ? err.message : 'Unable to load settings',
+      text: err instanceof Error ? err.message : t('common.error'),
     };
   } finally {
     isLoading.value = false;
@@ -46,11 +48,19 @@ async function handleViewChange(view: DefaultViewType) {
     await updateSettings({ defaultView: view });
     message.value = {
       type: 'success',
-      text: `Default startup view set to "${viewOptions.find(o => o.id === view)?.label}"`,
+      text: `Default view updated: ${view}`,
     };
   } catch (err) {
     console.error('Failed to save default view setting:', err);
   }
+}
+
+function handleThemeChange(themeId: ThemeName) {
+  setTheme(themeId);
+}
+
+function handleLocaleChange(locId: Locale) {
+  setLocale(locId);
 }
 
 async function handleSave(triggerScanAfter = false) {
@@ -82,7 +92,7 @@ async function handleSave(triggerScanAfter = false) {
   } catch (err) {
     message.value = {
       type: 'error',
-      text: err instanceof Error ? err.message : 'Error while saving',
+      text: err instanceof Error ? err.message : t('common.error'),
     };
   } finally {
     isSaving.value = false;
@@ -94,10 +104,10 @@ onMounted(load);
 
 <template>
   <TuiWindow 
-    title="SYSTEM CONFIGURATION" 
+    :title="t('settings.title')" 
     badge="NODE: LOCALHOST" 
     hotkey="F6"
-    variant="cyan"
+    variant="default"
   >
     <div class="space-y-4 max-w-4xl font-mono select-none">
       <!-- Status Message -->
@@ -106,22 +116,70 @@ onMounted(load);
         class="p-1.5 text-xs border font-bold"
         :class="[
           message.type === 'success'
-            ? 'bg-[#002211] border-[#00ff66] text-[#00ff66]'
-            : 'bg-[#220008] border-[#ff3366] text-[#ff3366]'
+            ? 'bg-theme-panel border-theme-success text-theme-success'
+            : 'bg-theme-panel border-theme-danger text-theme-danger'
         ]"
       >
         <span>&gt;&gt; {{ message.text }}</span>
       </div>
 
-      <!-- Default Startup Screen Card -->
-      <div class="border border-[#1a2b3c] bg-[#050a12] p-3 space-y-2">
-        <div class="flex items-center gap-2 text-xs font-bold text-[#ffff00] border-b border-[#112233] pb-1">
-          <span>┌──[ 1. DEFAULT STARTUP VIEW ]</span>
+      <!-- Retro Theme Selection Card -->
+      <div class="border border-theme-border-dim bg-theme-panel p-3 space-y-2">
+        <div class="flex items-center gap-2 text-xs font-bold text-theme-accent border-b border-theme-border-subtle pb-1">
+          <span>┌──[ 1. {{ t('settings.theme') }} ]</span>
         </div>
 
-        <p class="text-[10px] text-[#6688aa]">
-          Module automatically loaded on startup:
-        </p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-0.5">
+          <button
+            v-for="th in availableThemes"
+            :key="th.id"
+            type="button"
+            @click="handleThemeChange(th.id)"
+            class="p-2 border text-left transition-colors cursor-pointer"
+            :class="[
+              currentTheme === th.id
+                ? 'bg-theme-accent text-theme-accent-contrast border-theme-accent font-extrabold'
+                : 'bg-theme-bg border-theme-border-dim text-theme-text hover:border-theme-accent hover:text-theme-accent'
+            ]"
+          >
+            <div class="flex items-center justify-between w-full mb-0.5">
+              <span class="text-xs">[{{ th.tag }}]</span>
+              <span v-if="currentTheme === th.id" class="text-[9px]">● ON</span>
+            </div>
+            <span class="text-[10px] block opacity-90">{{ th.name }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Language Selection Card -->
+      <div class="border border-theme-border-dim bg-theme-panel p-3 space-y-2">
+        <div class="flex items-center gap-2 text-xs font-bold text-theme-highlight border-b border-theme-border-subtle pb-1">
+          <span>┌──[ 2. {{ t('settings.language') }} ]</span>
+        </div>
+
+        <div class="flex items-center gap-2 pt-0.5">
+          <button
+            v-for="loc in availableLocales"
+            :key="loc.id"
+            type="button"
+            @click="handleLocaleChange(loc.id)"
+            class="px-3 py-1.5 border text-xs font-bold transition-colors cursor-pointer"
+            :class="[
+              currentLocale === loc.id
+                ? 'bg-theme-highlight text-black border-theme-highlight font-extrabold'
+                : 'bg-theme-bg border-theme-border-dim text-theme-text hover:border-theme-highlight hover:text-theme-highlight'
+            ]"
+          >
+            [{{ loc.name.toUpperCase() }}]
+          </button>
+        </div>
+      </div>
+
+      <!-- Default Startup Screen Card -->
+      <div class="border border-theme-border-dim bg-theme-panel p-3 space-y-2">
+        <div class="flex items-center gap-2 text-xs font-bold text-theme-accent border-b border-theme-border-subtle pb-1">
+          <span>┌──[ 3. {{ t('settings.defaultView') }} ]</span>
+        </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 pt-0.5">
           <button
@@ -132,17 +190,17 @@ onMounted(load);
             class="flex flex-col items-start p-2 border text-left transition-colors cursor-pointer"
             :class="[
               defaultViewInput === opt.id
-                ? 'bg-[#00ffff] text-black border-[#00ffff] font-extrabold'
-                : 'bg-black border-[#223d54] text-[#aaaaaa] hover:border-[#00ffff] hover:text-[#00ffff]'
+                ? 'bg-theme-accent text-theme-accent-contrast border-theme-accent font-extrabold'
+                : 'bg-theme-bg border-theme-border-dim text-theme-text hover:border-theme-accent hover:text-theme-accent'
             ]"
           >
             <div class="flex items-center justify-between w-full mb-0.5">
               <span class="text-xs">
-                [{{ opt.label.toUpperCase() }}]
+                [{{ t(opt.labelKey) }}]
               </span>
               <span 
                 class="text-[8px] font-bold px-1"
-                :class="defaultViewInput === opt.id ? 'bg-black text-[#00ffff]' : 'bg-[#112233] text-[#446688]'"
+                :class="defaultViewInput === opt.id ? 'bg-theme-bg text-theme-accent' : 'bg-theme-card text-theme-text-dim'"
               >
                 {{ opt.key }}
               </span>
@@ -155,22 +213,22 @@ onMounted(load);
       </div>
 
       <!-- Music Library Path Card -->
-      <div class="border border-[#1a2b3c] bg-[#050a12] p-3 space-y-2">
-        <div class="flex items-center gap-2 text-xs font-bold text-[#00ffff] border-b border-[#112233] pb-1">
-          <span>┌──[ 2. MUSIC FOLDER PATH ]</span>
+      <div class="border border-theme-border-dim bg-theme-panel p-3 space-y-2">
+        <div class="flex items-center gap-2 text-xs font-bold text-theme-accent border-b border-theme-border-subtle pb-1">
+          <span>┌──[ 4. {{ t('settings.musicDir') }} ]</span>
         </div>
 
-        <p class="text-[10px] text-[#6688aa]">
-          Absolute path on disk (e.g. <code class="text-[#ffff00]">C:\Music</code> or <code class="text-[#ffff00]">/music</code>).
+        <p class="text-[10px] text-theme-text-dim">
+          Absolute path on disk (e.g. <code class="text-theme-highlight">C:\Music</code> or <code class="text-theme-highlight">/music</code>).
         </p>
 
-        <div class="flex items-center bg-black border border-[#00ffff]/60 px-2 py-1 focus-within:border-[#ffff00]">
-          <span class="text-[#00ffff] text-xs font-bold mr-2">&gt; PATH:</span>
+        <div class="flex items-center bg-theme-bg border border-theme-border/60 px-2 py-1 focus-within:border-theme-highlight">
+          <span class="text-theme-accent text-xs font-bold mr-2">&gt; PATH:</span>
           <input
             v-model="musicDirInput"
             type="text"
             placeholder="C:\Users\username\Music"
-            class="flex-1 bg-transparent text-xs text-[#ffff00] font-mono focus:outline-none"
+            class="flex-1 bg-transparent text-xs text-theme-highlight font-mono focus:outline-none"
           />
         </div>
 
@@ -179,48 +237,43 @@ onMounted(load);
           <button
             @click="handleSave(false)"
             :disabled="isSaving || !musicDirInput.trim()"
-            class="bg-[#0f1f2d] hover:bg-[#00ffff] hover:text-black text-[#00ffff] border border-[#224466] py-1 px-3 text-xs font-bold transition-colors cursor-pointer disabled:opacity-40"
+            class="bg-theme-card hover:bg-theme-accent hover:text-theme-accent-contrast text-theme-accent border border-theme-border-dim py-1 px-3 text-xs font-bold transition-colors cursor-pointer disabled:opacity-40"
           >
-            <span>{{ isSaving ? '[ SAVING... ]' : '[ SAVE CONFIGURATION ]' }}</span>
+            <span>{{ isSaving ? t('common.loading') : t('settings.saveSettings') }}</span>
           </button>
 
           <button
             @click="handleSave(true)"
             :disabled="isSaving || !musicDirInput.trim()"
-            class="bg-[#00ff66] hover:bg-[#55ff99] text-black font-extrabold py-1 px-3 text-xs border border-[#00ff66] transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-40"
+            class="bg-theme-success hover:opacity-90 text-black font-extrabold py-1 px-3 text-xs border border-theme-success transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-40"
           >
             <RefreshCw class="w-3 h-3" :class="{ 'animate-spin': isSaving }" />
-            <span>[ SAVE &amp; RESCAN NOW ]</span>
+            <span>{{ t('settings.rescanNow') }}</span>
           </button>
         </div>
       </div>
 
       <!-- Storage & DB Status -->
-      <div v-if="settings && settings.musicDir" class="border border-[#1a2b3c] bg-[#050a12] p-3 space-y-2">
-        <div class="flex items-center gap-2 text-xs font-bold text-[#00ff66] border-b border-[#112233] pb-1">
-          <span>┌──[ 3. DATABASE &amp; CACHE STATS ]</span>
+      <div v-if="settings && settings.musicDir" class="border border-theme-border-dim bg-theme-panel p-3 space-y-2">
+        <div class="flex items-center gap-2 text-xs font-bold text-theme-success border-b border-theme-border-subtle pb-1">
+          <span>┌──[ 5. {{ t('settings.stats') }} ]</span>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          <div class="bg-black border border-[#223d54] p-2">
-            <span class="text-[9px] text-[#6688aa] font-bold">INDEXED TRACKS</span>
-            <p class="text-base font-bold text-[#ffff00] mt-0.5">{{ settings.totalTracks }}</p>
+          <div class="bg-theme-bg border border-theme-border-dim p-2">
+            <span class="text-[9px] text-theme-text-dim font-bold">{{ t('settings.totalTracks') }}</span>
+            <p class="text-base font-bold text-theme-highlight mt-0.5">{{ settings.totalTracks }}</p>
           </div>
 
-          <div class="bg-black border border-[#223d54] p-2">
-            <span class="text-[9px] text-[#6688aa] font-bold">CATALOGED ALBUMS</span>
-            <p class="text-base font-bold text-[#00ffff] mt-0.5">{{ settings.totalAlbums }}</p>
+          <div class="bg-theme-bg border border-theme-border-dim p-2">
+            <span class="text-[9px] text-theme-text-dim font-bold">{{ t('settings.totalAlbums') }}</span>
+            <p class="text-base font-bold text-theme-accent mt-0.5">{{ settings.totalAlbums }}</p>
           </div>
 
-          <div class="bg-black border border-[#223d54] p-2">
-            <span class="text-[9px] text-[#6688aa] font-bold">REGISTERED ARTISTS</span>
-            <p class="text-base font-bold text-[#00ff66] mt-0.5">{{ settings.totalArtists }}</p>
+          <div class="bg-theme-bg border border-theme-border-dim p-2">
+            <span class="text-[9px] text-theme-text-dim font-bold">{{ t('settings.totalArtists') }}</span>
+            <p class="text-base font-bold text-theme-success mt-0.5">{{ settings.totalArtists }}</p>
           </div>
-        </div>
-
-        <div class="text-[10px] text-[#556677] space-y-0.5 pt-1 border-t border-[#112233]">
-          <p>&gt; Data storage: <span class="text-[#88aacc]">{{ settings.dataDir }}</span></p>
-          <p>&gt; SQLite DB: <span class="text-[#88aacc]">{{ settings.dataDir }}/quarter.db</span></p>
         </div>
       </div>
     </div>

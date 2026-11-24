@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { t } from '../i18n';
+
 const emit = defineEmits<{
   (e: 'close'): void;
 }>();
@@ -6,20 +8,20 @@ const emit = defineEmits<{
 
 <template>
   <div class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4 font-mono select-none">
-    <div class="bg-black border-2 border-[#00ffff] w-full max-w-2xl shadow-[0_0_30px_rgba(0,255,255,0.25)] flex flex-col">
+    <div class="bg-theme-bg border-2 border-theme-border w-full max-w-2xl shadow-2xl flex flex-col">
       <!-- Title Bar -->
-      <div class="flex items-center justify-between px-3 py-1 bg-[#002b4d] border-b border-[#00ffff] text-[#ffff00] text-xs font-bold">
-        <span>╔═[ QUICK GUIDE - TUI KEYBOARD COMMANDS ]</span>
-        <button @click="emit('close')" class="text-[#00ffff] hover:text-[#ff3366] cursor-pointer">
+      <div class="flex items-center justify-between px-3 py-1 bg-theme-panel border-b border-theme-border text-theme-highlight text-xs font-bold">
+        <span>╔═[ {{ t('help.title') }} ]</span>
+        <button @click="emit('close')" class="text-theme-accent hover:text-theme-danger cursor-pointer">
           [X CLOSE]═╗
         </button>
       </div>
 
       <!-- Content -->
-      <div class="p-4 space-y-4 text-xs text-[#d4d4d4] overflow-y-auto max-h-[80vh]">
+      <div class="p-4 space-y-4 text-xs text-theme-text overflow-y-auto max-h-[80vh]">
         <!-- ASCII Banner -->
         <div class="flex justify-center overflow-x-auto py-1">
-          <pre class="text-[#00ffff] text-[10px] leading-none font-mono text-left inline-block select-none font-bold" style="font-family: 'Consolas', 'Courier New', Monaco, monospace;">
+          <pre class="text-theme-accent text-[10px] leading-none font-mono text-left inline-block select-none font-bold" style="font-family: 'Consolas', 'Courier New', Monaco, monospace;">
 ╔════════════════════════════════════════════════════════════════════════╗
 ║   ____                   __            _   __      __                  ║
 ║  / __ \__  ______ ______/ /____  _____/ | / /___  / /____     TUI      ║
@@ -31,75 +33,75 @@ const emit = defineEmits<{
         </div>
 
         <!-- Keybindings Table -->
-        <div class="border border-[#2a2a2a] p-3 bg-[#070707] space-y-2">
-          <div class="text-[#ffff00] font-bold border-b border-[#222222] pb-1 text-[11px]">
-            ■ GLOBAL KEYBOARD SHORTCUTS:
+        <div class="border border-theme-border-dim p-3 bg-theme-panel space-y-2">
+          <div class="text-theme-highlight font-bold border-b border-theme-border-subtle pb-1 text-[11px]">
+            ■ {{ t('help.globalKeys') }}:
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 text-[11px]">
             <div class="flex items-center justify-between">
-              <span class="text-[#00ffff] font-bold">[F1] or [?]</span>
-              <span class="text-[#aaaaaa]">Show this help dialog</span>
+              <span class="text-theme-accent font-bold">[F1] or [?]</span>
+              <span class="text-theme-text-dim">Show this help dialog</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-[#00ffff] font-bold">[F2] or [1]</span>
-              <span class="text-[#aaaaaa]">Artists Directory</span>
+              <span class="text-theme-accent font-bold">[F2] or [1]</span>
+              <span class="text-theme-text-dim">Artists Directory</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-[#00ffff] font-bold">[F3] or [2]</span>
-              <span class="text-[#aaaaaa]">Albums Catalog</span>
+              <span class="text-theme-accent font-bold">[F3] or [2]</span>
+              <span class="text-theme-text-dim">Albums Catalog</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-[#00ffff] font-bold">[F4] or [3]</span>
-              <span class="text-[#aaaaaa]">Favorites Archive</span>
+              <span class="text-theme-accent font-bold">[F4] or [3]</span>
+              <span class="text-theme-text-dim">Favorites Archive</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-[#00ffff] font-bold">[F5] or [4]</span>
-              <span class="text-[#aaaaaa]">Playlists List</span>
+              <span class="text-theme-accent font-bold">[F5] or [4]</span>
+              <span class="text-theme-text-dim">Playlists List</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-[#00ffff] font-bold">[F6] or [5]</span>
-              <span class="text-[#aaaaaa]">System Configuration</span>
+              <span class="text-theme-accent font-bold">[F6] or [5]</span>
+              <span class="text-theme-text-dim">System Configuration</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-[#ffff00] font-bold">[Space]</span>
-              <span class="text-[#aaaaaa]">Play / Pause audio</span>
+              <span class="text-theme-highlight font-bold">[Space]</span>
+              <span class="text-theme-text-dim">Play / Pause audio</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-[#ffff00] font-bold">[N] / [P]</span>
-              <span class="text-[#aaaaaa]">Next / previous track</span>
+              <span class="text-theme-highlight font-bold">[N] / [P]</span>
+              <span class="text-theme-text-dim">Next / previous track</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-[#00ff66] font-bold">[/]</span>
-              <span class="text-[#aaaaaa]">Search library</span>
+              <span class="text-theme-success font-bold">[/]</span>
+              <span class="text-theme-text-dim">Search library</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-[#ff00aa] font-bold">[Q]</span>
-              <span class="text-[#aaaaaa]">Open / Close Queue</span>
+              <span class="text-theme-danger font-bold">[Q]</span>
+              <span class="text-theme-text-dim">Open / Close Queue</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-[#00ff66] font-bold">[C]</span>
-              <span class="text-[#aaaaaa]">Toggle CRT scanlines</span>
+              <span class="text-theme-success font-bold">[C]</span>
+              <span class="text-theme-text-dim">Toggle CRT scanlines</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-[#ff3366] font-bold">[ESC]</span>
-              <span class="text-[#aaaaaa]">Close dialogs / Cancel</span>
+              <span class="text-theme-danger font-bold">[ESC]</span>
+              <span class="text-theme-text-dim">Close dialogs / Cancel</span>
             </div>
           </div>
         </div>
 
-        <div class="text-[10px] text-[#777777] text-center">
+        <div class="text-[10px] text-theme-text-dim text-center">
           * Keyboard shortcuts work globally except while typing in a text input.
         </div>
       </div>
 
       <!-- Footer -->
-      <div class="p-2 bg-[#0a0a0a] border-t border-[#222222] text-center">
+      <div class="p-2 bg-theme-panel border-t border-theme-border-subtle text-center">
         <button
           @click="emit('close')"
-          class="bbs-btn bbs-btn-yellow py-1 px-4 text-xs font-bold"
+          class="bbs-btn py-1 px-4 text-xs font-bold"
         >
-          [ PRESS ESC OR CLICK HERE TO CONTINUE ]
+          {{ t('help.close') }}
         </button>
       </div>
     </div>

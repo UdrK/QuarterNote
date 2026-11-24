@@ -2,20 +2,114 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Base BBS Terminal Styling */
-:root {
-  --bbs-bg: #000000;
-  --bbs-fg: #d4d4d4;
-  --bbs-yellow: #ffff00;
-  --bbs-cyan: #00ffff;
-  --bbs-green: #00ff66;
-  --bbs-red: #ff3366;
-  --bbs-border: #2e2e2e;
+/* Dynamic Theme Tokens */
+:root, [data-theme="cyan"] {
+  --theme-bg: #000000;
+  --theme-panel: #001726;
+  --theme-card: #080808;
+  --theme-surface: #050a12;
+  --theme-border: #00ffff;
+  --theme-border-dim: #224466;
+  --theme-border-subtle: #1a2330;
+  --theme-accent: #00ffff;
+  --theme-accent-hover: #00cccc;
+  --theme-accent-contrast: #000000;
+  --theme-text: #d4d4d4;
+  --theme-text-dim: #888888;
+  --theme-text-bright: #ffffff;
+  --theme-highlight: #ffff00;
+  --theme-success: #00ff66;
+  --theme-danger: #ff3366;
+  --theme-active-bg: #002b4d;
+  --theme-header-bg: #001726;
+  --theme-header-fg: #00ffff;
+  --theme-badge-bg: #00ffff;
+  --theme-badge-fg: #000000;
+  --theme-scroll-thumb: #00aaaa;
+  --theme-scroll-hover: #00ffff;
+}
+
+[data-theme="green"] {
+  --theme-bg: #020803;
+  --theme-panel: #051809;
+  --theme-card: #07190a;
+  --theme-surface: #041006;
+  --theme-border: #00ff66;
+  --theme-border-dim: #005522;
+  --theme-border-subtle: #08280f;
+  --theme-accent: #00ff66;
+  --theme-accent-hover: #00cc52;
+  --theme-accent-contrast: #000000;
+  --theme-text: #a3f7bf;
+  --theme-text-dim: #448855;
+  --theme-text-bright: #d4ffe0;
+  --theme-highlight: #ffff33;
+  --theme-success: #00ff66;
+  --theme-danger: #ff4444;
+  --theme-active-bg: #0d3815;
+  --theme-header-bg: #051809;
+  --theme-header-fg: #00ff66;
+  --theme-badge-bg: #00ff66;
+  --theme-badge-fg: #000000;
+  --theme-scroll-thumb: #00aa44;
+  --theme-scroll-hover: #00ff66;
+}
+
+[data-theme="amber"] {
+  --theme-bg: #0a0600;
+  --theme-panel: #241400;
+  --theme-card: #1f1400;
+  --theme-surface: #140c00;
+  --theme-border: #ffb000;
+  --theme-border-dim: #664400;
+  --theme-border-subtle: #291b00;
+  --theme-accent: #ffb000;
+  --theme-accent-hover: #cc8c00;
+  --theme-accent-contrast: #000000;
+  --theme-text: #ffd580;
+  --theme-text-dim: #886622;
+  --theme-text-bright: #fff0cc;
+  --theme-highlight: #ffff00;
+  --theme-success: #55ff55;
+  --theme-danger: #ff4422;
+  --theme-active-bg: #3d2400;
+  --theme-header-bg: #241400;
+  --theme-header-fg: #ffb000;
+  --theme-badge-bg: #ffb000;
+  --theme-badge-fg: #000000;
+  --theme-scroll-thumb: #aa7700;
+  --theme-scroll-hover: #ffb000;
+}
+
+[data-theme="win98"] {
+  --theme-bg: #008080;
+  --theme-panel: #c0c0c0;
+  --theme-card: #ffffff;
+  --theme-surface: #ffffff;
+  --theme-border: #000000;
+  --theme-border-dim: #808080;
+  --theme-border-subtle: #d4d0c8;
+  --theme-accent: #000080;
+  --theme-accent-hover: #1084d0;
+  --theme-accent-contrast: #ffffff;
+  --theme-text: #000000;
+  --theme-text-dim: #555555;
+  --theme-text-bright: #000000;
+  --theme-highlight: #ffff00;
+  --theme-success: #008000;
+  --theme-danger: #800000;
+  --theme-active-bg: #000080;
+  --theme-header-bg: #000080;
+  --theme-header-fg: #ffffff;
+  --theme-badge-bg: #ffffff;
+  --theme-badge-fg: #000000;
+  --theme-scroll-thumb: #c0c0c0;
+  --theme-scroll-hover: #dfdfdf;
 }
 
 body {
-  background-color: #000000;
-  color: #d4d4d4;
+  background-color: var(--theme-bg);
+  color: var(--theme-text);
   font-family: 'Consolas', 'Courier New', Monaco, monospace;
 }
 
@@ -26,25 +120,25 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #000000;
-  border: 1px solid #222222;
+  background: var(--theme-bg);
+  border: 1px solid var(--theme-border-subtle);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #00aaaa;
+  background: var(--theme-scroll-thumb);
   border-radius: 0px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #00ffff;
+  background: var(--theme-scroll-hover);
 }
 
 /* BBS blocky range inputs */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
-  background: #1a1a1a;
-  border: 1px solid #333333;
+  background: var(--theme-card);
+  border: 1px solid var(--theme-border-dim);
   border-radius: 0px;
   cursor: pointer;
   height: 8px;
@@ -56,27 +150,27 @@ input[type="range"]::-webkit-slider-thumb {
   width: 10px;
   height: 14px;
   border-radius: 0px;
-  background: #00ffff;
-  border: 1px solid #ffffff;
+  background: var(--theme-accent);
+  border: 1px solid var(--theme-text-bright);
   cursor: pointer;
   transition: transform 0.05s ease;
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
-  background: #ffff00;
+  background: var(--theme-highlight);
 }
 
 /* BBS ASCII UI helpers */
 .bbs-card {
-  background-color: #080808;
-  border: 1px solid #2a2a2a;
+  background-color: var(--theme-card);
+  border: 1px solid var(--theme-border-dim);
   border-radius: 0px;
   transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .bbs-card:hover {
-  border-color: #00ffff;
-  background-color: #0d0d0d;
+  border-color: var(--theme-accent);
+  background-color: var(--theme-panel);
 }
 
 .bbs-btn {
@@ -90,49 +184,16 @@ input[type="range"]::-webkit-slider-thumb:hover {
   font-weight: 700;
   text-transform: uppercase;
   border-radius: 0px;
-  border: 1px solid #3a3a3a;
-  background-color: #0d0d0d;
-  color: #00ffff;
+  border: 1px solid var(--theme-border-dim);
+  background-color: var(--theme-card);
+  color: var(--theme-accent);
   transition: all 0.1s ease;
 }
 
 .bbs-btn:hover:not(:disabled) {
-  background-color: #00ffff;
-  color: #000000;
-  border-color: #00ffff;
-}
-
-.bbs-btn-yellow {
-  color: #ffff00;
-  border-color: #555500;
-}
-
-.bbs-btn-yellow:hover:not(:disabled) {
-  background-color: #ffff00;
-  color: #000000;
-  border-color: #ffff00;
-}
-
-.bbs-btn-green {
-  color: #00ff66;
-  border-color: #005522;
-}
-
-.bbs-btn-green:hover:not(:disabled) {
-  background-color: #00ff66;
-  color: #000000;
-  border-color: #00ff66;
-}
-
-.bbs-btn-red {
-  color: #ff3366;
-  border-color: #661122;
-}
-
-.bbs-btn-red:hover:not(:disabled) {
-  background-color: #ff3366;
-  color: #000000;
-  border-color: #ff3366;
+  background-color: var(--theme-accent);
+  color: var(--theme-accent-contrast);
+  border-color: var(--theme-accent);
 }
 
 /* Optional CRT scanline effect */

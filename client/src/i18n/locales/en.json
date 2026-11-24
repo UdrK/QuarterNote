@@ -1,0 +1,136 @@
+{
+  "common": {
+    "save": "[SAVE]",
+    "cancel": "[CANCEL]",
+    "delete": "[DELETE]",
+    "ok": "[ OK ]",
+    "close": "[CLOSE]",
+    "loading": "LOADING...",
+    "error": "ERROR"
+  },
+  "nav": {
+    "artists": "ARTISTS",
+    "albums": "ALBUMS",
+    "favorites": "FAVORITES",
+    "playlists": "PLAYLISTS",
+    "config": "CONFIG",
+    "rescan": "RESCAN LIBRARY",
+    "scanning": "SCANNING...",
+    "scanStatus": "● QN-TUI BBS",
+    "term": "TERM: ANSI 80x25",
+    "audioHeader": "╔═[ CURSES AUDIO ]═╗",
+    "navHeader": "┌──[ NAVIGATION ]──┐"
+  },
+  "header": {
+    "searchPlaceholder": "Search artists, albums, tracks... [/]",
+    "help": "HELP [F1]",
+    "crt": "CRT [C]",
+    "queue": "QUEUE [Q]"
+  },
+  "footer": {
+    "help": "HELP",
+    "artists": "ARTISTS",
+    "albums": "ALBUMS",
+    "favorites": "FAVS",
+    "playlists": "PLISTS",
+    "config": "CONFIG",
+    "search": "SEARCH",
+    "queue": "QUEUE",
+    "crt": "CRT"
+  },
+  "player": {
+    "consoleTitle": "┌──[ QN-TUI AUDIO CONSOLE ]",
+    "paused": "[PAUSED]",
+    "speed": "SPEED",
+    "volume": "VOL",
+    "queue": "QUEUE",
+    "noTrack": "No track selected",
+    "unknownArtist": "Unknown Artist",
+    "unknownAlbum": "Unknown Album",
+    "asciiArt": "ASCII ART",
+    "shuffle": "SHUF",
+    "repeat": "REP",
+    "repeatOne": "REP 1"
+  },
+  "favorites": {
+    "title": "FAVORITES ARCHIVE",
+    "categoriesBadge": "{count} CATEGORIES",
+    "subtitle": "> Organize artists, albums, tracks and playlists with Drag & Drop (Hotkey: [F4] or [3])",
+    "createCategory": "[+ CREATE CATEGORY]",
+    "categoryName": "> CATEGORY NAME:",
+    "categoryPlaceholder": "E.g. Heavy Metal, Chillout...",
+    "dropHere": ">> DROP HERE TO MOVE <<",
+    "dragPrompt": "+-- [ DRAG AN ITEM FROM ANOTHER CATEGORY HERE ] --+",
+    "deleteConfirm": "Are you sure you want to delete the category \"{title}\" and its favorite items?",
+    "artistBadge": "ARTIST",
+    "albumBadge": "ALBUM",
+    "playlistBadge": "PLAYLIST",
+    "albumsCount": "[{count} ALBUMS]",
+    "tracksCount": "[{count} TRACKS]",
+    "dragToMove": "Drag to move to another category",
+    "removeFromFavorites": "Remove from favorites",
+    "playAlbum": "Play album",
+    "playPlaylist": "Play playlist"
+  },
+  "settings": {
+    "title": "SYSTEM CONFIGURATION",
+    "theme": "UI RETRO THEME",
+    "language": "INTERFACE LANGUAGE",
+    "musicDir": "MUSIC FOLDER PATH",
+    "defaultView": "DEFAULT STARTUP VIEW",
+    "stats": "LIBRARY METRICS",
+    "totalTracks": "Total Tracks",
+    "totalAlbums": "Total Albums",
+    "totalArtists": "Total Artists",
+    "saveSettings": "[SAVE CONFIGURATION]",
+    "rescanNow": "[RUN FULL SCAN NOW]",
+    "themeCyan": "Cyber Cyan (BBS)",
+    "themeGreen": "Phosphor CRT (VT220)",
+    "themeAmber": "Amber Phosphor (Hercules)",
+    "themeWin98": "Windows 98 Classic"
+  },
+  "artists": {
+    "title": "ARTISTS DIRECTORY",
+    "badge": "{count} ARTISTS",
+    "noArtists": "No artists indexed in library. Click [RESCAN LIBRARY] in the sidebar.",
+    "albums": "ALBUMS",
+    "tracks": "TRACKS",
+    "uploadImage": "[UPLOAD PHOTO]"
+  },
+  "albums": {
+    "title": "ALBUMS CATALOG",
+    "badge": "{count} ALBUMS",
+    "noAlbums": "No albums indexed in library. Click [RESCAN LIBRARY] in the sidebar.",
+    "playAlbum": "[PLAY ALBUM]",
+    "tracks": "TRACKS"
+  },
+  "playlists": {
+    "title": "PLAYLISTS ARCHIVE",
+    "badge": "{count} PLAYLISTS",
+    "createPlaylist": "[+ CREATE PLAYLIST]",
+    "namePlaceholder": "Playlist title...",
+    "noPlaylists": "No playlists created yet. Click [+ CREATE PLAYLIST] to create one."
+  },
+  "search": {
+    "title": "INSTANT SEARCH",
+    "prompt": "Type to search artists, albums, and tracks...",
+    "noResults": "No results found for \"{query}\"",
+    "artists": "ARTISTS",
+    "albums": "ALBUMS",
+    "tracks": "TRACKS"
+  },
+  "queue": {
+    "title": "PLAYBACK QUEUE",
+    "badge": "{count} TRACKS",
+    "empty": "Queue is currently empty.",
+    "clear": "[CLEAR QUEUE]"
+  },
+  "help": {
+    "title": "KEYBOARD SHORTCUTS REFERENCE",
+    "badge": "HELP [F1 / ?]",
+    "close": "[CLOSE - ESC]",
+    "globalKeys": "GLOBAL CONTROLS",
+    "navigation": "NAVIGATION",
+    "player": "AUDIO ENGINE"
+  }
+}

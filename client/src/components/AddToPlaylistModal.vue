@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { X, Plus, Check } from '@lucide/vue';
 import { fetchPlaylists, createPlaylist, addTracksToPlaylist } from '../api/client';
 import type { Track, Playlist } from '@quarter-note/shared';
 
@@ -59,31 +58,31 @@ onMounted(load);
 
 <template>
   <div class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 font-mono">
-    <div class="bg-black border-2 border-[#00ffff] w-full max-w-sm shadow-[0_0_20px_rgba(0,255,255,0.2)] overflow-hidden select-none">
+    <div class="bg-theme-panel border-2 border-theme-border w-full max-w-sm shadow-2xl overflow-hidden select-none">
       <!-- Header -->
-      <div class="px-4 py-2 border-b border-[#222222] bg-[#0a0a0a] flex items-center justify-between">
+      <div class="px-4 py-2 border-b border-theme-border-dim bg-theme-header-bg flex items-center justify-between">
         <div>
-          <h3 class="text-xs font-bold text-[#00ffff]">■ [ ADD TO PLAYLIST ]</h3>
-          <p class="text-[10px] text-[#888888] truncate max-w-[240px]">&gt; {{ track.title }}</p>
+          <h3 class="text-xs font-bold text-theme-header-fg">■ [ ADD TO PLAYLIST ]</h3>
+          <p class="text-[10px] text-theme-header-fg/80 truncate max-w-[240px]">&gt; {{ track.title }}</p>
         </div>
-        <button @click="emit('close')" class="bbs-btn py-0.5 px-1.5 text-xs border-[#333333]">
+        <button @click="emit('close')" class="bbs-btn py-0.5 px-1.5 text-xs border-theme-border-dim">
           [X]
         </button>
       </div>
 
       <!-- New playlist form -->
-      <div class="p-3 border-b border-[#222222] bg-[#060606]">
+      <div class="p-3 border-b border-theme-border-subtle bg-theme-surface">
         <form @submit.prevent="handleCreateAndAdd" class="flex items-center gap-2">
           <input
             v-model="newName"
             type="text"
             placeholder="New playlist name..."
-            class="flex-1 bg-black text-xs text-[#ffff00] px-2.5 py-1.5 border border-[#333333] focus:outline-none focus:border-[#00ffff]"
+            class="flex-1 bg-theme-bg text-xs text-theme-highlight px-2.5 py-1.5 border border-theme-border-dim focus:outline-none focus:border-theme-accent"
           />
           <button
             type="submit"
             :disabled="!newName.trim() || isCreating"
-            class="bbs-btn bbs-btn-yellow py-1.5 px-3 text-xs"
+            class="bbs-btn py-1.5 px-3 text-xs bg-theme-panel text-theme-accent hover:bg-theme-accent hover:text-theme-accent-contrast disabled:opacity-40"
           >
             [+ CREATE]
           </button>
@@ -91,8 +90,8 @@ onMounted(load);
       </div>
 
       <!-- Playlists list -->
-      <div class="max-h-60 overflow-y-auto p-2 space-y-1">
-        <div v-if="playlists.length === 0" class="text-center py-6 text-xs text-[#666666] italic">
+      <div class="max-h-60 overflow-y-auto p-2 space-y-1 bg-theme-surface">
+        <div v-if="playlists.length === 0" class="text-center py-6 text-xs text-theme-text-dim italic">
           No playlists created.
         </div>
 
@@ -100,13 +99,13 @@ onMounted(load);
           v-for="pl in playlists"
           :key="pl.id"
           @click="handleAddTo(pl.id)"
-          class="w-full flex items-center justify-between px-2.5 py-2 text-xs text-[#cccccc] border border-[#1a1a1a] hover:bg-[#002b4d] hover:border-[#00ffff] hover:text-[#ffff00] transition-colors group"
+          class="w-full flex items-center justify-between px-2.5 py-2 text-xs text-theme-text border border-theme-border-subtle hover:bg-theme-active-bg hover:border-theme-accent hover:text-white transition-colors group cursor-pointer"
         >
           <span class="truncate">&gt; {{ pl.name }}</span>
-          <span v-if="addedTo === pl.id" class="text-[#00ff66] font-bold">
+          <span v-if="addedTo === pl.id" class="text-theme-success font-bold">
             [✓ ADDED]
           </span>
-          <span v-else class="text-[10px] text-[#777777] group-hover:text-[#00ffff]">
+          <span v-else class="text-[10px] text-theme-text-dim group-hover:text-white/80">
             [{{ pl.trackCount }} tracks]
           </span>
         </button>

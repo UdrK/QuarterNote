@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Play, ListPlus, CornerDownRight, Plus, Heart } from '@lucide/vue';
 import { playerState, playerActions, formatTime } from '../stores/player';
 import { isFavorite, toggleFavorite } from '../stores/favorites';
 import AddToPlaylistModal from './AddToPlaylistModal.vue';
@@ -22,11 +21,11 @@ function play() {
 
 <template>
   <div
-    class="group flex items-center justify-between px-2 py-1 text-xs select-none transition-colors border-b border-[#141b24] font-mono cursor-pointer"
+    class="group flex items-center justify-between px-2 py-1 text-xs select-none transition-colors border-b border-theme-border-subtle font-mono cursor-pointer"
     :class="[
       playerState.currentTrack?.id === track.id
-        ? 'bg-[#00ffff] text-black font-extrabold border-[#00ffff]'
-        : 'text-[#cccccc] hover:bg-[#002238] hover:text-[#ffff00]'
+        ? 'bg-theme-accent text-theme-accent-contrast font-extrabold border-theme-accent'
+        : 'text-theme-text hover:bg-theme-active-bg hover:text-white'
     ]"
   >
     <!-- Left: Index / Play & Title -->
@@ -34,7 +33,7 @@ function play() {
       <!-- Index or Play cursor -->
       <span 
         class="w-7 text-center font-mono text-[10px] shrink-0"
-        :class="playerState.currentTrack?.id === track.id ? 'text-black font-extrabold' : 'text-[#556677] group-hover:text-[#00ff66]'"
+        :class="playerState.currentTrack?.id === track.id ? 'text-theme-accent-contrast font-extrabold' : 'text-theme-text-dim group-hover:text-white'"
       >
         <span v-if="playerState.currentTrack?.id === track.id">►►</span>
         <template v-else>
@@ -45,12 +44,12 @@ function play() {
 
       <!-- Title & Artist -->
       <div class="min-w-0 flex-1 flex items-baseline gap-2">
-        <p class="font-bold truncate" :class="playerState.currentTrack?.id === track.id ? 'text-black' : 'group-hover:text-[#ffffff]'">
+        <p class="font-bold truncate" :class="playerState.currentTrack?.id === track.id ? 'text-theme-accent-contrast' : 'text-theme-text group-hover:text-white'">
           {{ track.title }}
         </p>
         <p 
           class="text-[10px] truncate shrink-0"
-          :class="playerState.currentTrack?.id === track.id ? 'text-black/80' : 'text-[#00ffff] opacity-75'"
+          :class="playerState.currentTrack?.id === track.id ? 'text-theme-accent-contrast/80' : 'text-theme-accent group-hover:text-white/80 opacity-85'"
         >
           {{ track.artistName }}
         </p>
@@ -60,7 +59,7 @@ function play() {
       <div 
         v-if="showAlbum" 
         class="hidden md:block w-1/4 min-w-0 truncate text-[10px]"
-        :class="playerState.currentTrack?.id === track.id ? 'text-black/80' : 'text-[#667788]'"
+        :class="playerState.currentTrack?.id === track.id ? 'text-theme-accent-contrast/80' : 'text-theme-text-dim group-hover:text-white/70'"
       >
         [{{ track.albumTitle }}]
       </div>
@@ -72,24 +71,30 @@ function play() {
       <div class="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity">
         <button
           @click.stop="playerActions.playNext(track)"
-          class="px-1 text-[10px] font-bold border transition-colors"
-          :class="playerState.currentTrack?.id === track.id ? 'bg-black text-[#00ffff] border-black' : 'bg-[#0d1622] text-[#00ffff] border-[#224466] hover:bg-[#00ffff] hover:text-black'"
+          class="px-1 text-[10px] font-bold border transition-colors cursor-pointer"
+          :class="playerState.currentTrack?.id === track.id 
+            ? 'bg-theme-bg text-theme-accent border-theme-bg hover:bg-theme-accent hover:text-theme-accent-contrast' 
+            : 'bg-theme-panel text-theme-accent border-theme-border-dim hover:bg-theme-accent hover:text-theme-accent-contrast'"
           title="Play next (↳)"
         >
           [↳]
         </button>
         <button
           @click.stop="playerActions.addToQueue(track)"
-          class="px-1 text-[10px] font-bold border transition-colors"
-          :class="playerState.currentTrack?.id === track.id ? 'bg-black text-[#00ffff] border-black' : 'bg-[#0d1622] text-[#00ffff] border-[#224466] hover:bg-[#00ffff] hover:text-black'"
+          class="px-1 text-[10px] font-bold border transition-colors cursor-pointer"
+          :class="playerState.currentTrack?.id === track.id 
+            ? 'bg-theme-bg text-theme-accent border-theme-bg hover:bg-theme-accent hover:text-theme-accent-contrast' 
+            : 'bg-theme-panel text-theme-accent border-theme-border-dim hover:bg-theme-accent hover:text-theme-accent-contrast'"
           title="Add to queue (+QUEUE)"
         >
           [+C]
         </button>
         <button
           @click.stop="showPlaylistModal = true"
-          class="px-1 text-[10px] font-bold border transition-colors"
-          :class="playerState.currentTrack?.id === track.id ? 'bg-black text-[#00ffff] border-black' : 'bg-[#0d1622] text-[#00ffff] border-[#224466] hover:bg-[#00ffff] hover:text-black'"
+          class="px-1 text-[10px] font-bold border transition-colors cursor-pointer"
+          :class="playerState.currentTrack?.id === track.id 
+            ? 'bg-theme-bg text-theme-accent border-theme-bg hover:bg-theme-accent hover:text-theme-accent-contrast' 
+            : 'bg-theme-panel text-theme-accent border-theme-border-dim hover:bg-theme-accent hover:text-theme-accent-contrast'"
           title="Add to playlist (+LIST)"
         >
           [+L]
@@ -99,11 +104,11 @@ function play() {
       <!-- Favorite button -->
       <button
         @click.stop="toggleFavorite('track', track.id)"
-        class="px-0.5 text-[11px] font-bold transition-all"
+        class="px-0.5 text-[11px] font-bold transition-all cursor-pointer"
         :class="[
           isFavorite('track', track.id)
-            ? (playerState.currentTrack?.id === track.id ? 'text-black' : 'text-[#ff3366]')
-            : 'text-[#445566] hover:text-[#ff3366] opacity-40 group-hover:opacity-100'
+            ? (playerState.currentTrack?.id === track.id ? 'text-theme-accent-contrast' : 'text-theme-danger')
+            : (playerState.currentTrack?.id === track.id ? 'text-theme-accent-contrast/60' : 'text-theme-text-dim hover:text-theme-danger opacity-40 group-hover:opacity-100 group-hover:text-white/70')
         ]"
         :title="isFavorite('track', track.id) ? 'Remove from favorites' : 'Add to favorites'"
       >
@@ -113,7 +118,7 @@ function play() {
       <!-- Duration -->
       <span 
         class="w-11 text-right font-mono text-[10px] tabular-nums"
-        :class="playerState.currentTrack?.id === track.id ? 'text-black' : 'text-[#778899]'"
+        :class="playerState.currentTrack?.id === track.id ? 'text-theme-accent-contrast' : 'text-theme-text-dim group-hover:text-white/80'"
       >
         {{ formatTime(track.duration) }}
       </span>

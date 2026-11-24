@@ -47,45 +47,45 @@ function playShuffled() {
   <TuiWindow 
     :title="album ? `ALBUM: ${album.title}` : 'LOADING...'" 
     :badge="album ? `${tracks.length} TRACKS / ${formatTime(album.duration)}` : ''"
-    variant="yellow"
+    variant="default"
   >
     <div class="space-y-4 font-mono select-none">
       <!-- Breadcrumb -->
-      <div class="flex items-center gap-2 text-xs border-b border-[#2a2a00] pb-2">
+      <div class="flex items-center gap-2 text-xs border-b border-theme-border-subtle pb-2">
         <button
           @click="router.back()"
-          class="bg-[#1a1700] hover:bg-[#ffff00] hover:text-black text-[#ffff00] border border-[#555500] px-2 py-0.5 text-xs font-bold transition-colors cursor-pointer"
+          class="bg-theme-panel hover:bg-theme-accent hover:text-theme-accent-contrast text-theme-accent border border-theme-border-dim px-2 py-0.5 text-xs font-bold transition-colors cursor-pointer"
         >
           <span>[&lt; BACK]</span>
         </button>
-        <span class="text-[#666600]">&gt; CATALOG &gt; ALBUMS &gt;</span>
-        <span class="text-[#ffff00] font-bold" v-if="album">[{{ album.title }}]</span>
+        <span class="text-theme-text-dim">&gt; CATALOG &gt; ALBUMS &gt;</span>
+        <span class="text-theme-accent font-bold" v-if="album">[{{ album.title }}]</span>
       </div>
 
       <!-- Album Hero Card in Curses Box -->
-      <div v-if="album" class="border border-[#444400] bg-[#090800] p-3 flex flex-col sm:flex-row items-center sm:items-start gap-4">
-        <div class="w-32 h-32 sm:w-36 sm:h-36 bg-black border-2 border-[#ffff00] overflow-hidden shrink-0">
+      <div v-if="album" class="border border-theme-border-dim bg-theme-panel p-3 flex flex-col sm:flex-row items-center sm:items-start gap-4">
+        <div class="w-32 h-32 sm:w-36 sm:h-36 bg-black border-2 border-theme-border overflow-hidden shrink-0">
           <img :src="album.coverUrl" :alt="album.title" class="w-full h-full object-cover" />
         </div>
 
         <div class="space-y-1.5 min-w-0 flex-1 text-center sm:text-left">
-          <div class="text-[10px] text-[#ffff00] font-bold">
+          <div class="text-[10px] text-theme-accent font-bold">
             ┌──[ ALBUM DETAILS ]
           </div>
-          <h1 class="text-xl sm:text-2xl font-bold text-[#ffff00] truncate">
+          <h1 class="text-xl sm:text-2xl font-bold text-theme-text-bright truncate">
             {{ album.title }}
           </h1>
           <p 
             @click="router.push(`/artists/${album.artistId}`)" 
-            class="text-xs font-bold text-[#00ffff] hover:underline cursor-pointer"
+            class="text-xs font-bold text-theme-accent hover:underline cursor-pointer"
           >
             &gt; ARTIST: {{ album.artistName }}
           </p>
 
-          <div class="text-[11px] text-[#888800] space-x-2 pt-0.5">
-            <span>YEAR: <span class="text-[#ffff00] font-bold">{{ album.year || 'N/A' }}</span></span>
+          <div class="text-[11px] text-theme-text-dim space-x-2 pt-0.5">
+            <span>YEAR: <span class="text-theme-text font-bold">{{ album.year || 'N/A' }}</span></span>
             <span>|</span>
-            <span>TRACKS: <span class="text-[#00ff66] font-bold">{{ tracks.length }}</span></span>
+            <span>TRACKS: <span class="text-theme-success font-bold">{{ tracks.length }}</span></span>
             <span>|</span>
             <span>DURATION: {{ formatTime(album.duration) }}</span>
           </div>
@@ -94,20 +94,20 @@ function playShuffled() {
           <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1.5">
             <button
               @click="playAll"
-              class="bg-[#00ff66] hover:bg-[#55ff99] text-black font-extrabold px-3 py-1 text-xs border border-[#00ff66] transition-colors cursor-pointer"
+              class="bg-theme-success hover:opacity-90 text-white font-extrabold px-3 py-1 text-xs border border-theme-success transition-colors cursor-pointer"
             >
               <span>[ ▶ PLAY ALL ]</span>
             </button>
             <button
               @click="playShuffled"
-              class="bg-[#1a1700] hover:bg-[#ffff00] hover:text-black text-[#ffff00] border border-[#555500] px-3 py-1 text-xs font-bold transition-colors cursor-pointer"
+              class="bg-theme-panel hover:bg-theme-accent hover:text-theme-accent-contrast text-theme-accent border border-theme-border-dim px-3 py-1 text-xs font-bold transition-colors cursor-pointer"
             >
               <span>[ ⇄ SHUFFLE ]</span>
             </button>
             <button
               @click="toggleFavorite('album', album.id)"
               class="px-3 py-1 text-xs font-bold border transition-colors cursor-pointer"
-              :class="isFavorite('album', album.id) ? 'bg-[#ff3366] text-black border-[#ff3366]' : 'bg-[#1a1700] text-[#aaaaaa] border-[#555500] hover:border-[#ffff00] hover:text-[#ffff00]'"
+              :class="isFavorite('album', album.id) ? 'bg-theme-danger text-white border-theme-danger' : 'bg-theme-panel text-theme-text-dim border-theme-border-dim hover:border-theme-accent hover:text-theme-accent'"
             >
               <span>{{ isFavorite('album', album.id) ? '[★ IN FAVORITES]' : '[☆ ADD FAVORITE]' }}</span>
             </button>
@@ -117,11 +117,11 @@ function playShuffled() {
 
       <!-- Tracks List Table in Curses box -->
       <div class="space-y-2">
-        <div class="border-b border-[#2a2a00] pb-1 flex items-center justify-between text-xs font-bold text-[#00ff66]">
+        <div class="border-b border-theme-border-subtle pb-1 flex items-center justify-between text-xs font-bold text-theme-accent">
           <span>┌──[ TRACKLIST ]───────────────────────────────────</span>
-          <span class="text-[#ffff00]">({{ tracks.length }} TRACKS)─┐</span>
+          <span class="text-theme-highlight">({{ tracks.length }} TRACKS)─┐</span>
         </div>
-        <div class="border border-[#333300] bg-[#090800]">
+        <div class="border border-theme-border-dim bg-theme-surface">
           <TrackRow
             v-for="(track, idx) in tracks"
             :key="track.id"

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { RefreshCw } from '@lucide/vue';
 import { triggerScan, fetchScanStatus } from '../api/client';
 import type { ScanStatus } from '@quarter-note/shared';
+import { t } from '../i18n';
 
 const route = useRoute();
-const router = useRouter();
 
 const scanStatus = ref<ScanStatus>({
   isScanning: false,
@@ -50,36 +50,36 @@ onUnmounted(() => {
   if (pollTimer) clearInterval(pollTimer);
 });
 
-const navLinks = [
-  { id: '1', key: 'F2', name: 'ARTISTS', path: '/artists' },
-  { id: '2', key: 'F3', name: 'ALBUMS', path: '/albums' },
-  { id: '3', key: 'F4', name: 'FAVORITES', path: '/favorites' },
-  { id: '4', key: 'F5', name: 'PLAYLISTS', path: '/playlists' },
-  { id: '5', key: 'F6', name: 'CONFIG', path: '/settings' },
-];
+const navLinks = computed(() => [
+  { id: '1', key: 'F2', nameKey: 'nav.artists', path: '/artists' },
+  { id: '2', key: 'F3', nameKey: 'nav.albums', path: '/albums' },
+  { id: '3', key: 'F4', nameKey: 'nav.favorites', path: '/favorites' },
+  { id: '4', key: 'F5', nameKey: 'nav.playlists', path: '/playlists' },
+  { id: '5', key: 'F6', nameKey: 'nav.config', path: '/settings' },
+]);
 </script>
 
 <template>
-  <aside class="w-60 bg-black border-r border-[#00ffff]/40 flex flex-col justify-between shrink-0 select-none font-mono text-xs">
+  <aside class="w-60 bg-theme-bg border-r border-theme-border/40 flex flex-col justify-between shrink-0 select-none font-mono text-xs">
     <!-- Top System Banner & Menu -->
     <div class="p-2 space-y-2">
       <!-- Curses Window Header Box -->
-      <div class="border border-[#00ffff] bg-[#001726] p-2">
-        <div class="text-[10px] text-[#00ff66] font-bold flex items-center justify-between">
-          <span>● QN-TUI BBS</span>
-          <span class="text-[#ffff00]">v2.0</span>
+      <div class="border border-theme-border bg-theme-panel p-2">
+        <div class="text-[10px] text-theme-success font-bold flex items-center justify-between">
+          <span>{{ t('nav.scanStatus') }}</span>
+          <span class="text-theme-highlight">v2.0</span>
         </div>
-        <div class="text-xs text-[#00ffff] font-extrabold mt-0.5 tracking-tight">
-          ╔═[ CURSES AUDIO ]═╗
+        <div class="text-xs text-theme-accent font-extrabold mt-0.5 tracking-tight">
+          {{ t('nav.audioHeader') }}
         </div>
-        <div class="text-[9px] text-[#6688aa] mt-0.5">
-          TERM: ANSI 80x25
+        <div class="text-[9px] text-theme-text-dim mt-0.5">
+          {{ t('nav.term') }}
         </div>
       </div>
 
       <!-- Navigation Section Header -->
-      <div class="px-1 text-[10px] text-[#446688] font-bold flex items-center justify-between border-b border-[#1f2937] pb-0.5">
-        <span>┌──[ NAVIGATION ]──┐</span>
+      <div class="px-1 text-[10px] text-theme-text-dim font-bold flex items-center justify-between border-b border-theme-border-subtle pb-0.5">
+        <span>{{ t('nav.navHeader') }}</span>
       </div>
 
       <!-- Nav Links with Inverted Video Selection -->
@@ -88,22 +88,22 @@ const navLinks = [
           v-for="item in navLinks"
           :key="item.path"
           :to="item.path"
-          class="flex items-center justify-between px-2 py-1 text-xs font-bold transition-all cursor-pointer border"
+          class="flex items-center justify-between px-2 py-1 text-xs font-bold transition-all cursor-pointer border group"
           :class="[
             route.path.startsWith(item.path)
-              ? 'bg-[#00ffff] text-black border-[#00ffff]'
-              : 'text-[#aaaaaa] border-transparent hover:bg-[#002b4d] hover:text-[#ffff00] hover:border-[#00ffff]/50'
+              ? 'bg-theme-accent text-theme-accent-contrast border-theme-accent'
+              : 'text-theme-text border-transparent hover:bg-theme-active-bg hover:text-white hover:border-theme-border/50'
           ]"
         >
           <div class="flex items-center gap-1.5 truncate">
-            <span v-if="route.path.startsWith(item.path)" class="text-black font-extrabold">►</span>
-            <span v-else class="text-[#446688]"> </span>
-            <span class="truncate">{{ item.id }}. [{{ item.name }}]</span>
+            <span v-if="route.path.startsWith(item.path)" class="text-theme-accent-contrast font-extrabold">►</span>
+            <span v-else class="text-theme-border-dim group-hover:text-white"> </span>
+            <span class="truncate">{{ item.id }}. [{{ t(item.nameKey) }}]</span>
           </div>
 
           <span 
             class="text-[9px] px-1 font-bold shrink-0 ml-1"
-            :class="route.path.startsWith(item.path) ? 'bg-black text-[#00ffff]' : 'bg-[#1a2936] text-[#6688aa]'"
+            :class="route.path.startsWith(item.path) ? 'bg-theme-bg text-theme-accent' : 'bg-theme-card text-theme-text-dim group-hover:text-white group-hover:bg-theme-panel'"
           >
             {{ item.key }}
           </span>
@@ -112,44 +112,44 @@ const navLinks = [
     </div>
 
     <!-- Scanner / Bottom Curses Box -->
-    <div class="p-2 border-t border-[#1f2937] bg-[#05080c] space-y-2">
-      <div class="border border-[#223d54] p-2 bg-black">
-        <div class="flex items-center justify-between text-[10px] font-bold text-[#888888] pb-1 border-b border-[#172533]">
-          <span class="text-[#00ffff]">┌─[ SCANNER ]</span>
-          <span class="text-[#00ff66]" v-if="scanStatus.isScanning">[ACTIVE]─┐</span>
-          <span class="text-[#6688aa]" v-else>[IDLE]─┐</span>
+    <div class="p-2 border-t border-theme-border-subtle bg-theme-panel space-y-2">
+      <div class="border border-theme-border-dim p-2 bg-theme-bg">
+        <div class="flex items-center justify-between text-[10px] font-bold text-theme-text-dim pb-1 border-b border-theme-border-subtle">
+          <span class="text-theme-accent">┌─[ SCANNER ]</span>
+          <span class="text-theme-success" v-if="scanStatus.isScanning">[ACTIVE]─┐</span>
+          <span class="text-theme-text-dim" v-else>[IDLE]─┐</span>
         </div>
 
         <div v-if="scanStatus.isScanning" class="space-y-1 mt-1.5">
-          <div class="flex items-center justify-between text-[10px] text-[#aaaaaa]">
+          <div class="flex items-center justify-between text-[10px] text-theme-text">
             <span>Scanned:</span>
-            <span class="text-[#ffff00] font-bold">{{ scanStatus.scannedFiles }}/{{ scanStatus.totalFiles }}</span>
+            <span class="text-theme-highlight font-bold">{{ scanStatus.scannedFiles }}/{{ scanStatus.totalFiles }}</span>
           </div>
           <!-- ASCII Progress Bar -->
-          <div class="w-full bg-[#111] border border-[#333] h-2">
+          <div class="w-full bg-theme-card border border-theme-border-dim h-2">
             <div 
-              class="bg-[#00ff66] h-full transition-all duration-200"
+              class="bg-theme-success h-full transition-all duration-200"
               :style="{ width: `${scanStatus.totalFiles ? (scanStatus.scannedFiles / scanStatus.totalFiles) * 100 : 0}%` }"
             />
           </div>
-          <p v-if="scanStatus.currentFile" class="text-[9px] text-[#556677] truncate" :title="scanStatus.currentFile">
+          <p v-if="scanStatus.currentFile" class="text-[9px] text-theme-text-dim truncate" :title="scanStatus.currentFile">
             &gt; {{ scanStatus.currentFile }}
           </p>
         </div>
 
-        <div v-else class="text-[9px] text-[#556677] mt-1 flex items-center justify-between">
+        <div v-else class="text-[9px] text-theme-text-dim mt-1 flex items-center justify-between">
           <span>Status: READY</span>
-          <span class="text-[#00ff66]">● OK</span>
+          <span class="text-theme-success">● OK</span>
         </div>
       </div>
 
       <button
         @click="handleScan"
         :disabled="scanStatus.isScanning"
-        class="w-full bg-[#0a1622] hover:bg-[#00ffff] hover:text-black text-[#00ffff] border border-[#00ffff]/40 py-1 text-[11px] font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+        class="w-full bg-theme-card hover:bg-theme-accent hover:text-theme-accent-contrast text-theme-accent border border-theme-border/40 py-1 text-[11px] font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5"
       >
         <RefreshCw class="w-3 h-3" :class="{ 'animate-spin': scanStatus.isScanning }" />
-        <span>{{ scanStatus.isScanning ? '[ SCANNING... ]' : '[ RESCAN LIBRARY ]' }}</span>
+        <span>{{ scanStatus.isScanning ? t('nav.scanning') : t('nav.rescan') }}</span>
       </button>
     </div>
   </aside>

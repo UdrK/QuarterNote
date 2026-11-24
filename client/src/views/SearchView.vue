@@ -6,6 +6,7 @@ import { searchLibrary } from '../api/client';
 import TrackRow from '../components/TrackRow.vue';
 import TuiWindow from '../components/TuiWindow.vue';
 import type { SearchResponse } from '@quarter-note/shared';
+import { t } from '../i18n';
 
 const route = useRoute();
 const router = useRouter();
@@ -45,44 +46,44 @@ const totalResults = computed(() =>
 
 <template>
   <TuiWindow 
-    title="SEARCH RESULTS" 
+    :title="t('search.title')" 
     :badge="`${totalResults} MATCHES`" 
-    variant="cyan"
+    variant="default"
   >
     <div class="space-y-4 font-mono select-none">
       <!-- Search Summary -->
-      <div class="border-b border-[#1c2936] pb-2 text-xs">
-        <span class="text-[#6688aa]">&gt; Search query: </span>
-        <span class="text-[#ffff00] font-bold">"{{ query }}"</span>
+      <div class="border-b border-theme-border-subtle pb-2 text-xs">
+        <span class="text-theme-text-dim">&gt; Search query: </span>
+        <span class="text-theme-highlight font-bold">"{{ query }}"</span>
       </div>
 
       <!-- Empty Results -->
-      <div v-if="!isLoading && totalResults === 0 && query" class="border border-dashed border-[#223d54] p-10 text-center text-[#556677]">
-        <Search class="w-8 h-8 mx-auto mb-2 opacity-30 text-[#00ffff]" />
-        <p class="text-xs">&gt;&gt; NO RESULTS FOUND FOR "{{ query }}" &lt;&lt;</p>
+      <div v-if="!isLoading && totalResults === 0 && query" class="border border-dashed border-theme-border-dim p-10 text-center text-theme-text-dim">
+        <Search class="w-8 h-8 mx-auto mb-2 opacity-30 text-theme-accent" />
+        <p class="text-xs">&gt;&gt; {{ t('search.noResults', { query }) }} &lt;&lt;</p>
       </div>
 
       <!-- Artists Results -->
       <div v-if="results.artists.length > 0" class="space-y-2">
-        <div class="border-b border-[#1c2936] pb-1 flex items-center justify-between text-xs font-bold text-[#00ffff]">
-          <span>┌──[ MATCHING ARTISTS ]────────────────────</span>
-          <span class="text-[#ffff00]">({{ results.artists.length }})─┐</span>
+        <div class="border-b border-theme-border-subtle pb-1 flex items-center justify-between text-xs font-bold text-theme-accent">
+          <span>┌──[ {{ t('search.artists') }} ]────────────────────</span>
+          <span class="text-theme-highlight">({{ results.artists.length }})─┐</span>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2">
           <div
             v-for="artist in results.artists"
             :key="artist.id"
             @click="router.push(`/artists/${artist.id}`)"
-            class="flex items-center gap-2 p-1.5 bg-[#050a12] border border-[#1a2b3c] hover:border-[#00ffff] hover:bg-[#001f33] cursor-pointer group transition-colors"
+            class="flex items-center gap-2 p-1.5 bg-theme-panel border border-theme-border-dim hover:border-theme-accent hover:bg-theme-card cursor-pointer group transition-colors"
           >
-            <div class="w-8 h-8 bg-black border border-[#223d54] shrink-0 overflow-hidden">
+            <div class="w-8 h-8 bg-theme-bg border border-theme-border-dim shrink-0 overflow-hidden">
               <img :src="`/api/artists/${artist.id}/image`" :alt="artist.name" class="w-full h-full object-cover" />
             </div>
             <div class="min-w-0 flex-1">
-              <p class="text-xs font-bold text-[#d4d4d4] truncate group-hover:text-[#ffff00] transition-colors">
+              <p class="text-xs font-bold text-theme-text truncate group-hover:text-theme-highlight transition-colors">
                 {{ artist.name }}
               </p>
-              <p class="text-[9px] text-[#6688aa]">[{{ artist.albumCount }} ALBUMS]</p>
+              <p class="text-[9px] text-theme-text-dim">{{ t('favorites.albumsCount', { count: artist.albumCount }) }}</p>
             </div>
           </div>
         </div>
@@ -90,35 +91,35 @@ const totalResults = computed(() =>
 
       <!-- Albums Results -->
       <div v-if="results.albums.length > 0" class="space-y-2">
-        <div class="border-b border-[#1c2936] pb-1 flex items-center justify-between text-xs font-bold text-[#ffff00]">
-          <span>┌──[ MATCHING ALBUMS ]──────────────────────</span>
-          <span class="text-[#ffff00]">({{ results.albums.length }})─┐</span>
+        <div class="border-b border-theme-border-subtle pb-1 flex items-center justify-between text-xs font-bold text-theme-highlight">
+          <span>┌──[ {{ t('search.albums') }} ]──────────────────────</span>
+          <span class="text-theme-highlight">({{ results.albums.length }})─┐</span>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2">
           <div
             v-for="album in results.albums"
             :key="album.id"
             @click="router.push(`/albums/${album.id}`)"
-            class="p-1.5 bg-[#050a12] border border-[#1a2b3c] hover:border-[#ffff00] hover:bg-[#1a1700] cursor-pointer group transition-colors"
+            class="p-1.5 bg-theme-panel border border-theme-border-dim hover:border-theme-highlight hover:bg-theme-card cursor-pointer group transition-colors"
           >
-            <div class="aspect-square bg-black border border-[#223d54] mb-1 overflow-hidden">
+            <div class="aspect-square bg-theme-bg border border-theme-border-dim mb-1 overflow-hidden">
               <img :src="album.coverUrl" :alt="album.title" class="w-full h-full object-cover" />
             </div>
-            <p class="text-xs font-bold text-[#d4d4d4] truncate group-hover:text-[#ffff00] transition-colors">
+            <p class="text-xs font-bold text-theme-text truncate group-hover:text-theme-highlight transition-colors">
               {{ album.title }}
             </p>
-            <p class="text-[9px] text-[#00ffff] truncate opacity-80">&gt; {{ album.artistName }}</p>
+            <p class="text-[9px] text-theme-accent truncate opacity-80">&gt; {{ album.artistName }}</p>
           </div>
         </div>
       </div>
 
       <!-- Tracks Results -->
       <div v-if="results.tracks.length > 0" class="space-y-2">
-        <div class="border-b border-[#1c2936] pb-1 flex items-center justify-between text-xs font-bold text-[#00ff66]">
-          <span>┌──[ MATCHING TRACKS ]─────────────────────</span>
-          <span class="text-[#ffff00]">({{ results.tracks.length }})─┐</span>
+        <div class="border-b border-theme-border-subtle pb-1 flex items-center justify-between text-xs font-bold text-theme-success">
+          <span>┌──[ {{ t('search.tracks') }} ]─────────────────────</span>
+          <span class="text-theme-highlight">({{ results.tracks.length }})─┐</span>
         </div>
-        <div class="border border-[#1a2b3c] bg-[#050a12]">
+        <div class="border border-theme-border-dim bg-theme-panel">
           <TrackRow
             v-for="(track, idx) in results.tracks"
             :key="track.id"

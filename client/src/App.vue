@@ -105,7 +105,7 @@ function handleGlobalKeydown(e: KeyboardEvent) {
 
 <template>
   <div 
-    class="flex flex-col h-screen w-screen overflow-hidden bg-black text-[#d4d4d4] font-mono relative"
+    class="flex flex-col h-screen w-screen overflow-hidden bg-theme-bg text-theme-text font-mono relative"
     :class="{ 'crt-scanlines': crtMode }"
   >
     <!-- Top Navigation & Search Header -->
@@ -122,8 +122,8 @@ function handleGlobalKeydown(e: KeyboardEvent) {
       <Sidebar />
 
       <!-- Center Content Area -->
-      <div class="flex-1 flex overflow-hidden bg-black">
-        <main class="flex-1 overflow-y-auto bg-black p-3.5">
+      <div class="flex-1 flex overflow-hidden bg-theme-bg">
+        <main class="flex-1 overflow-y-auto bg-theme-bg p-3.5">
           <RouterView />
         </main>
 

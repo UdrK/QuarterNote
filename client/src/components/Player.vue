@@ -1,22 +1,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { 
-  Play, 
-  Pause, 
-  SkipBack, 
-  SkipForward, 
-  Shuffle, 
-  Repeat, 
-  Repeat1, 
-  Volume2, 
-  ListMusic, 
-  Disc3,
-  Heart
-} from '@lucide/vue';
+import { Disc3 } from '@lucide/vue';
 import { playerState, playerActions, formatTime } from '../stores/player';
 import { isFavorite, toggleFavorite } from '../stores/favorites';
 import type { PlaybackRate } from '@quarter-note/shared';
+import { t } from '../i18n';
 
 const router = useRouter();
 const isSpeedMenuOpen = ref(false);
@@ -83,25 +72,25 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <footer class="bg-black border-t-2 border-[#00ffff] px-3 py-1.5 shrink-0 select-none z-30 font-mono text-xs">
+  <footer class="bg-theme-bg border-t-2 border-theme-border px-3 py-1.5 shrink-0 select-none z-30 font-mono text-xs">
     <!-- Curses Console Top Header -->
-    <div class="flex items-center justify-between text-[10px] text-[#446688] pb-1 border-b border-[#172533] mb-1.5">
+    <div class="flex items-center justify-between text-[10px] text-theme-text-dim pb-1 border-b border-theme-border-subtle mb-1.5">
       <div class="flex items-center gap-2">
-        <span class="text-[#00ffff] font-extrabold">┌──[ QN-TUI AUDIO CONSOLE ]</span>
-        <span v-if="playerState.isPlaying" class="text-[#00ff66] font-bold">
+        <span class="text-theme-accent font-extrabold">{{ t('player.consoleTitle') }}</span>
+        <span v-if="playerState.isPlaying" class="text-theme-success font-bold">
           [EQ: {{ eqBars[eqFrame] }}]
         </span>
-        <span v-else class="text-[#666666]">[PAUSED]</span>
+        <span v-else class="text-theme-text-dim">{{ t('player.paused') }}</span>
       </div>
 
       <div class="flex items-center gap-2">
         <button 
           @click="showAsciiArt = !showAsciiArt" 
-          class="text-[9px] px-1 bg-[#0f1f2d] hover:bg-[#00ffff] hover:text-black text-[#00ffff] border border-[#224466] transition-colors cursor-pointer"
+          class="text-[9px] px-1 bg-theme-panel hover:bg-theme-accent hover:text-theme-accent-contrast text-theme-accent border border-theme-border-dim transition-colors cursor-pointer"
         >
           [{{ showAsciiArt ? 'COVER: PHOTO' : 'COVER: ASCII' }}]
         </button>
-        <span class="text-[#446688]">──┐</span>
+        <span class="text-theme-text-dim">──┐</span>
       </div>
     </div>
 
@@ -112,10 +101,10 @@ onUnmounted(() => {
         <!-- Cover Art or ASCII Cassette -->
         <div 
           @click="navigateToAlbum"
-          class="w-12 h-12 bg-black border border-[#00ffff] shrink-0 overflow-hidden cursor-pointer relative"
+          class="w-12 h-12 bg-theme-card border border-theme-border shrink-0 overflow-hidden cursor-pointer relative"
         >
           <!-- ASCII Cassette Mode -->
-          <div v-if="showAsciiArt" class="w-full h-full flex flex-col items-center justify-center text-[7px] text-[#00ff66] font-bold leading-none bg-[#02111a]">
+          <div v-if="showAsciiArt" class="w-full h-full flex flex-col items-center justify-center text-[7px] text-theme-success font-bold leading-none bg-theme-panel">
             <span>.-----.</span>
             <span>|{{ playerState.isPlaying && (eqFrame % 2 === 0) ? '(o) (o)' : '(O) (O)' }}|</span>
             <span>`====='</span>
@@ -128,21 +117,21 @@ onUnmounted(() => {
             :alt="playerState.currentTrack.title"
             class="w-full h-full object-cover"
           />
-          <div v-else class="w-full h-full flex items-center justify-center text-[#555555]">
+          <div v-else class="w-full h-full flex items-center justify-center text-theme-text-dim">
             <Disc3 class="w-6 h-6" />
           </div>
         </div>
 
         <div v-if="playerState.currentTrack" class="min-w-0 pr-1 flex-1">
           <div class="flex items-center gap-1">
-            <span class="text-[#00ff66] text-[10px]">{{ playerState.isPlaying ? '▶' : '❚❚' }}</span>
-            <p class="text-xs font-bold text-[#ffff00] truncate" :title="playerState.currentTrack.title">
+            <span class="text-theme-success text-[10px]">{{ playerState.isPlaying ? '▶' : '❚❚' }}</span>
+            <p class="text-xs font-bold text-theme-highlight truncate" :title="playerState.currentTrack.title">
               {{ playerState.currentTrack.title }}
             </p>
           </div>
           <p 
             @click="navigateToAlbum"
-            class="text-[10px] text-[#00ffff] truncate hover:underline cursor-pointer"
+            class="text-[10px] text-theme-accent truncate hover:underline cursor-pointer"
             :title="playerState.currentTrack.artistName"
           >
             &gt; {{ playerState.currentTrack.artistName }}
@@ -154,35 +143,34 @@ onUnmounted(() => {
           v-if="playerState.currentTrack"
           type="button"
           @click="toggleFavorite('track', playerState.currentTrack.id)"
-          class="px-1 text-xs border border-[#223d54] hover:border-[#ff3366] shrink-0 transition-colors cursor-pointer"
-          :class="isFavorite('track', playerState.currentTrack.id) ? 'bg-[#330011] text-[#ff3366] border-[#ff3366]' : 'text-[#666666]'"
-          :title="isFavorite('track', playerState.currentTrack.id) ? 'Remove from favorites' : 'Add to favorites'"
+          class="px-1 text-xs border border-theme-border-dim hover:border-theme-danger shrink-0 transition-colors cursor-pointer"
+          :class="isFavorite('track', playerState.currentTrack.id) ? 'bg-theme-panel text-theme-danger border-theme-danger' : 'text-theme-text-dim'"
+          :title="isFavorite('track', playerState.currentTrack.id) ? t('favorites.removeFromFavorites') : 'Add to favorites'"
         >
           <span>{{ isFavorite('track', playerState.currentTrack.id) ? '[★]' : '[☆]' }}</span>
         </button>
         <div v-else class="min-w-0">
-          <p class="text-[10px] text-[#556677]">&gt; NO TRACK PLAYING</p>
+          <p class="text-[10px] text-theme-text-dim">&gt; {{ t('player.noTrack').toUpperCase() }}</p>
         </div>
       </div>
 
-      <!-- CENTER: Controls & Dual Scrubber (ASCII + interactive bar) -->
+      <!-- CENTER: Controls & Dual Scrubber -->
       <div class="flex flex-col items-center gap-1 w-2/4 max-w-xl">
-        <!-- Buttons row in true TUI style -->
         <div class="flex items-center gap-1.5 text-xs">
           <!-- Shuffle -->
           <button
             @click="playerActions.toggleShuffle()"
             class="px-1.5 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer"
-            :class="playerState.shuffle ? 'bg-[#ffff00] text-black border-[#ffff00]' : 'text-[#888888] border-[#223d54] hover:border-[#00ffff]'"
+            :class="playerState.shuffle ? 'bg-theme-highlight text-black border-theme-highlight' : 'text-theme-text-dim border-theme-border-dim hover:border-theme-accent'"
             title="Shuffle playback"
           >
-            <span>[⇄ SHUF]</span>
+            <span>[⇄ {{ t('player.shuffle') }}]</span>
           </button>
 
           <!-- Previous -->
           <button
             @click="playerActions.prev()"
-            class="px-2 py-0.5 text-[11px] font-bold bg-[#0d1622] hover:bg-[#00ffff] hover:text-black text-[#00ffff] border border-[#223d54] transition-colors cursor-pointer"
+            class="px-2 py-0.5 text-[11px] font-bold bg-theme-panel hover:bg-theme-accent hover:text-theme-accent-contrast text-theme-accent border border-theme-border-dim transition-colors cursor-pointer"
             title="Previous (P)"
           >
             <span>[&lt;&lt;]</span>
@@ -192,7 +180,7 @@ onUnmounted(() => {
           <button
             @click="playerActions.togglePlay()"
             class="px-4 py-0.5 text-xs font-extrabold border-2 transition-all cursor-pointer"
-            :class="playerState.isPlaying ? 'bg-[#ffff00] text-black border-[#ffff00]' : 'bg-[#00ff66] text-black border-[#00ff66]'"
+            :class="playerState.isPlaying ? 'bg-theme-highlight text-black border-theme-highlight' : 'bg-theme-success text-black border-theme-success'"
             :title="playerState.isPlaying ? 'Pause (Space)' : 'Play (Space)'"
           >
             <span v-if="playerState.isPlaying">[ ❚❚ PAUSE ]</span>
@@ -202,7 +190,7 @@ onUnmounted(() => {
           <!-- Next -->
           <button
             @click="playerActions.next()"
-            class="px-2 py-0.5 text-[11px] font-bold bg-[#0d1622] hover:bg-[#00ffff] hover:text-black text-[#00ffff] border border-[#223d54] transition-colors cursor-pointer"
+            class="px-2 py-0.5 text-[11px] font-bold bg-theme-panel hover:bg-theme-accent hover:text-theme-accent-contrast text-theme-accent border border-theme-border-dim transition-colors cursor-pointer"
             title="Next (N)"
           >
             <span>[&gt;&gt;]</span>
@@ -212,7 +200,7 @@ onUnmounted(() => {
           <button
             @click="playerActions.toggleRepeat()"
             class="px-1.5 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer"
-            :class="playerState.repeatMode !== 'off' ? 'bg-[#ffff00] text-black border-[#ffff00]' : 'text-[#888888] border-[#223d54] hover:border-[#00ffff]'"
+            :class="playerState.repeatMode !== 'off' ? 'bg-theme-highlight text-black border-theme-highlight' : 'text-theme-text-dim border-theme-border-dim hover:border-theme-accent'"
             :title="`Repeat: ${playerState.repeatMode}`"
           >
             <span>[↻ {{ playerState.repeatMode.toUpperCase() }}]</span>
@@ -221,7 +209,7 @@ onUnmounted(() => {
 
         <!-- Time & Scrubber row -->
         <div class="flex items-center gap-2 w-full">
-          <span class="text-[10px] font-bold text-[#ffff00] w-10 text-right tabular-nums">
+          <span class="text-[10px] font-bold text-theme-highlight w-10 text-right tabular-nums">
             {{ formatTime(playerState.currentTime) }}
           </span>
 
@@ -234,13 +222,13 @@ onUnmounted(() => {
               @input="handleSeek"
               class="w-full h-1.5 cursor-pointer"
             />
-            <div class="w-full flex justify-between text-[8px] text-[#00ffff]/70 font-mono tracking-tighter mt-0.5">
+            <div class="w-full flex justify-between text-[8px] text-theme-accent/70 font-mono tracking-tighter mt-0.5">
               <span>[{{ asciiBar }}]</span>
-              <span class="text-[#556677]">{{ Math.round((playerState.currentTime / (playerState.duration || 1)) * 100) }}%</span>
+              <span class="text-theme-text-dim">{{ Math.round((playerState.currentTime / (playerState.duration || 1)) * 100) }}%</span>
             </div>
           </div>
 
-          <span class="text-[10px] text-[#888888] w-10 text-left tabular-nums">
+          <span class="text-[10px] text-theme-text-dim w-10 text-left tabular-nums">
             {{ formatTime(playerState.duration) }}
           </span>
         </div>
@@ -248,12 +236,12 @@ onUnmounted(() => {
 
       <!-- RIGHT: Controls (Rate, Volume, Queue) -->
       <div class="flex items-center justify-end gap-2 w-1/4 min-w-[220px] relative">
-        <!-- Playback Rate (Rallentatore) -->
+        <!-- Playback Rate -->
         <div class="relative">
           <button
             @click.stop="isSpeedMenuOpen = !isSpeedMenuOpen"
             class="px-1.5 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer"
-            :class="playerState.playbackRate !== 1.0 ? 'bg-[#ffff00] text-black border-[#ffff00]' : 'text-[#aaaaaa] border-[#223d54] hover:border-[#00ffff]'"
+            :class="playerState.playbackRate !== 1.0 ? 'bg-theme-highlight text-black border-theme-highlight' : 'text-theme-text border-theme-border-dim hover:border-theme-accent'"
             title="Playback speed"
           >
             <span>[{{ playerState.playbackRate }}x]</span>
@@ -263,11 +251,11 @@ onUnmounted(() => {
           <div
             v-if="isSpeedMenuOpen"
             @click.stop
-            class="absolute bottom-10 right-0 w-44 bg-black border-2 border-[#00ffff] p-2 z-50 text-xs space-y-1.5 select-none shadow-[0_0_20px_rgba(0,255,255,0.3)]"
+            class="absolute bottom-10 right-0 w-44 bg-theme-bg border-2 border-theme-border p-2 z-50 text-xs space-y-1.5 select-none shadow-[0_0_20px_rgba(0,0,0,0.5)]"
           >
-            <div class="flex items-center justify-between pb-1 border-b border-[#223d54] text-[10px] text-[#00ffff] font-bold">
-              <span>┌──[ PLAYBACK RATE ]</span>
-              <button @click="isSpeedMenuOpen = false" class="text-[#888888] hover:text-[#ff3366]">[X]─┐</button>
+            <div class="flex items-center justify-between pb-1 border-b border-theme-border-dim text-[10px] text-theme-accent font-bold">
+              <span>┌──[ {{ t('player.speed') }} ]</span>
+              <button @click="isSpeedMenuOpen = false" class="text-theme-text-dim hover:text-theme-danger">[X]─┐</button>
             </div>
             <div class="grid grid-cols-4 gap-1">
               <button
@@ -275,7 +263,7 @@ onUnmounted(() => {
                 :key="speed"
                 @click="selectSpeed(speed)"
                 class="py-1 text-[10px] font-bold border transition-colors cursor-pointer"
-                :class="playerState.playbackRate === speed ? 'bg-[#ffff00] text-black border-[#ffff00]' : 'bg-[#0d1622] text-[#00ffff] border-[#223d54] hover:border-[#00ffff]'"
+                :class="playerState.playbackRate === speed ? 'bg-theme-highlight text-black border-theme-highlight' : 'bg-theme-panel text-theme-accent border-theme-border-dim hover:border-theme-accent'"
               >
                 {{ speed }}x
               </button>
@@ -284,8 +272,8 @@ onUnmounted(() => {
         </div>
 
         <!-- Volume Bar -->
-        <div class="flex items-center gap-1 border border-[#223d54] px-1.5 py-0.5 bg-black">
-          <span class="text-[9px] text-[#00ffff] font-bold">VOL:</span>
+        <div class="flex items-center gap-1 border border-theme-border-dim px-1.5 py-0.5 bg-theme-bg">
+          <span class="text-[9px] text-theme-accent font-bold">{{ t('player.volume') }}:</span>
           <input
             type="range"
             min="0"
@@ -296,7 +284,7 @@ onUnmounted(() => {
             class="w-14 h-1 cursor-pointer"
             title="Volume"
           />
-          <span class="text-[9px] text-[#ffff00] tabular-nums w-6 text-right">
+          <span class="text-[9px] text-theme-highlight tabular-nums w-6 text-right">
             {{ Math.round(playerState.volume * 100) }}%
           </span>
         </div>
@@ -305,7 +293,7 @@ onUnmounted(() => {
         <button
           @click="playerState.isQueueOpen = !playerState.isQueueOpen"
           class="px-1.5 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer"
-          :class="playerState.isQueueOpen ? 'bg-[#00ffff] text-black border-[#00ffff]' : 'text-[#aaaaaa] border-[#223d54] hover:border-[#00ffff]'"
+          :class="playerState.isQueueOpen ? 'bg-theme-accent text-theme-accent-contrast border-theme-accent' : 'text-theme-text border-theme-border-dim hover:border-theme-accent'"
           title="Show / Hide queue (Q)"
         >
           <span>[Q: {{ playerState.queue.length }}]</span>

@@ -162,3 +162,7 @@ export function getDatabase(): DatabaseSync {
   }
   return dbInstance;
 }
+
+export function setDatabase(db: DatabaseSync | null): void {
+  dbInstance = db;
+}

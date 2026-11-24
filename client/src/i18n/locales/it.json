@@ -1,0 +1,136 @@
+{
+  "common": {
+    "save": "[SALVA]",
+    "cancel": "[ANNULLA]",
+    "delete": "[ELIMINA]",
+    "ok": "[ OK ]",
+    "close": "[CHIUDI]",
+    "loading": "CARICAMENTO...",
+    "error": "ERRORE"
+  },
+  "nav": {
+    "artists": "ARTISTI",
+    "albums": "ALBUM",
+    "favorites": "PREFERITI",
+    "playlists": "PLAYLIST",
+    "config": "CONFIG",
+    "rescan": "RISCANSIONA LIBRERIA",
+    "scanning": "SCANSIONE...",
+    "scanStatus": "● QN-TUI BBS",
+    "term": "TERM: ANSI 80x25",
+    "audioHeader": "╔═[ AUDIO CURSES ]═╗",
+    "navHeader": "┌──[ NAVIGAZIONE ]──┐"
+  },
+  "header": {
+    "searchPlaceholder": "Cerca artisti, album, brani... [/]",
+    "help": "AIUTO [F1]",
+    "crt": "CRT [C]",
+    "queue": "CODA [Q]"
+  },
+  "footer": {
+    "help": "AIUTO",
+    "artists": "ARTISTI",
+    "albums": "ALBUM",
+    "favorites": "PREF",
+    "playlists": "PLIST",
+    "config": "CONFIG",
+    "search": "CERCA",
+    "queue": "CODA",
+    "crt": "CRT"
+  },
+  "player": {
+    "consoleTitle": "┌──[ CONSOLE AUDIO QN-TUI ]",
+    "paused": "[IN PAUSA]",
+    "speed": "VELOCITÀ",
+    "volume": "VOL",
+    "queue": "CODA",
+    "noTrack": "Nessun brano selezionato",
+    "unknownArtist": "Artista Sconosciuto",
+    "unknownAlbum": "Album Sconosciuto",
+    "asciiArt": "ARTE ASCII",
+    "shuffle": "CASUALE",
+    "repeat": "RIPETI",
+    "repeatOne": "RIPETI 1"
+  },
+  "favorites": {
+    "title": "ARCHIVIO PREFERITI",
+    "categoriesBadge": "{count} CATEGORIE",
+    "subtitle": "> Organizza artisti, album, brani e playlist con Drag & Drop (Tasto: [F4] o [3])",
+    "createCategory": "[+ CREA CATEGORIA]",
+    "categoryName": "> NOME CATEGORIA:",
+    "categoryPlaceholder": "Es. Rock Classico, Chillout...",
+    "dropHere": ">> RILASCIA QUI PER SPOSTARE <<",
+    "dragPrompt": "+-- [ TRASCINA QUI UN ELEMENTO DA UN'ALTRA CATEGORIA ] --+",
+    "deleteConfirm": "Sei sicuro di voler eliminare la categoria \"{title}\" e i relativi preferiti?",
+    "artistBadge": "ARTISTA",
+    "albumBadge": "ALBUM",
+    "playlistBadge": "PLAYLIST",
+    "albumsCount": "[{count} ALBUM]",
+    "tracksCount": "[{count} BRANI]",
+    "dragToMove": "Trascina per spostare in un'altra categoria",
+    "removeFromFavorites": "Rimuovi dai preferiti",
+    "playAlbum": "Riproduci album",
+    "playPlaylist": "Riproduci playlist"
+  },
+  "settings": {
+    "title": "CONFIGURAZIONE DI SISTEMA",
+    "theme": "TEMA RETRO UI",
+    "language": "LINGUA INTERFACCIA",
+    "musicDir": "PERCORSO CARTELLA MUSICA",
+    "defaultView": "VISTA PREDEFINITA ALL'AVVIO",
+    "stats": "METRICHE LIBRERIA",
+    "totalTracks": "Totale Brani",
+    "totalAlbums": "Totale Album",
+    "totalArtists": "Totale Artisti",
+    "saveSettings": "[SALVA CONFIGURAZIONE]",
+    "rescanNow": "[AVVIA SCANSIONE ORA]",
+    "themeCyan": "Cyber Cyan (BBS)",
+    "themeGreen": "Fosfori Verdi (VT220)",
+    "themeAmber": "Fosfori Ambra (Hercules)",
+    "themeWin98": "Windows 98 Classic"
+  },
+  "artists": {
+    "title": "RUBRICA ARTISTI",
+    "badge": "{count} ARTISTI",
+    "noArtists": "Nessun artista indicizzato nella libreria. Clicca su [RISCANSIONA LIBRERIA] nella barra laterale.",
+    "albums": "ALBUM",
+    "tracks": "BRANI",
+    "uploadImage": "[CARICA FOTO]"
+  },
+  "albums": {
+    "title": "CATALOGO ALBUM",
+    "badge": "{count} ALBUM",
+    "noAlbums": "Nessun album indicizzato nella libreria. Clicca su [RISCANSIONA LIBRERIA] nella barra laterale.",
+    "playAlbum": "[RIPRODUCI ALBUM]",
+    "tracks": "BRANI"
+  },
+  "playlists": {
+    "title": "ARCHIVIO PLAYLIST",
+    "badge": "{count} PLAYLIST",
+    "createPlaylist": "[+ CREA PLAYLIST]",
+    "namePlaceholder": "Titolo playlist...",
+    "noPlaylists": "Nessuna playlist creata finora. Clicca su [+ CREA PLAYLIST] per crearne una."
+  },
+  "search": {
+    "title": "RICERCA ISTANTANEA",
+    "prompt": "Digita per cercare artisti, album e brani...",
+    "noResults": "Nessun risultato trovato per \"{query}\"",
+    "artists": "ARTISTI",
+    "albums": "ALBUM",
+    "tracks": "BRANI"
+  },
+  "queue": {
+    "title": "CODA DI RIPRODUZIONE",
+    "badge": "{count} BRANI",
+    "empty": "La coda è attualmente vuota.",
+    "clear": "[SVUOTA CODA]"
+  },
+  "help": {
+    "title": "GUIDA SCORCIATOIE DA TASTIERA",
+    "badge": "AIUTO [F1 / ?]",
+    "close": "[CHIUDI - ESC]",
+    "globalKeys": "CONTROLLI GLOBALI",
+    "navigation": "NAVIGAZIONE",
+    "player": "MOTORE AUDIO"
+  }
+}
