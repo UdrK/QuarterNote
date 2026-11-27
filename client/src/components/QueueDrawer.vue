@@ -9,10 +9,14 @@ function close() {
 </script>
 
 <template>
-  <aside
+  <div
     v-if="playerState.isQueueOpen"
-    class="w-84 bg-theme-bg border-l-2 border-theme-border flex flex-col shrink-0 select-none z-20 shadow-2xl transition-all font-mono text-xs"
+    class="fixed inset-0 z-40 flex justify-end bg-black/75 md:static md:inset-auto md:z-20 md:bg-transparent md:shrink-0"
+    @click.self="close"
   >
+    <aside
+      class="w-full max-w-sm md:w-84 h-full bg-theme-bg border-l-2 border-theme-border flex flex-col shrink-0 select-none shadow-2xl transition-all font-mono text-xs"
+    >
     <!-- Header -->
     <div class="h-9 px-2 border-b border-theme-border/60 bg-theme-panel flex items-center justify-between shrink-0 text-theme-accent">
       <div class="flex items-center gap-1.5 font-bold">
@@ -100,5 +104,6 @@ function close() {
         </div>
       </div>
     </div>
-  </aside>
+    </aside>
+  </div>
 </template>

@@ -92,15 +92,15 @@ async function handleFileSelected(event: Event) {
   >
     <div class="space-y-4 font-mono select-none">
       <!-- Breadcrumb / Back button -->
-      <div class="flex items-center gap-2 text-xs border-b border-theme-border-subtle pb-2">
+      <div class="flex flex-wrap items-center gap-2 text-xs border-b border-theme-border-subtle pb-2">
         <button
           @click="router.back()"
-          class="bg-theme-panel hover:bg-theme-accent hover:text-theme-accent-contrast text-theme-accent border border-theme-border-dim px-2 py-0.5 text-xs font-bold transition-colors cursor-pointer"
+          class="bg-theme-panel hover:bg-theme-accent hover:text-theme-accent-contrast text-theme-accent border border-theme-border-dim px-2 py-0.5 text-xs font-bold transition-colors cursor-pointer shrink-0"
         >
           <span>[&lt; BACK]</span>
         </button>
-        <span class="text-theme-text-dim">&gt; DIRECTORY &gt; ARTISTS &gt;</span>
-        <span class="text-theme-accent font-bold" v-if="artist">[{{ artist.name }}]</span>
+        <span class="hidden sm:inline text-theme-text-dim">&gt; DIRECTORY &gt; ARTISTS &gt;</span>
+        <span class="text-theme-accent font-bold truncate" v-if="artist">[{{ artist.name }}]</span>
       </div>
 
       <!-- Hidden file input for uploading custom artist photo -->
@@ -124,18 +124,33 @@ async function handleFileSelected(event: Event) {
             />
           </div>
 
-          <!-- Upload overlay button -->
+          <!-- Upload overlay button (desktop hover) -->
           <button
             @click="triggerPhotoUpload"
             :disabled="isUploading"
             type="button"
-            class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 text-theme-accent transition-opacity cursor-pointer border-2 border-theme-accent"
+            class="hidden md:flex absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 flex-col items-center justify-center gap-1 text-theme-accent transition-opacity cursor-pointer border-2 border-theme-accent"
             title="Change artist photo"
           >
             <Loader2 v-if="isUploading" class="w-5 h-5 animate-spin" />
             <template v-else>
               <Camera class="w-4 h-4" />
               <span class="text-[8px] font-bold">[PHOTO]</span>
+            </template>
+          </button>
+
+          <!-- Upload corner button (mobile touch) -->
+          <button
+            @click="triggerPhotoUpload"
+            :disabled="isUploading"
+            type="button"
+            class="md:hidden absolute bottom-1 right-1 bg-theme-bg/90 text-theme-accent border border-theme-accent px-1.5 py-0.5 text-[9px] font-bold flex items-center gap-1 cursor-pointer"
+            title="Change artist photo"
+          >
+            <Loader2 v-if="isUploading" class="w-3 h-3 animate-spin" />
+            <template v-else>
+              <Camera class="w-3 h-3" />
+              <span>[PHOTO]</span>
             </template>
           </button>
         </div>
@@ -173,9 +188,9 @@ async function handleFileSelected(event: Event) {
 
       <!-- Albums Section -->
       <div v-if="albums.length > 0" class="space-y-2">
-        <div class="border-b border-theme-border-subtle pb-1 flex items-center justify-between text-xs font-bold text-theme-accent">
-          <span>┌──[ AVAILABLE ALBUMS ]─────────────────────────</span>
-          <span class="text-theme-highlight">({{ albums.length }})─┐</span>
+        <div class="border-b border-theme-border-subtle pb-1 flex items-center justify-between gap-2 text-xs font-bold text-theme-accent">
+          <span class="truncate">┌──[ AVAILABLE ALBUMS ]─────────────────────────</span>
+          <span class="text-theme-highlight shrink-0">({{ albums.length }})─┐</span>
         </div>
 
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
@@ -191,11 +206,11 @@ async function handleFileSelected(event: Event) {
               <button
                 type="button"
                 @click.stop="toggleFavorite('album', alb.id)"
-                class="absolute top-1 right-1 text-xs font-bold z-10 transition-colors cursor-pointer"
+                class="absolute top-1 right-1 text-xs font-bold z-10 transition-colors cursor-pointer bg-theme-bg/85 md:bg-transparent px-0.5 md:px-0"
                 :class="[
                   isFavorite('album', alb.id)
                     ? 'text-theme-danger'
-                    : 'text-theme-text-dim hover:text-theme-danger opacity-0 group-hover:opacity-100'
+                    : 'text-theme-text hover:text-theme-danger opacity-95 md:opacity-0 md:group-hover:opacity-100'
                 ]"
                 :title="isFavorite('album', alb.id) ? 'Remove from favorites' : 'Add to favorites'"
               >
@@ -212,9 +227,9 @@ async function handleFileSelected(event: Event) {
 
       <!-- Tracks Table -->
       <div v-if="tracks.length > 0" class="space-y-2">
-        <div class="border-b border-theme-border-subtle pb-1 flex items-center justify-between text-xs font-bold text-theme-accent">
-          <span>┌──[ COMPLETE TRACKLIST ]────────────────────────</span>
-          <span class="text-theme-highlight">({{ tracks.length }} TRACKS)─┐</span>
+        <div class="border-b border-theme-border-subtle pb-1 flex items-center justify-between gap-2 text-xs font-bold text-theme-accent">
+          <span class="truncate">┌──[ COMPLETE TRACKLIST ]────────────────────────</span>
+          <span class="text-theme-highlight shrink-0">({{ tracks.length }} TRACKS)─┐</span>
         </div>
         <div class="border border-theme-border-dim bg-theme-surface">
           <TrackRow

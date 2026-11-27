@@ -73,29 +73,31 @@ onMounted(load);
       </div>
 
       <!-- Create Inline Form in Curses Box -->
-      <div v-if="showCreate" class="p-2.5 border-2 border-theme-accent bg-theme-panel flex items-center gap-2">
-        <span class="text-theme-accent text-xs font-bold">&gt; NAME:</span>
+      <div v-if="showCreate" class="p-2.5 border-2 border-theme-accent bg-theme-panel flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+        <span class="text-theme-accent text-xs font-bold shrink-0">&gt; NAME:</span>
         <input
           v-model="newName"
           type="text"
           :placeholder="t('playlists.namePlaceholder')"
-          class="flex-1 bg-theme-bg text-xs text-theme-highlight px-2 py-1 border border-theme-border-dim focus:outline-none focus:border-theme-highlight font-mono"
+          class="flex-1 min-w-0 bg-theme-bg text-xs text-theme-highlight px-2 py-1 border border-theme-border-dim focus:outline-none focus:border-theme-highlight font-mono"
           @keyup.enter="handleCreate"
           autofocus
         />
-        <button
-          @click="handleCreate"
-          :disabled="!newName.trim()"
-          class="bg-theme-accent hover:opacity-90 text-theme-accent-contrast font-bold px-3 py-1 text-xs border border-theme-accent cursor-pointer"
-        >
-          {{ t('common.save') }}
-        </button>
-        <button
-          @click="showCreate = false"
-          class="bg-theme-card text-theme-text-dim hover:text-theme-text-bright px-2 py-1 text-xs border border-theme-border-dim cursor-pointer"
-        >
-          {{ t('common.cancel') }}
-        </button>
+        <div class="flex items-center gap-2 self-end sm:self-auto">
+          <button
+            @click="handleCreate"
+            :disabled="!newName.trim()"
+            class="bg-theme-accent hover:opacity-90 text-theme-accent-contrast font-bold px-3 py-1 text-xs border border-theme-accent cursor-pointer"
+          >
+            {{ t('common.save') }}
+          </button>
+          <button
+            @click="showCreate = false"
+            class="bg-theme-card text-theme-text-dim hover:text-theme-text-bright px-2 py-1 text-xs border border-theme-border-dim cursor-pointer"
+          >
+            {{ t('common.cancel') }}
+          </button>
+        </div>
       </div>
 
       <!-- Empty State -->

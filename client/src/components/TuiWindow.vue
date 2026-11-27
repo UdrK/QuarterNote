@@ -31,7 +31,7 @@ defineProps<{
     </div>
 
     <!-- Content Area -->
-    <div class="p-3 flex-1 overflow-auto bg-theme-bg">
+    <div class="p-2 sm:p-3 flex-1 overflow-auto bg-theme-bg">
       <slot />
     </div>
 

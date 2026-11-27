@@ -13,6 +13,7 @@ import { playerActions, playerState } from './stores/player';
 const router = useRouter();
 const crtMode = ref(false);
 const showHelpModal = ref(false);
+const isMobileMenuOpen = ref(false);
 const headerRef = ref<InstanceType<typeof Header> | null>(null);
 
 onMounted(() => {
@@ -45,6 +46,10 @@ function handleGlobalKeydown(e: KeyboardEvent) {
   if (e.key === 'Escape') {
     if (showHelpModal.value) {
       showHelpModal.value = false;
+      return;
+    }
+    if (isMobileMenuOpen.value) {
+      isMobileMenuOpen.value = false;
       return;
     }
     if (playerState.isQueueOpen) {
@@ -105,25 +110,32 @@ function handleGlobalKeydown(e: KeyboardEvent) {
 
 <template>
   <div 
-    class="flex flex-col h-screen w-screen overflow-hidden bg-theme-bg text-theme-text font-mono relative"
+    class="flex flex-col h-dvh w-screen overflow-hidden bg-theme-bg text-theme-text font-mono relative"
     :class="{ 'crt-scanlines': crtMode }"
   >
     <!-- Top Navigation & Search Header -->
     <Header 
       ref="headerRef" 
       :crt-mode="crtMode" 
+      :mobile-menu-open="isMobileMenuOpen"
       @toggle-crt="toggleCrt" 
+      @toggle-menu="isMobileMenuOpen = !isMobileMenuOpen"
       @open-help="showHelpModal = true" 
     />
 
     <!-- Middle: Sidebar + Main Area + Queue Drawer -->
-    <div class="flex-1 flex overflow-hidden">
-      <!-- Left Navigation Sidebar -->
-      <Sidebar />
+    <div class="flex-1 min-h-0 flex overflow-hidden relative">
+      <!-- Left Navigation Sidebar (drawer on mobile, static on md+) -->
+      <Sidebar 
+        :mobile-open="isMobileMenuOpen"
+        :crt-mode="crtMode"
+        @close-mobile="isMobileMenuOpen = false"
+        @toggle-crt="toggleCrt"
+      />
 
       <!-- Center Content Area -->
-      <div class="flex-1 flex overflow-hidden bg-theme-bg">
-        <main class="flex-1 overflow-y-auto bg-theme-bg p-3.5">
+      <div class="flex-1 min-w-0 min-h-0 flex overflow-hidden bg-theme-bg">
+        <main class="flex-1 min-w-0 overflow-y-auto bg-theme-bg p-2 md:p-3.5">
           <RouterView />
         </main>
 

@@ -109,15 +109,15 @@ onMounted(load);
   >
     <div class="space-y-4 font-mono select-none">
       <!-- Breadcrumb -->
-      <div class="flex items-center gap-2 text-xs border-b border-theme-border-subtle pb-2">
+      <div class="flex flex-wrap items-center gap-2 text-xs border-b border-theme-border-subtle pb-2">
         <button
           @click="router.back()"
-          class="bg-theme-panel hover:bg-theme-accent hover:text-theme-accent-contrast text-theme-accent border border-theme-border-dim px-2 py-0.5 text-xs font-bold transition-colors cursor-pointer"
+          class="bg-theme-panel hover:bg-theme-accent hover:text-theme-accent-contrast text-theme-accent border border-theme-border-dim px-2 py-0.5 text-xs font-bold transition-colors cursor-pointer shrink-0"
         >
           <span>[&lt; BACK]</span>
         </button>
-        <span class="text-theme-text-dim">&gt; COLLECTIONS &gt; PLAYLISTS &gt;</span>
-        <span class="text-theme-accent font-bold" v-if="playlist">[{{ playlist.name }}]</span>
+        <span class="hidden sm:inline text-theme-text-dim">&gt; COLLECTIONS &gt; PLAYLISTS &gt;</span>
+        <span class="text-theme-accent font-bold truncate" v-if="playlist">[{{ playlist.name }}]</span>
       </div>
 
       <!-- Hidden file input for uploading custom playlist photo -->
@@ -145,13 +145,27 @@ onMounted(load);
             @click="triggerPhotoUpload"
             :disabled="isUploading"
             type="button"
-            class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 text-theme-accent transition-opacity cursor-pointer border-2 border-theme-accent"
+            class="hidden md:flex absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 flex-col items-center justify-center gap-1 text-theme-accent transition-opacity cursor-pointer border-2 border-theme-accent"
             title="Change playlist cover"
           >
             <Loader2 v-if="isUploading" class="w-5 h-5 animate-spin" />
             <template v-else>
               <Camera class="w-4 h-4" />
               <span class="text-[8px] font-bold">[COVER]</span>
+            </template>
+          </button>
+
+          <button
+            @click="triggerPhotoUpload"
+            :disabled="isUploading"
+            type="button"
+            class="md:hidden absolute bottom-1 right-1 bg-theme-bg/90 text-theme-accent border border-theme-accent px-1.5 py-0.5 text-[9px] font-bold flex items-center gap-1 cursor-pointer"
+            title="Change playlist cover"
+          >
+            <Loader2 v-if="isUploading" class="w-3 h-3 animate-spin" />
+            <template v-else>
+              <Camera class="w-3 h-3" />
+              <span>[COVER]</span>
             </template>
           </button>
         </div>
@@ -205,9 +219,9 @@ onMounted(load);
 
       <!-- Tracks List Table -->
       <div v-if="playlistTracks.length > 0" class="space-y-2">
-        <div class="border-b border-theme-border-subtle pb-1 flex items-center justify-between text-xs font-bold text-theme-accent">
-          <span>┌──[ INCLUDED TRACKS ]───────────────────────────</span>
-          <span class="text-theme-highlight">({{ playlistTracks.length }})─┐</span>
+        <div class="border-b border-theme-border-subtle pb-1 flex items-center justify-between gap-2 text-xs font-bold text-theme-accent">
+          <span class="truncate">┌──[ INCLUDED TRACKS ]───────────────────────────</span>
+          <span class="text-theme-highlight shrink-0">({{ playlistTracks.length }})─┐</span>
         </div>
         <div class="border border-theme-border-dim bg-theme-surface">
           <div

@@ -8,6 +8,7 @@ defineProps<{
   index: number;
   containerId: string;
   isDragged: boolean;
+  canMove?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -15,6 +16,7 @@ const emit = defineEmits<{
   (e: 'dragend', event?: DragEvent): void;
   (e: 'toggle-favorite', itemType: FavoriteItemType, itemId: string): void;
   (e: 'play', item: FavoriteItem): void;
+  (e: 'move-request', item: FavoriteItem, containerId: string): void;
 }>();
 </script>
 
@@ -55,8 +57,16 @@ const emit = defineEmits<{
       </div>
     </div>
 
-    <!-- Right: Remove + Duration -->
-    <div class="flex items-center gap-2 shrink-0 ml-2">
+    <!-- Right: Move + Remove + Duration -->
+    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-2">
+      <button
+        v-if="canMove"
+        @click.stop="emit('move-request', item, containerId)"
+        class="text-theme-accent hover:text-theme-highlight text-xs font-bold cursor-pointer px-0.5"
+        :title="t('favorites.moveTo')"
+      >
+        {{ t('favorites.moveBtn') }}
+      </button>
       <button
         @click.stop="emit('toggle-favorite', 'track', item.itemId)"
         class="text-theme-danger text-xs font-bold cursor-pointer"

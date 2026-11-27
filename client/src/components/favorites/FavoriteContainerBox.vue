@@ -10,6 +10,7 @@ const props = defineProps<{
   dragOverContainerId: string | null;
   draggedItemId?: string | null;
   editingDividerId: string | null;
+  canMove?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -28,6 +29,7 @@ const emit = defineEmits<{
   (e: 'play-track', item: FavoriteItem): void;
   (e: 'play-album', albumId: string): void;
   (e: 'play-playlist', playlistId: string): void;
+  (e: 'move-request', item: FavoriteItem, containerId: string): void;
 }>();
 
 const renameTitle = ref(props.container.title);
@@ -96,8 +98,8 @@ function handleSaveRename() {
             ╔═[ {{ container.title }} ]═╗
           </span>
 
-          <!-- Action Buttons -->
-          <div class="flex items-center gap-1 opacity-0 group-hover/divider:opacity-100 transition-opacity ml-1">
+          <!-- Action Buttons (always visible on mobile, hover on desktop) -->
+          <div class="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover/divider:opacity-100 transition-opacity ml-1">
             <button
               @click="handleStartRename"
               title="Rename category"
@@ -151,10 +153,12 @@ function handleSaveRename() {
           :index="idx"
           :container-id="container.id"
           :is-dragged="draggedItemId === item.id"
+          :can-move="canMove"
           @dragstart="(ev, itm, cId) => emit('dragstart', ev, itm, cId)"
           @dragend="(ev) => emit('dragend', ev)"
           @toggle-favorite="(type, id) => emit('toggle-favorite', type, id)"
           @play="(itm) => emit('play-track', itm)"
+          @move-request="(itm, cId) => emit('move-request', itm, cId)"
         />
       </div>
 
@@ -169,12 +173,14 @@ function handleSaveRename() {
           :item="item"
           :container-id="container.id"
           :is-dragged="draggedItemId === item.id"
+          :can-move="canMove"
           @dragstart="(ev, itm, cId) => emit('dragstart', ev, itm, cId)"
           @dragend="(ev) => emit('dragend', ev)"
           @toggle-favorite="(type, id) => emit('toggle-favorite', type, id)"
           @navigate="(itm) => emit('navigate', itm)"
           @play-album="(id) => emit('play-album', id)"
           @play-playlist="(id) => emit('play-playlist', id)"
+          @move-request="(itm, cId) => emit('move-request', itm, cId)"
         />
       </div>
     </div>

@@ -6,6 +6,7 @@ defineProps<{
   item: FavoriteItem;
   containerId: string;
   isDragged: boolean;
+  canMove?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -15,6 +16,7 @@ const emit = defineEmits<{
   (e: 'navigate', item: FavoriteItem): void;
   (e: 'play-album', albumId: string): void;
   (e: 'play-playlist', playlistId: string): void;
+  (e: 'move-request', item: FavoriteItem, containerId: string): void;
 }>();
 </script>
 
@@ -51,13 +53,23 @@ const emit = defineEmits<{
         </span>
       </div>
 
-      <button
-        @click.stop="emit('toggle-favorite', item.itemType, item.itemId)"
-        class="text-theme-danger text-xs font-bold cursor-pointer"
-        :title="t('favorites.removeFromFavorites')"
-      >
-        [★]
-      </button>
+      <div class="flex items-center gap-1 shrink-0">
+        <button
+          v-if="canMove"
+          @click.stop="emit('move-request', item, containerId)"
+          class="text-theme-accent hover:text-theme-highlight text-xs font-bold cursor-pointer"
+          :title="t('favorites.moveTo')"
+        >
+          {{ t('favorites.moveBtn') }}
+        </button>
+        <button
+          @click.stop="emit('toggle-favorite', item.itemType, item.itemId)"
+          class="text-theme-danger text-xs font-bold cursor-pointer"
+          :title="t('favorites.removeFromFavorites')"
+        >
+          [★]
+        </button>
+      </div>
     </div>
 
     <!-- Media thumbnail -->
@@ -90,7 +102,7 @@ const emit = defineEmits<{
         />
         <button
           @click.stop="emit('play-album', item.itemId)"
-          class="absolute bottom-1 right-1 bg-theme-highlight text-black font-bold px-1 text-[8px] opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+          class="absolute bottom-1 right-1 bg-theme-highlight text-black font-bold px-1.5 py-0.5 md:px-1 md:py-0 text-[9px] md:text-[8px] opacity-95 md:opacity-0 md:group-hover:opacity-100 transition-opacity cursor-pointer"
           :title="t('favorites.playAlbum')"
         >
           [▶]
@@ -115,7 +127,7 @@ const emit = defineEmits<{
         />
         <button
           @click.stop="emit('play-playlist', item.itemId)"
-          class="absolute bottom-1 right-1 bg-theme-success text-black font-bold px-1 text-[8px] opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+          class="absolute bottom-1 right-1 bg-theme-success text-black font-bold px-1.5 py-0.5 md:px-1 md:py-0 text-[9px] md:text-[8px] opacity-95 md:opacity-0 md:group-hover:opacity-100 transition-opacity cursor-pointer"
           :title="t('favorites.playPlaylist')"
         >
           [▶]

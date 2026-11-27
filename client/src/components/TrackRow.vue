@@ -21,7 +21,7 @@ function play() {
 
 <template>
   <div
-    class="group flex items-center justify-between px-2 py-1 text-xs select-none transition-colors border-b border-theme-border-subtle font-mono cursor-pointer"
+    class="group flex items-center justify-between px-2 py-1.5 md:py-1 text-xs select-none transition-colors border-b border-theme-border-subtle font-mono cursor-pointer"
     :class="[
       playerState.currentTrack?.id === track.id
         ? 'bg-theme-accent text-theme-accent-contrast font-extrabold border-theme-accent'
@@ -29,10 +29,10 @@ function play() {
     ]"
   >
     <!-- Left: Index / Play & Title -->
-    <div @click="play" class="flex items-center gap-2 min-w-0 flex-1">
+    <div @click="play" class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
       <!-- Index or Play cursor -->
       <span 
-        class="w-7 text-center font-mono text-[10px] shrink-0"
+        class="w-6 sm:w-7 text-center font-mono text-[10px] shrink-0"
         :class="playerState.currentTrack?.id === track.id ? 'text-theme-accent-contrast font-extrabold' : 'text-theme-text-dim group-hover:text-white'"
       >
         <span v-if="playerState.currentTrack?.id === track.id">►►</span>
@@ -43,12 +43,12 @@ function play() {
       </span>
 
       <!-- Title & Artist -->
-      <div class="min-w-0 flex-1 flex items-baseline gap-2">
+      <div class="min-w-0 flex-1 flex flex-col sm:flex-row sm:items-baseline sm:gap-2">
         <p class="font-bold truncate" :class="playerState.currentTrack?.id === track.id ? 'text-theme-accent-contrast' : 'text-theme-text group-hover:text-white'">
           {{ track.title }}
         </p>
         <p 
-          class="text-[10px] truncate shrink-0"
+          class="text-[10px] truncate"
           :class="playerState.currentTrack?.id === track.id ? 'text-theme-accent-contrast/80' : 'text-theme-accent group-hover:text-white/80 opacity-85'"
         >
           {{ track.artistName }}
@@ -66,12 +66,12 @@ function play() {
     </div>
 
     <!-- Right: Duration & Quick Actions in TUI bracket format -->
-    <div class="flex items-center gap-1.5 shrink-0 ml-2">
-      <!-- Action buttons (visible on hover) -->
-      <div class="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity">
+    <div class="flex items-center gap-1 sm:gap-1.5 shrink-0 ml-1.5 sm:ml-2">
+      <!-- Action buttons (always visible on mobile touch, hover on desktop) -->
+      <div class="opacity-100 md:opacity-0 md:group-hover:opacity-100 flex items-center gap-1 transition-opacity">
         <button
           @click.stop="playerActions.playNext(track)"
-          class="px-1 text-[10px] font-bold border transition-colors cursor-pointer"
+          class="px-1 py-0.5 md:py-0 text-[10px] font-bold border transition-colors cursor-pointer"
           :class="playerState.currentTrack?.id === track.id 
             ? 'bg-theme-bg text-theme-accent border-theme-bg hover:bg-theme-accent hover:text-theme-accent-contrast' 
             : 'bg-theme-panel text-theme-accent border-theme-border-dim hover:bg-theme-accent hover:text-theme-accent-contrast'"
@@ -81,7 +81,7 @@ function play() {
         </button>
         <button
           @click.stop="playerActions.addToQueue(track)"
-          class="px-1 text-[10px] font-bold border transition-colors cursor-pointer"
+          class="px-1 py-0.5 md:py-0 text-[10px] font-bold border transition-colors cursor-pointer"
           :class="playerState.currentTrack?.id === track.id 
             ? 'bg-theme-bg text-theme-accent border-theme-bg hover:bg-theme-accent hover:text-theme-accent-contrast' 
             : 'bg-theme-panel text-theme-accent border-theme-border-dim hover:bg-theme-accent hover:text-theme-accent-contrast'"
@@ -91,7 +91,7 @@ function play() {
         </button>
         <button
           @click.stop="showPlaylistModal = true"
-          class="px-1 text-[10px] font-bold border transition-colors cursor-pointer"
+          class="px-1 py-0.5 md:py-0 text-[10px] font-bold border transition-colors cursor-pointer"
           :class="playerState.currentTrack?.id === track.id 
             ? 'bg-theme-bg text-theme-accent border-theme-bg hover:bg-theme-accent hover:text-theme-accent-contrast' 
             : 'bg-theme-panel text-theme-accent border-theme-border-dim hover:bg-theme-accent hover:text-theme-accent-contrast'"
@@ -108,7 +108,7 @@ function play() {
         :class="[
           isFavorite('track', track.id)
             ? (playerState.currentTrack?.id === track.id ? 'text-theme-accent-contrast' : 'text-theme-danger')
-            : (playerState.currentTrack?.id === track.id ? 'text-theme-accent-contrast/60' : 'text-theme-text-dim hover:text-theme-danger opacity-40 group-hover:opacity-100 group-hover:text-white/70')
+            : (playerState.currentTrack?.id === track.id ? 'text-theme-accent-contrast/60' : 'text-theme-text-dim hover:text-theme-danger opacity-75 md:opacity-40 md:group-hover:opacity-100 group-hover:text-white/70')
         ]"
         :title="isFavorite('track', track.id) ? 'Remove from favorites' : 'Add to favorites'"
       >
@@ -117,7 +117,7 @@ function play() {
 
       <!-- Duration -->
       <span 
-        class="w-11 text-right font-mono text-[10px] tabular-nums"
+        class="w-10 sm:w-11 text-right font-mono text-[10px] tabular-nums"
         :class="playerState.currentTrack?.id === track.id ? 'text-theme-accent-contrast' : 'text-theme-text-dim group-hover:text-white/80'"
       >
         {{ formatTime(track.duration) }}

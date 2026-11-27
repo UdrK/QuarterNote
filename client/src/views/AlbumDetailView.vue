@@ -51,15 +51,15 @@ function playShuffled() {
   >
     <div class="space-y-4 font-mono select-none">
       <!-- Breadcrumb -->
-      <div class="flex items-center gap-2 text-xs border-b border-theme-border-subtle pb-2">
+      <div class="flex flex-wrap items-center gap-2 text-xs border-b border-theme-border-subtle pb-2">
         <button
           @click="router.back()"
-          class="bg-theme-panel hover:bg-theme-accent hover:text-theme-accent-contrast text-theme-accent border border-theme-border-dim px-2 py-0.5 text-xs font-bold transition-colors cursor-pointer"
+          class="bg-theme-panel hover:bg-theme-accent hover:text-theme-accent-contrast text-theme-accent border border-theme-border-dim px-2 py-0.5 text-xs font-bold transition-colors cursor-pointer shrink-0"
         >
           <span>[&lt; BACK]</span>
         </button>
-        <span class="text-theme-text-dim">&gt; CATALOG &gt; ALBUMS &gt;</span>
-        <span class="text-theme-accent font-bold" v-if="album">[{{ album.title }}]</span>
+        <span class="hidden sm:inline text-theme-text-dim">&gt; CATALOG &gt; ALBUMS &gt;</span>
+        <span class="text-theme-accent font-bold truncate" v-if="album">[{{ album.title }}]</span>
       </div>
 
       <!-- Album Hero Card in Curses Box -->
@@ -117,9 +117,9 @@ function playShuffled() {
 
       <!-- Tracks List Table in Curses box -->
       <div class="space-y-2">
-        <div class="border-b border-theme-border-subtle pb-1 flex items-center justify-between text-xs font-bold text-theme-accent">
-          <span>┌──[ TRACKLIST ]───────────────────────────────────</span>
-          <span class="text-theme-highlight">({{ tracks.length }} TRACKS)─┐</span>
+        <div class="border-b border-theme-border-subtle pb-1 flex items-center justify-between gap-2 text-xs font-bold text-theme-accent">
+          <span class="truncate">┌──[ TRACKLIST ]───────────────────────────────────</span>
+          <span class="text-theme-highlight shrink-0">({{ tracks.length }} TRACKS)─┐</span>
         </div>
         <div class="border border-theme-border-dim bg-theme-surface">
           <TrackRow

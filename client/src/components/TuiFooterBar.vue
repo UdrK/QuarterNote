@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { computed } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { playerActions, playerState } from '../stores/player';
 import { t } from '../i18n';
 
@@ -14,6 +15,15 @@ const emit = defineEmits<{
 }>();
 
 const router = useRouter();
+const route = useRoute();
+
+const mobileTabs = computed(() => [
+  { key: '1', labelKey: 'footer.artists', path: '/artists' },
+  { key: '2', labelKey: 'footer.albums', path: '/albums' },
+  { key: '3', labelKey: 'footer.favorites', path: '/favorites' },
+  { key: '4', labelKey: 'footer.playlists', path: '/playlists' },
+  { key: '5', labelKey: 'footer.config', path: '/settings' },
+]);
 
 function handleKeyAction(key: string) {
   switch (key) {
@@ -52,7 +62,24 @@ function handleKeyAction(key: string) {
 </script>
 
 <template>
-  <footer class="h-6 bg-theme-panel border-t border-theme-border/60 px-2 flex items-center justify-between shrink-0 select-none font-mono text-[11px] overflow-x-auto whitespace-nowrap">
+  <!-- Mobile Bottom TUI Tab Bar (< md) -->
+  <nav class="flex md:hidden h-9 bg-theme-panel border-t border-theme-border/60 shrink-0 select-none font-mono text-[10px]">
+    <RouterLink
+      v-for="tab in mobileTabs"
+      :key="tab.path"
+      :to="tab.path"
+      class="flex-1 min-w-0 flex items-center justify-center gap-0.5 px-1 border-r border-theme-border-subtle last:border-r-0 font-bold transition-colors truncate"
+      :class="route.path.startsWith(tab.path)
+        ? 'bg-theme-accent text-theme-accent-contrast font-extrabold'
+        : 'text-theme-text hover:bg-theme-active-bg'"
+    >
+      <span class="opacity-70 text-[9px]">{{ tab.key }}.</span>
+      <span class="truncate">{{ t(tab.labelKey) }}</span>
+    </RouterLink>
+  </nav>
+
+  <!-- Desktop Function Key Bar (md+) -->
+  <footer class="hidden md:flex h-6 bg-theme-panel border-t border-theme-border/60 px-2 items-center justify-between shrink-0 select-none font-mono text-[11px] overflow-x-auto whitespace-nowrap">
     <div class="flex items-center gap-2">
       <!-- F1 Help -->
       <button 

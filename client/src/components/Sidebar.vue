@@ -6,6 +6,16 @@ import { triggerScan, fetchScanStatus } from '../api/client';
 import type { ScanStatus } from '@quarter-note/shared';
 import { t } from '../i18n';
 
+const props = defineProps<{
+  mobileOpen?: boolean;
+  crtMode?: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: 'closeMobile'): void;
+  (e: 'toggleCrt'): void;
+}>();
+
 const route = useRoute();
 
 const scanStatus = ref<ScanStatus>({
@@ -60,14 +70,33 @@ const navLinks = computed(() => [
 </script>
 
 <template>
-  <aside class="w-60 bg-theme-bg border-r border-theme-border/40 flex flex-col justify-between shrink-0 select-none font-mono text-xs">
+  <!-- Mobile Drawer Backdrop -->
+  <div
+    v-if="props.mobileOpen"
+    @click="emit('closeMobile')"
+    class="fixed inset-0 bg-black/75 z-30 md:hidden"
+  />
+
+  <aside
+    class="fixed inset-y-0 left-0 z-40 w-64 transition-transform duration-200 ease-out md:static md:translate-x-0 md:w-60 md:z-auto bg-theme-bg border-r border-theme-border/40 flex flex-col justify-between shrink-0 select-none font-mono text-xs overflow-y-auto"
+    :class="props.mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
+  >
     <!-- Top System Banner & Menu -->
     <div class="p-2 space-y-2">
       <!-- Curses Window Header Box -->
       <div class="border border-theme-border bg-theme-panel p-2">
         <div class="text-[10px] text-theme-success font-bold flex items-center justify-between">
           <span>{{ t('nav.scanStatus') }}</span>
-          <span class="text-theme-highlight">v2.0</span>
+          <div class="flex items-center gap-1.5">
+            <span class="text-theme-highlight">v2.0</span>
+            <button
+              @click="emit('closeMobile')"
+              class="md:hidden text-theme-accent hover:text-theme-danger font-bold px-1 border border-theme-border-dim"
+              title="Close"
+            >
+              [X]
+            </button>
+          </div>
         </div>
         <div class="text-xs text-theme-accent font-extrabold mt-0.5 tracking-tight">
           {{ t('nav.audioHeader') }}
@@ -88,7 +117,8 @@ const navLinks = computed(() => [
           v-for="item in navLinks"
           :key="item.path"
           :to="item.path"
-          class="flex items-center justify-between px-2 py-1 text-xs font-bold transition-all cursor-pointer border group"
+          @click="emit('closeMobile')"
+          class="flex items-center justify-between px-2 py-2 md:py-1 text-xs font-bold transition-all cursor-pointer border group"
           :class="[
             route.path.startsWith(item.path)
               ? 'bg-theme-accent text-theme-accent-contrast border-theme-accent'
@@ -146,10 +176,18 @@ const navLinks = computed(() => [
       <button
         @click="handleScan"
         :disabled="scanStatus.isScanning"
-        class="w-full bg-theme-card hover:bg-theme-accent hover:text-theme-accent-contrast text-theme-accent border border-theme-border/40 py-1 text-[11px] font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+        class="w-full bg-theme-card hover:bg-theme-accent hover:text-theme-accent-contrast text-theme-accent border border-theme-border/40 py-1.5 md:py-1 text-[11px] font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5"
       >
         <RefreshCw class="w-3 h-3" :class="{ 'animate-spin': scanStatus.isScanning }" />
         <span>{{ scanStatus.isScanning ? t('nav.scanning') : t('nav.rescan') }}</span>
+      </button>
+
+      <!-- Mobile CRT Toggle -->
+      <button
+        @click="emit('toggleCrt')"
+        class="md:hidden w-full bg-theme-bg hover:bg-theme-active-bg text-theme-success border border-theme-border-dim py-1.5 text-[11px] font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+      >
+        <span>[{{ t('footer.crt') }}: {{ props.crtMode ? 'ON' : 'OFF' }}]</span>
       </button>
     </div>
   </aside>

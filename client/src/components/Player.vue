@@ -72,36 +72,36 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <footer class="bg-theme-bg border-t-2 border-theme-border px-3 py-1.5 shrink-0 select-none z-30 font-mono text-xs">
+  <footer class="bg-theme-bg border-t-2 border-theme-border px-2 sm:px-3 py-1.5 shrink-0 select-none z-30 font-mono text-xs">
     <!-- Curses Console Top Header -->
-    <div class="flex items-center justify-between text-[10px] text-theme-text-dim pb-1 border-b border-theme-border-subtle mb-1.5">
-      <div class="flex items-center gap-2">
-        <span class="text-theme-accent font-extrabold">{{ t('player.consoleTitle') }}</span>
-        <span v-if="playerState.isPlaying" class="text-theme-success font-bold">
+    <div class="flex items-center justify-between text-[10px] text-theme-text-dim pb-1 border-b border-theme-border-subtle mb-1.5 gap-2">
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="text-theme-accent font-extrabold truncate">{{ t('player.consoleTitle') }}</span>
+        <span v-if="playerState.isPlaying" class="hidden sm:inline text-theme-success font-bold shrink-0">
           [EQ: {{ eqBars[eqFrame] }}]
         </span>
-        <span v-else class="text-theme-text-dim">{{ t('player.paused') }}</span>
+        <span v-else class="hidden sm:inline text-theme-text-dim shrink-0">{{ t('player.paused') }}</span>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 shrink-0">
         <button 
           @click="showAsciiArt = !showAsciiArt" 
           class="text-[9px] px-1 bg-theme-panel hover:bg-theme-accent hover:text-theme-accent-contrast text-theme-accent border border-theme-border-dim transition-colors cursor-pointer"
         >
           [{{ showAsciiArt ? 'COVER: PHOTO' : 'COVER: ASCII' }}]
         </button>
-        <span class="text-theme-text-dim">──┐</span>
+        <span class="hidden sm:inline text-theme-text-dim">──┐</span>
       </div>
     </div>
 
-    <!-- Main Console Grid: 3 columns -->
-    <div class="flex items-center justify-between gap-3">
+    <!-- Main Console Grid: 2-row responsive on mobile, 3-column on md+ -->
+    <div class="grid grid-cols-[1fr_auto] md:flex md:items-center md:justify-between gap-2 md:gap-3">
       <!-- LEFT: Track Metadata & Cover Thumbnail -->
-      <div class="flex items-center gap-2.5 w-1/4 min-w-[220px]">
+      <div class="col-span-1 order-1 flex items-center gap-2 md:gap-2.5 min-w-0 md:w-1/4 md:min-w-[220px]">
         <!-- Cover Art or ASCII Cassette -->
         <div 
           @click="navigateToAlbum"
-          class="w-12 h-12 bg-theme-card border border-theme-border shrink-0 overflow-hidden cursor-pointer relative"
+          class="w-10 h-10 md:w-12 md:h-12 bg-theme-card border border-theme-border shrink-0 overflow-hidden cursor-pointer relative"
         >
           <!-- ASCII Cassette Mode -->
           <div v-if="showAsciiArt" class="w-full h-full flex flex-col items-center justify-center text-[7px] text-theme-success font-bold leading-none bg-theme-panel">
@@ -143,34 +143,35 @@ onUnmounted(() => {
           v-if="playerState.currentTrack"
           type="button"
           @click="toggleFavorite('track', playerState.currentTrack.id)"
-          class="px-1 text-xs border border-theme-border-dim hover:border-theme-danger shrink-0 transition-colors cursor-pointer"
+          class="px-1.5 py-1 md:px-1 md:py-0 text-xs border border-theme-border-dim hover:border-theme-danger shrink-0 transition-colors cursor-pointer"
           :class="isFavorite('track', playerState.currentTrack.id) ? 'bg-theme-panel text-theme-danger border-theme-danger' : 'text-theme-text-dim'"
           :title="isFavorite('track', playerState.currentTrack.id) ? t('favorites.removeFromFavorites') : 'Add to favorites'"
         >
           <span>{{ isFavorite('track', playerState.currentTrack.id) ? '[★]' : '[☆]' }}</span>
         </button>
         <div v-else class="min-w-0">
-          <p class="text-[10px] text-theme-text-dim">&gt; {{ t('player.noTrack').toUpperCase() }}</p>
+          <p class="text-[10px] text-theme-text-dim truncate">&gt; {{ t('player.noTrack').toUpperCase() }}</p>
         </div>
       </div>
 
       <!-- CENTER: Controls & Dual Scrubber -->
-      <div class="flex flex-col items-center gap-1 w-2/4 max-w-xl">
-        <div class="flex items-center gap-1.5 text-xs">
+      <div class="col-span-2 order-3 md:order-2 flex flex-col items-center gap-1.5 md:gap-1 w-full md:w-2/4 md:max-w-xl">
+        <div class="flex items-center justify-center gap-1 sm:gap-1.5 text-xs w-full">
           <!-- Shuffle -->
           <button
             @click="playerActions.toggleShuffle()"
-            class="px-1.5 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer"
+            class="px-1.5 py-1 md:py-0.5 text-[10px] font-bold border transition-colors cursor-pointer"
             :class="playerState.shuffle ? 'bg-theme-highlight text-black border-theme-highlight' : 'text-theme-text-dim border-theme-border-dim hover:border-theme-accent'"
             title="Shuffle playback"
           >
-            <span>[⇄ {{ t('player.shuffle') }}]</span>
+            <span class="sm:hidden">[⇄]</span>
+            <span class="hidden sm:inline">[⇄ {{ t('player.shuffle') }}]</span>
           </button>
 
           <!-- Previous -->
           <button
             @click="playerActions.prev()"
-            class="px-2 py-0.5 text-[11px] font-bold bg-theme-panel hover:bg-theme-accent hover:text-theme-accent-contrast text-theme-accent border border-theme-border-dim transition-colors cursor-pointer"
+            class="px-2.5 sm:px-2 py-1 md:py-0.5 text-[11px] font-bold bg-theme-panel hover:bg-theme-accent hover:text-theme-accent-contrast text-theme-accent border border-theme-border-dim transition-colors cursor-pointer"
             title="Previous (P)"
           >
             <span>[&lt;&lt;]</span>
@@ -179,7 +180,7 @@ onUnmounted(() => {
           <!-- Play / Pause -->
           <button
             @click="playerActions.togglePlay()"
-            class="px-4 py-0.5 text-xs font-extrabold border-2 transition-all cursor-pointer"
+            class="px-3 sm:px-4 py-1 md:py-0.5 text-xs font-extrabold border-2 transition-all cursor-pointer"
             :class="playerState.isPlaying ? 'bg-theme-highlight text-black border-theme-highlight' : 'bg-theme-success text-black border-theme-success'"
             :title="playerState.isPlaying ? 'Pause (Space)' : 'Play (Space)'"
           >
@@ -190,7 +191,7 @@ onUnmounted(() => {
           <!-- Next -->
           <button
             @click="playerActions.next()"
-            class="px-2 py-0.5 text-[11px] font-bold bg-theme-panel hover:bg-theme-accent hover:text-theme-accent-contrast text-theme-accent border border-theme-border-dim transition-colors cursor-pointer"
+            class="px-2.5 sm:px-2 py-1 md:py-0.5 text-[11px] font-bold bg-theme-panel hover:bg-theme-accent hover:text-theme-accent-contrast text-theme-accent border border-theme-border-dim transition-colors cursor-pointer"
             title="Next (N)"
           >
             <span>[&gt;&gt;]</span>
@@ -199,21 +200,22 @@ onUnmounted(() => {
           <!-- Repeat Mode -->
           <button
             @click="playerActions.toggleRepeat()"
-            class="px-1.5 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer"
+            class="px-1.5 py-1 md:py-0.5 text-[10px] font-bold border transition-colors cursor-pointer"
             :class="playerState.repeatMode !== 'off' ? 'bg-theme-highlight text-black border-theme-highlight' : 'text-theme-text-dim border-theme-border-dim hover:border-theme-accent'"
             :title="`Repeat: ${playerState.repeatMode}`"
           >
-            <span>[↻ {{ playerState.repeatMode.toUpperCase() }}]</span>
+            <span class="sm:hidden">[↻{{ playerState.repeatMode === 'one' ? '1' : playerState.repeatMode === 'all' ? 'A' : '' }}]</span>
+            <span class="hidden sm:inline">[↻ {{ playerState.repeatMode.toUpperCase() }}]</span>
           </button>
         </div>
 
         <!-- Time & Scrubber row -->
         <div class="flex items-center gap-2 w-full">
-          <span class="text-[10px] font-bold text-theme-highlight w-10 text-right tabular-nums">
+          <span class="text-[10px] font-bold text-theme-highlight w-9 sm:w-10 text-right tabular-nums shrink-0">
             {{ formatTime(playerState.currentTime) }}
           </span>
 
-          <div class="flex-1 flex flex-col items-center">
+          <div class="flex-1 flex flex-col items-center min-w-0">
             <input
               type="range"
               min="0"
@@ -222,25 +224,25 @@ onUnmounted(() => {
               @input="handleSeek"
               class="w-full h-1.5 cursor-pointer"
             />
-            <div class="w-full flex justify-between text-[8px] text-theme-accent/70 font-mono tracking-tighter mt-0.5">
+            <div class="hidden md:flex w-full justify-between text-[8px] text-theme-accent/70 font-mono tracking-tighter mt-0.5">
               <span>[{{ asciiBar }}]</span>
               <span class="text-theme-text-dim">{{ Math.round((playerState.currentTime / (playerState.duration || 1)) * 100) }}%</span>
             </div>
           </div>
 
-          <span class="text-[10px] text-theme-text-dim w-10 text-left tabular-nums">
+          <span class="text-[10px] text-theme-text-dim w-9 sm:w-10 text-left tabular-nums shrink-0">
             {{ formatTime(playerState.duration) }}
           </span>
         </div>
       </div>
 
       <!-- RIGHT: Controls (Rate, Volume, Queue) -->
-      <div class="flex items-center justify-end gap-2 w-1/4 min-w-[220px] relative">
+      <div class="col-span-1 order-2 md:order-3 flex items-center justify-end gap-1.5 md:gap-2 md:w-1/4 md:min-w-[220px] relative">
         <!-- Playback Rate -->
         <div class="relative">
           <button
             @click.stop="isSpeedMenuOpen = !isSpeedMenuOpen"
-            class="px-1.5 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer"
+            class="px-1.5 py-1 md:py-0.5 text-[10px] font-bold border transition-colors cursor-pointer"
             :class="playerState.playbackRate !== 1.0 ? 'bg-theme-highlight text-black border-theme-highlight' : 'text-theme-text border-theme-border-dim hover:border-theme-accent'"
             title="Playback speed"
           >
@@ -271,8 +273,8 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- Volume Bar -->
-        <div class="flex items-center gap-1 border border-theme-border-dim px-1.5 py-0.5 bg-theme-bg">
+        <!-- Volume Bar (desktop only, hardware volume on mobile) -->
+        <div class="hidden md:flex items-center gap-1 border border-theme-border-dim px-1.5 py-0.5 bg-theme-bg">
           <span class="text-[9px] text-theme-accent font-bold">{{ t('player.volume') }}:</span>
           <input
             type="range"
@@ -292,7 +294,7 @@ onUnmounted(() => {
         <!-- Queue Drawer Button -->
         <button
           @click="playerState.isQueueOpen = !playerState.isQueueOpen"
-          class="px-1.5 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer"
+          class="px-1.5 py-1 md:py-0.5 text-[10px] font-bold border transition-colors cursor-pointer"
           :class="playerState.isQueueOpen ? 'bg-theme-accent text-theme-accent-contrast border-theme-accent' : 'text-theme-text border-theme-border-dim hover:border-theme-accent'"
           title="Show / Hide queue (Q)"
         >

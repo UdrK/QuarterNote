@@ -22,6 +22,7 @@ const router = useRouter();
 
 const showNewDividerDialog = ref(false);
 const editingDividerId = ref<string | null>(null);
+const movingItemState = ref<{ item: FavoriteItem; fromContainerId: string } | null>(null);
 
 // HTML5 Drag and Drop states
 const draggedItem = ref<FavoriteItem | null>(null);
@@ -150,6 +151,22 @@ async function playPlaylistItem(playlistId: string) {
   }
 }
 
+function handleMoveRequest(item: FavoriteItem, fromContainerId: string) {
+  movingItemState.value = { item, fromContainerId };
+}
+
+async function confirmMoveToContainer(targetContainerId: string) {
+  if (!movingItemState.value) return;
+  const { item, fromContainerId } = movingItemState.value;
+  movingItemState.value = null;
+  if (fromContainerId === targetContainerId) return;
+  try {
+    await moveItem(item.id, targetContainerId);
+  } catch (err) {
+    console.error('Failed to move favorite item:', err);
+  }
+}
+
 function handleNavigate(item: FavoriteItem) {
   if (item.itemType === 'artist') {
     router.push(`/artists/${item.itemId}`);
@@ -200,6 +217,7 @@ function handleNavigate(item: FavoriteItem) {
           :drag-over-container-id="dragOverContainerId"
           :dragged-item-id="draggedItem?.id"
           :editing-divider-id="editingDividerId"
+          :can-move="favoritesState.containers.length > 1"
           @dragover="handleDragOver"
           @dragenter="handleDragEnter"
           @dragleave="handleDragLeave"
@@ -215,7 +233,35 @@ function handleNavigate(item: FavoriteItem) {
           @play-track="(item) => item.track && playerActions.playTrack(item.track)"
           @play-album="playAlbumItem"
           @play-playlist="playPlaylistItem"
+          @move-request="handleMoveRequest"
         />
+      </div>
+
+      <!-- Touch-friendly Move to Category Modal -->
+      <div
+        v-if="movingItemState"
+        class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 font-mono"
+        @click.self="movingItemState = null"
+      >
+        <div class="bg-theme-panel border-2 border-theme-border w-full max-w-sm shadow-2xl overflow-hidden">
+          <div class="px-3 py-2 border-b border-theme-border-dim bg-theme-header-bg flex items-center justify-between">
+            <h3 class="text-xs font-bold text-theme-header-fg">■ [ {{ t('favorites.moveTitle') }} ]</h3>
+            <button @click="movingItemState = null" class="bbs-btn py-0.5 px-1.5 text-xs border-theme-border-dim">
+              [X]
+            </button>
+          </div>
+          <div class="p-2 space-y-1 bg-theme-surface max-h-72 overflow-y-auto">
+            <button
+              v-for="target in favoritesState.containers.filter(c => c.id !== movingItemState?.fromContainerId)"
+              :key="target.id"
+              @click="confirmMoveToContainer(target.id)"
+              class="w-full flex items-center justify-between px-3 py-2 text-xs text-theme-text border border-theme-border-subtle hover:bg-theme-active-bg hover:border-theme-accent hover:text-white transition-colors cursor-pointer"
+            >
+              <span class="font-bold uppercase truncate">&gt; {{ target.title }}</span>
+              <span class="text-[10px] text-theme-text-dim shrink-0 ml-2">[{{ target.items.length }}]</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </TuiWindow>

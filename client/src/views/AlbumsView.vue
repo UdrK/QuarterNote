@@ -67,17 +67,17 @@ async function playAlbum(album: Album) {
           &gt; Browse album covers (Hotkey: [F3] or [2])
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
           <!-- Filter search -->
-          <div class="flex items-center bg-theme-bg border border-theme-border/60 px-2 py-0.5 focus-within:border-theme-highlight">
-            <span class="text-theme-accent text-xs font-bold mr-1.5">&gt; SEARCH:</span>
+          <div class="flex items-center flex-1 min-w-0 bg-theme-bg border border-theme-border/60 px-2 py-1 sm:py-0.5 focus-within:border-theme-highlight">
+            <span class="text-theme-accent text-xs font-bold mr-1.5 shrink-0">&gt; SEARCH:</span>
             <input
               v-model="filterText"
               type="text"
               placeholder="Filter title/artist..."
-              class="bg-transparent text-xs text-theme-highlight placeholder-theme-text-dim/60 focus:outline-none w-36 sm:w-44 font-mono"
+              class="bg-transparent text-xs text-theme-highlight placeholder-theme-text-dim/60 focus:outline-none w-full min-w-0 sm:w-44 font-mono"
             />
-            <button v-if="filterText" @click="filterText = ''" class="text-theme-text-dim hover:text-theme-danger text-xs cursor-pointer">
+            <button v-if="filterText" @click="filterText = ''" class="text-theme-text-dim hover:text-theme-danger text-xs shrink-0 cursor-pointer">
               [X]
             </button>
           </div>
@@ -85,7 +85,7 @@ async function playAlbum(album: Album) {
           <!-- Sort selector -->
           <select
             v-model="sortBy"
-            class="bg-theme-bg border border-theme-border/60 text-xs text-theme-highlight px-2 py-0.5 focus:outline-none focus:border-theme-accent cursor-pointer font-mono"
+            class="bg-theme-bg border border-theme-border/60 text-xs text-theme-highlight px-2 py-1 sm:py-0.5 focus:outline-none focus:border-theme-accent cursor-pointer font-mono shrink-0"
           >
             <option value="title">[SORT: TITLE]</option>
             <option value="artist">[SORT: ARTIST]</option>
@@ -121,11 +121,11 @@ async function playAlbum(album: Album) {
             <button
               type="button"
               @click.stop="toggleFavorite('album', album.id)"
-              class="absolute top-1 right-1 text-xs font-bold z-10 transition-colors cursor-pointer"
+              class="absolute top-1 right-1 text-xs font-bold z-10 transition-colors cursor-pointer bg-theme-bg/85 md:bg-transparent px-0.5 md:px-0"
               :class="[
                 isFavorite('album', album.id)
                   ? 'text-theme-danger'
-                  : 'text-theme-border-dim hover:text-theme-danger opacity-0 group-hover:opacity-100'
+                  : 'text-theme-text hover:text-theme-danger opacity-95 md:opacity-0 md:group-hover:opacity-100'
               ]"
               :title="isFavorite('album', album.id) ? t('favorites.removeFromFavorites') : 'Add to favorites'"
             >
@@ -135,7 +135,7 @@ async function playAlbum(album: Album) {
             <!-- Quick Play Button -->
             <button
               @click.stop="playAlbum(album)"
-              class="absolute bottom-1 right-1 bg-theme-highlight text-black font-extrabold px-1.5 py-0.5 text-[9px] opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+              class="absolute bottom-1 right-1 bg-theme-highlight text-black font-extrabold px-1.5 py-0.5 text-[9px] opacity-95 md:opacity-0 md:group-hover:opacity-100 transition-opacity cursor-pointer"
               :title="t('favorites.playAlbum')"
             >
               <span>[▶ PLAY]</span>

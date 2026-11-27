@@ -53,15 +53,15 @@ async function handleToggleFavorite(e: Event, artistId: string) {
           &gt; Select an artist to browse their discography (Hotkey: [F2] or [1])
         </div>
 
-        <div class="flex items-center bg-theme-bg border border-theme-border/60 px-2 py-0.5 focus-within:border-theme-highlight">
-          <span class="text-theme-accent text-xs font-bold mr-1.5">&gt; FILTER:</span>
+        <div class="flex items-center bg-theme-bg border border-theme-border/60 px-2 py-1 sm:py-0.5 focus-within:border-theme-highlight">
+          <span class="text-theme-accent text-xs font-bold mr-1.5 shrink-0">&gt; FILTER:</span>
           <input
             v-model="filterText"
             type="text"
             placeholder="Artist name..."
-            class="bg-transparent text-xs text-theme-highlight placeholder-theme-text-dim/60 focus:outline-none w-36 sm:w-48 font-mono"
+            class="bg-transparent text-xs text-theme-highlight placeholder-theme-text-dim/60 focus:outline-none w-full min-w-0 sm:w-48 font-mono"
           />
-          <button v-if="filterText" @click="filterText = ''" class="text-theme-text-dim hover:text-theme-danger text-xs cursor-pointer">
+          <button v-if="filterText" @click="filterText = ''" class="text-theme-text-dim hover:text-theme-danger text-xs shrink-0 cursor-pointer">
             [X]
           </button>
         </div>
@@ -85,11 +85,11 @@ async function handleToggleFavorite(e: Event, artistId: string) {
           <button
             type="button"
             @click="handleToggleFavorite($event, artist.id)"
-            class="absolute top-1.5 right-1.5 text-xs font-bold z-10 transition-colors cursor-pointer"
+            class="absolute top-1.5 right-1.5 text-xs font-bold z-10 transition-colors cursor-pointer bg-theme-panel/85 md:bg-transparent px-0.5 md:px-0"
             :class="[
               isFavorite('artist', artist.id)
                 ? 'text-theme-danger'
-                : 'text-theme-border-dim hover:text-theme-danger opacity-0 group-hover:opacity-100'
+                : 'text-theme-text hover:text-theme-danger opacity-95 md:opacity-0 md:group-hover:opacity-100'
             ]"
             :title="isFavorite('artist', artist.id) ? t('favorites.removeFromFavorites') : 'Add to favorites'"
           >

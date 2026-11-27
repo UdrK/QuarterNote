@@ -65,9 +65,9 @@ const totalResults = computed(() =>
 
       <!-- Artists Results -->
       <div v-if="results.artists.length > 0" class="space-y-2">
-        <div class="border-b border-theme-border-subtle pb-1 flex items-center justify-between text-xs font-bold text-theme-accent">
-          <span>┌──[ {{ t('search.artists') }} ]────────────────────</span>
-          <span class="text-theme-highlight">({{ results.artists.length }})─┐</span>
+        <div class="border-b border-theme-border-subtle pb-1 flex items-center justify-between gap-2 text-xs font-bold text-theme-accent">
+          <span class="truncate">┌──[ {{ t('search.artists') }} ]────────────────────</span>
+          <span class="text-theme-highlight shrink-0">({{ results.artists.length }})─┐</span>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2">
           <div
@@ -91,9 +91,9 @@ const totalResults = computed(() =>
 
       <!-- Albums Results -->
       <div v-if="results.albums.length > 0" class="space-y-2">
-        <div class="border-b border-theme-border-subtle pb-1 flex items-center justify-between text-xs font-bold text-theme-highlight">
-          <span>┌──[ {{ t('search.albums') }} ]──────────────────────</span>
-          <span class="text-theme-highlight">({{ results.albums.length }})─┐</span>
+        <div class="border-b border-theme-border-subtle pb-1 flex items-center justify-between gap-2 text-xs font-bold text-theme-highlight">
+          <span class="truncate">┌──[ {{ t('search.albums') }} ]──────────────────────</span>
+          <span class="text-theme-highlight shrink-0">({{ results.albums.length }})─┐</span>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2">
           <div
@@ -115,9 +115,9 @@ const totalResults = computed(() =>
 
       <!-- Tracks Results -->
       <div v-if="results.tracks.length > 0" class="space-y-2">
-        <div class="border-b border-theme-border-subtle pb-1 flex items-center justify-between text-xs font-bold text-theme-success">
-          <span>┌──[ {{ t('search.tracks') }} ]─────────────────────</span>
-          <span class="text-theme-highlight">({{ results.tracks.length }})─┐</span>
+        <div class="border-b border-theme-border-subtle pb-1 flex items-center justify-between gap-2 text-xs font-bold text-theme-success">
+          <span class="truncate">┌──[ {{ t('search.tracks') }} ]─────────────────────</span>
+          <span class="text-theme-highlight shrink-0">({{ results.tracks.length }})─┐</span>
         </div>
         <div class="border border-theme-border-dim bg-theme-panel">
           <TrackRow
