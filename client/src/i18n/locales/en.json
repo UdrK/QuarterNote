@@ -136,5 +136,12 @@
     "globalKeys": "GLOBAL CONTROLS",
     "navigation": "NAVIGATION",
     "player": "AUDIO ENGINE"
+  },
+  "track": {
+    "moreActions": "Track actions",
+    "actionsTitle": "TRACK ACTIONS",
+    "playNext": "Play next",
+    "addToQueue": "Add to queue",
+    "addToPlaylist": "Add to playlist"
   }
 }

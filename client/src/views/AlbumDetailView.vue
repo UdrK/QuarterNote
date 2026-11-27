@@ -68,7 +68,7 @@ function playShuffled() {
           <img :src="album.coverUrl" :alt="album.title" class="w-full h-full object-cover" />
         </div>
 
-        <div class="space-y-1.5 min-w-0 flex-1 text-center sm:text-left">
+        <div class="space-y-1.5 w-full min-w-0 flex-1 text-center sm:text-left">
           <div class="text-[10px] text-theme-accent font-bold">
             ┌──[ ALBUM DETAILS ]
           </div>

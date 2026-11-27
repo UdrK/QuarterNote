@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { playerState, playerActions, formatTime } from '../stores/player';
 import { isFavorite, toggleFavorite } from '../stores/favorites';
+import { t } from '../i18n';
 import AddToPlaylistModal from './AddToPlaylistModal.vue';
 import type { Track } from '@quarter-note/shared';
 
@@ -13,9 +14,25 @@ const props = defineProps<{
 }>();
 
 const showPlaylistModal = ref(false);
+const showMobileActions = ref(false);
 
 function play() {
   playerActions.playTrack(props.track, props.playlistContext);
+}
+
+function handleMobilePlayNext() {
+  playerActions.playNext(props.track);
+  showMobileActions.value = false;
+}
+
+function handleMobileAddToQueue() {
+  playerActions.addToQueue(props.track);
+  showMobileActions.value = false;
+}
+
+function handleMobileAddToPlaylist() {
+  showMobileActions.value = false;
+  showPlaylistModal.value = true;
 }
 </script>
 
@@ -66,12 +83,12 @@ function play() {
     </div>
 
     <!-- Right: Duration & Quick Actions in TUI bracket format -->
-    <div class="flex items-center gap-1 sm:gap-1.5 shrink-0 ml-1.5 sm:ml-2">
-      <!-- Action buttons (always visible on mobile touch, hover on desktop) -->
-      <div class="opacity-100 md:opacity-0 md:group-hover:opacity-100 flex items-center gap-1 transition-opacity">
+    <div class="flex items-center gap-1.5 shrink-0 ml-1.5 sm:ml-2">
+      <!-- Desktop Action buttons (visible on hover) -->
+      <div class="hidden md:flex opacity-0 group-hover:opacity-100 items-center gap-1 transition-opacity">
         <button
           @click.stop="playerActions.playNext(track)"
-          class="px-1 py-0.5 md:py-0 text-[10px] font-bold border transition-colors cursor-pointer"
+          class="px-1 text-[10px] font-bold border transition-colors cursor-pointer"
           :class="playerState.currentTrack?.id === track.id 
             ? 'bg-theme-bg text-theme-accent border-theme-bg hover:bg-theme-accent hover:text-theme-accent-contrast' 
             : 'bg-theme-panel text-theme-accent border-theme-border-dim hover:bg-theme-accent hover:text-theme-accent-contrast'"
@@ -81,7 +98,7 @@ function play() {
         </button>
         <button
           @click.stop="playerActions.addToQueue(track)"
-          class="px-1 py-0.5 md:py-0 text-[10px] font-bold border transition-colors cursor-pointer"
+          class="px-1 text-[10px] font-bold border transition-colors cursor-pointer"
           :class="playerState.currentTrack?.id === track.id 
             ? 'bg-theme-bg text-theme-accent border-theme-bg hover:bg-theme-accent hover:text-theme-accent-contrast' 
             : 'bg-theme-panel text-theme-accent border-theme-border-dim hover:bg-theme-accent hover:text-theme-accent-contrast'"
@@ -91,7 +108,7 @@ function play() {
         </button>
         <button
           @click.stop="showPlaylistModal = true"
-          class="px-1 py-0.5 md:py-0 text-[10px] font-bold border transition-colors cursor-pointer"
+          class="px-1 text-[10px] font-bold border transition-colors cursor-pointer"
           :class="playerState.currentTrack?.id === track.id 
             ? 'bg-theme-bg text-theme-accent border-theme-bg hover:bg-theme-accent hover:text-theme-accent-contrast' 
             : 'bg-theme-panel text-theme-accent border-theme-border-dim hover:bg-theme-accent hover:text-theme-accent-contrast'"
@@ -122,6 +139,72 @@ function play() {
       >
         {{ formatTime(track.duration) }}
       </span>
+
+      <!-- Mobile compact context menu trigger -->
+      <button
+        type="button"
+        @click.stop="showMobileActions = true"
+        class="md:hidden px-1.5 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer"
+        :class="playerState.currentTrack?.id === track.id
+          ? 'bg-theme-bg text-theme-accent border-theme-bg'
+          : 'bg-theme-panel text-theme-accent border-theme-border-dim hover:border-theme-accent'"
+        :aria-label="t('track.moreActions')"
+        :title="t('track.moreActions')"
+      >
+        [...]
+      </button>
+    </div>
+
+    <!-- Mobile Track Actions Modal -->
+    <div
+      v-if="showMobileActions"
+      class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 font-mono font-normal text-theme-text md:hidden"
+      @click.self.stop="showMobileActions = false"
+    >
+      <div class="bg-theme-panel border-2 border-theme-border w-full max-w-xs shadow-2xl overflow-hidden select-none">
+        <div class="px-3 py-2 border-b border-theme-border-dim bg-theme-header-bg flex items-center justify-between gap-2">
+          <div class="min-w-0">
+            <h3 class="text-xs font-bold text-theme-header-fg">■ [ {{ t('track.actionsTitle') }} ]</h3>
+            <p class="text-[10px] text-theme-header-fg opacity-80 truncate">&gt; {{ track.title }}</p>
+          </div>
+          <button
+            type="button"
+            @click.stop="showMobileActions = false"
+            class="bbs-btn py-0.5 px-1.5 text-xs border-theme-border-dim shrink-0"
+          >
+            [X]
+          </button>
+        </div>
+
+        <div class="p-2 space-y-1.5 bg-theme-surface">
+          <button
+            type="button"
+            @click.stop="handleMobilePlayNext"
+            class="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-theme-text border border-theme-border-subtle bg-theme-panel hover:bg-theme-active-bg hover:border-theme-accent transition-colors cursor-pointer"
+          >
+            <span class="text-theme-accent font-bold shrink-0">[↳]</span>
+            <span class="font-bold">{{ t('track.playNext') }}</span>
+          </button>
+
+          <button
+            type="button"
+            @click.stop="handleMobileAddToQueue"
+            class="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-theme-text border border-theme-border-subtle bg-theme-panel hover:bg-theme-active-bg hover:border-theme-accent transition-colors cursor-pointer"
+          >
+            <span class="text-theme-accent font-bold shrink-0">[+C]</span>
+            <span class="font-bold">{{ t('track.addToQueue') }}</span>
+          </button>
+
+          <button
+            type="button"
+            @click.stop="handleMobileAddToPlaylist"
+            class="w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-theme-text border border-theme-border-subtle bg-theme-panel hover:bg-theme-active-bg hover:border-theme-accent transition-colors cursor-pointer"
+          >
+            <span class="text-theme-accent font-bold shrink-0">[+L]</span>
+            <span class="font-bold">{{ t('track.addToPlaylist') }}</span>
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Modal -->

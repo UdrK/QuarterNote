@@ -155,7 +155,7 @@ async function handleFileSelected(event: Event) {
           </button>
         </div>
 
-        <div class="space-y-1.5 min-w-0 flex-1 text-center sm:text-left">
+        <div class="space-y-1.5 w-full min-w-0 flex-1 text-center sm:text-left">
           <div class="text-[10px] text-theme-accent font-bold">
             ┌──[ ARTIST DETAILS ]
           </div>
