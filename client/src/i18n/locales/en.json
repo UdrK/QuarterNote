@@ -72,6 +72,11 @@
     "moveTo": "Move to category",
     "moveTitle": "MOVE TO CATEGORY",
     "moveBtn": "[⇄]",
+    "addToTitle": "ADD TO FAVORITES",
+    "newCategoryPlaceholder": "New category name...",
+    "createBtn": "[+ CREATE]",
+    "added": "[✓ ADDED]",
+    "noCategories": "No categories created.",
     "removeFromFavorites": "Remove from favorites",
     "playAlbum": "Play album",
     "playPlaylist": "Play playlist"

@@ -10,6 +10,96 @@ export function formatTime(seconds: number): string {
 
 const audio = new Audio();
 
+// Web Audio API analyser (lazy singleton, desktop-only to preserve mobile background playback)
+// All chars from Unicode Block Elements (U+2581..U+2588) for strictly identical glyph width
+const EQ_CHARS = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
+let audioCtx: AudioContext | null = null;
+let analyser: AnalyserNode | null = null;
+let freqData: Uint8Array<ArrayBuffer> | null = null;
+let analyserFailed = false;
+
+function shouldEnableAnalyser(): boolean {
+  if (typeof window === 'undefined') return false;
+  const isNarrow = window.matchMedia('(max-width: 639px)').matches;
+  const isCoarse = window.matchMedia('(pointer: coarse)').matches;
+  return !isNarrow && !isCoarse;
+}
+
+function ensureAnalyser(): void {
+  if (analyser || analyserFailed || !shouldEnableAnalyser()) return;
+  try {
+    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (!AudioCtx) {
+      analyserFailed = true;
+      return;
+    }
+    audioCtx = new AudioCtx();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    analyser.minDecibels = -75;
+    analyser.maxDecibels = -12;
+    analyser.smoothingTimeConstant = 0.55;
+
+    const source = audioCtx.createMediaElementSource(audio);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+    freqData = new Uint8Array(analyser.frequencyBinCount);
+  } catch (err) {
+    console.warn('Web Audio analyser unavailable, using fallback EQ:', err);
+    analyserFailed = true;
+    analyser = null;
+    audioCtx = null;
+    freqData = null;
+  }
+}
+
+function resumeAudioContext(): void {
+  ensureAnalyser();
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume().catch(() => {});
+  }
+}
+
+// 12 logarithmic frequency bands for fftSize = 256 (~172 Hz/bin at 44.1 kHz)
+const EQ_BANDS: [number, number][] = [
+  [0, 1],
+  [1, 2],
+  [2, 3],
+  [3, 5],
+  [5, 7],
+  [7, 10],
+  [10, 14],
+  [14, 20],
+  [20, 28],
+  [28, 40],
+  [40, 56],
+  [56, 78],
+];
+
+/**
+ * Returns a fixed-width 12-char real-time ASCII spectrum string from the Web Audio
+ * AnalyserNode, or null when unavailable (allowing fallback to animated bars).
+ */
+export function getEqSpectrumString(): string | null {
+  if (!analyser || !freqData || !audioCtx || audioCtx.state !== 'running') {
+    return null;
+  }
+  analyser.getByteFrequencyData(freqData);
+  let out = '';
+  for (const [start, end] of EQ_BANDS) {
+    let sum = 0;
+    const limit = Math.min(end, freqData.length);
+    const count = Math.max(1, limit - start);
+    for (let b = start; b < limit; b++) {
+      sum += freqData[b];
+    }
+    const normalized = Math.pow(sum / count / 255, 1.35);
+    const level = Math.min(EQ_CHARS.length - 1, Math.floor(normalized * EQ_CHARS.length));
+    out += EQ_CHARS[level];
+  }
+  return out;
+}
+
 const savedVolume = parseFloat(localStorage.getItem('qn_volume') || '0.8');
 const savedRate = parseFloat(localStorage.getItem('qn_rate') || '1.0') as PlaybackRate;
 const savedRepeat = (localStorage.getItem('qn_repeat') || 'off') as RepeatMode;
@@ -95,6 +185,7 @@ export const playerActions = {
     playerState.isLoading = true;
     audio.src = `/api/stream/${track.id}`;
     audio.playbackRate = playerState.playbackRate;
+    resumeAudioContext();
     audio.play().catch(err => {
       console.warn('Autoplay prevented or failed:', err);
       playerState.isLoading = false;
@@ -109,6 +200,7 @@ export const playerActions = {
     if (playerState.isPlaying) {
       audio.pause();
     } else {
+      resumeAudioContext();
       audio.play().catch(console.error);
     }
   },

@@ -72,6 +72,11 @@
     "moveTo": "Sposta in categoria",
     "moveTitle": "SPOSTA IN CATEGORIA",
     "moveBtn": "[⇄]",
+    "addToTitle": "AGGIUNGI AI PREFERITI",
+    "newCategoryPlaceholder": "Nome nuova categoria...",
+    "createBtn": "[+ CREA]",
+    "added": "[✓ AGGIUNTO]",
+    "noCategories": "Nessuna categoria creata.",
     "removeFromFavorites": "Rimuovi dai preferiti",
     "playAlbum": "Riproduci album",
     "playPlaylist": "Riproduci playlist"

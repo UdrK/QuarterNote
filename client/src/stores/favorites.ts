@@ -17,6 +17,7 @@ export const favoritesState = reactive({
   favoriteAlbumIds: new Set<string>(),
   favoriteTrackIds: new Set<string>(),
   favoritePlaylistIds: new Set<string>(),
+  pendingAdd: null as { type: FavoriteItemType; id: string } | null,
   isLoading: false,
   isInitialized: false,
 });
@@ -83,6 +84,16 @@ export async function toggleFavorite(
 ): Promise<boolean> {
   // Determine optimistic state
   const currentlyFavorited = isFavorite(type, id);
+
+  // When adding without an explicit category, open the category picker modal
+  if (!currentlyFavorited && !containerId) {
+    favoritesState.pendingAdd = { type, id };
+    if (favoritesState.containers.length === 0 && !favoritesState.isLoading) {
+      void loadFavorites();
+    }
+    return false;
+  }
+
   const targetSet =
     type === 'artist'
       ? favoritesState.favoriteArtistIds
@@ -131,9 +142,10 @@ export async function toggleFavorite(
   }
 }
 
-export async function createDivider(title: string): Promise<void> {
+export async function createDivider(title: string): Promise<FavoriteContainer> {
   const container = await createContainerApi(title);
   favoritesState.containers.push(container);
+  return container;
 }
 
 export async function renameDivider(id: string, newTitle: string): Promise<void> {

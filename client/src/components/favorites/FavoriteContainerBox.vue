@@ -98,8 +98,8 @@ function handleSaveRename() {
             ╔═[ {{ container.title }} ]═╗
           </span>
 
-          <!-- Action Buttons (always visible on mobile, hover on desktop) -->
-          <div class="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover/divider:opacity-100 transition-opacity ml-1">
+          <!-- Action Buttons -->
+          <div class="flex items-center gap-1 ml-1">
             <button
               @click="handleStartRename"
               title="Rename category"

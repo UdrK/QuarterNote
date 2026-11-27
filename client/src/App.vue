@@ -7,7 +7,8 @@ import Player from './components/Player.vue';
 import QueueDrawer from './components/QueueDrawer.vue';
 import TuiFooterBar from './components/TuiFooterBar.vue';
 import TuiHelpModal from './components/TuiHelpModal.vue';
-import { initFavorites } from './stores/favorites';
+import AddToFavoriteModal from './components/AddToFavoriteModal.vue';
+import { favoritesState, initFavorites } from './stores/favorites';
 import { playerActions, playerState } from './stores/player';
 
 const router = useRouter();
@@ -44,6 +45,10 @@ function handleGlobalKeydown(e: KeyboardEvent) {
 
   // ESC: close modals or blur input
   if (e.key === 'Escape') {
+    if (favoritesState.pendingAdd) {
+      favoritesState.pendingAdd = null;
+      return;
+    }
     if (showHelpModal.value) {
       showHelpModal.value = false;
       return;
@@ -160,5 +165,8 @@ function handleGlobalKeydown(e: KeyboardEvent) {
       v-if="showHelpModal" 
       @close="showHelpModal = false" 
     />
+
+    <!-- Global Favorite Category Picker Modal -->
+    <AddToFavoriteModal />
   </div>
 </template>

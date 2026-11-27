@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { Disc3 } from '@lucide/vue';
-import { playerState, playerActions, formatTime } from '../stores/player';
+import { playerState, playerActions, formatTime, getEqSpectrumString } from '../stores/player';
 import { isFavorite, toggleFavorite } from '../stores/favorites';
 import type { PlaybackRate } from '@quarter-note/shared';
 import { t } from '../i18n';
@@ -44,30 +44,72 @@ const asciiBar = computed(() => {
   return '█'.repeat(filled) + '░'.repeat(empty);
 });
 
-// Animated ASCII spectrum visualizer bars when playing
-const eqFrame = ref(0);
-let eqTimer: ReturnType<typeof setInterval> | null = null;
-
+// Real-time ASCII spectrum visualizer (Web Audio AnalyserNode with fallback)
 const eqBars = [
-  ' ▂▃▅▆▇█▇▆▅▃▂ ',
-  '▂▃▅▆▇█▇▆▅▃▂  ',
-  '▃▅▆▇█▇▆▅▃▂ ▂',
-  '▅▆▇█▇▆▅▃▂ ▂▃',
-  '▆▇█▇▆▅▃▂ ▂▃▅',
-  '▇█▇▆▅▃▂ ▂▃▅▆',
-  '█▇▆▅▃▂ ▂▃▅▆▇',
+  '▁▂▃▅▆▇█▇▆▅▃▂',
+  '▂▃▅▆▇█▇▆▅▃▂▁',
+  '▃▅▆▇█▇▆▅▃▂▁▂',
+  '▅▆▇█▇▆▅▃▂▁▂▃',
+  '▆▇█▇▆▅▃▂▁▂▃▅',
+  '▇█▇▆▅▃▂▁▂▃▅▆',
+  '█▇▆▅▃▂▁▂▃▅▆▇',
 ];
 
-onMounted(() => {
-  eqTimer = setInterval(() => {
-    if (playerState.isPlaying) {
-      eqFrame.value = (eqFrame.value + 1) % eqBars.length;
+const eqFrame = ref(0);
+const eqDisplay = ref(eqBars[0]);
+const BAR_LEVELS: Record<string, number> = {
+  '▁': 14,
+  '▂': 26,
+  '▃': 38,
+  '▄': 50,
+  '▅': 63,
+  '▆': 75,
+  '▇': 88,
+  '█': 100,
+};
+let rafId: number | null = null;
+let lastUpdate = 0;
+
+function tickEq(now: number) {
+  if (!playerState.isPlaying) {
+    rafId = null;
+    return;
+  }
+
+  const live = getEqSpectrumString();
+  if (live !== null) {
+    if (now - lastUpdate >= 45) {
+      eqDisplay.value = live;
+      lastUpdate = now;
     }
-  }, 140);
-});
+  } else if (now - lastUpdate >= 140) {
+    eqFrame.value = (eqFrame.value + 1) % eqBars.length;
+    eqDisplay.value = eqBars[eqFrame.value];
+    lastUpdate = now;
+  }
+
+  rafId = requestAnimationFrame(tickEq);
+}
+
+watch(
+  () => playerState.isPlaying,
+  (playing) => {
+    if (playing && rafId === null) {
+      lastUpdate = 0;
+      rafId = requestAnimationFrame(tickEq);
+    } else if (!playing && rafId !== null) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+  },
+  { immediate: true }
+);
 
 onUnmounted(() => {
-  if (eqTimer) clearInterval(eqTimer);
+  if (rafId !== null) {
+    cancelAnimationFrame(rafId);
+    rafId = null;
+  }
 });
 </script>
 
@@ -77,8 +119,17 @@ onUnmounted(() => {
     <div class="flex items-center justify-between text-[10px] text-theme-text-dim pb-1 border-b border-theme-border-subtle mb-1.5 gap-2">
       <div class="flex items-center gap-2 min-w-0">
         <span class="text-theme-accent font-extrabold truncate">{{ t('player.consoleTitle') }}</span>
-        <span v-if="playerState.isPlaying" class="hidden sm:inline text-theme-success font-bold shrink-0">
-          [EQ: {{ eqBars[eqFrame] }}]
+        <span v-if="playerState.isPlaying" class="hidden sm:inline-flex items-center gap-1 text-theme-success font-bold shrink-0">
+          <span>[EQ:</span>
+          <span class="inline-flex items-end h-[10px]" aria-hidden="true">
+            <span
+              v-for="(ch, i) in eqDisplay"
+              :key="i"
+              class="w-[4px] bg-current transition-[height] duration-75"
+              :style="{ height: `${BAR_LEVELS[ch] ?? 14}%` }"
+            />
+          </span>
+          <span>]</span>
         </span>
         <span v-else class="hidden sm:inline text-theme-text-dim shrink-0">{{ t('player.paused') }}</span>
       </div>
